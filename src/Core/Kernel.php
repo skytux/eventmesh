@@ -12,6 +12,7 @@ use EventMesh\Admin\SourcesPage;
 use EventMesh\Admin\View;
 use EventMesh\Content\EventPostType;
 use EventMesh\Content\PerformerTaxonomy;
+use EventMesh\Services\ArtistMap;
 use EventMesh\Services\ConnectorManager;
 use EventMesh\Services\EventMediaEnricher;
 use EventMesh\Sync\EventSynchronizer;
@@ -73,6 +74,11 @@ final class Kernel
         $this->container->singleton(
             EventPostType::class,
             fn () => new EventPostType()
+        );
+
+        $this->container->singleton(
+            ArtistMap::class,
+            fn () => new ArtistMap()
         );
 
         $this->container->singleton(
