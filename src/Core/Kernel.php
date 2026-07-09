@@ -11,6 +11,7 @@ use EventMesh\Admin\SettingsPage;
 use EventMesh\Admin\SourcesPage;
 use EventMesh\Admin\View;
 use EventMesh\Content\EventPostType;
+use EventMesh\Content\PerformerTaxonomy;
 use EventMesh\Services\ConnectorManager;
 use EventMesh\Sync\EventSynchronizer;
 use EventMesh\Support\Logger;
@@ -33,6 +34,9 @@ final class Kernel
 
         $eventPostType = $this->container->get(EventPostType::class);
         $eventPostType->boot();
+
+        $performerTaxonomy = $this->container->get(PerformerTaxonomy::class);
+        $performerTaxonomy->boot();
 
         do_action(
             'eventmesh/register_connectors',
@@ -75,6 +79,11 @@ final class Kernel
             fn (Container $container) => new EventSynchronizer(
                 $container->get(Logger::class)
             )
+        );
+
+        $this->container->singleton(
+            PerformerTaxonomy::class,
+            fn () => new PerformerTaxonomy()
         );
 
         $this->container->singleton(
