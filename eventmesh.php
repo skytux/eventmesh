@@ -25,4 +25,6 @@ require EVENTMESH_PLUGIN_DIR . 'src/Support/Autoloader.php';
 
 EventMesh\Support\Autoloader::register();
 
+require EVENTMESH_PLUGIN_DIR . 'src/Connectors/Holvi/register.php';
+
 EventMesh\Core\Plugin::boot();
