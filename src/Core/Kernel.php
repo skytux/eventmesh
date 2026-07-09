@@ -126,7 +126,8 @@ final class Kernel
         $this->container->singleton(
             DiagnosticsPage::class,
             fn (Container $container) => new DiagnosticsPage(
-                $container->get(View::class)
+                $container->get(View::class),
+                $container->get(Logger::class)
             )
         );
 
