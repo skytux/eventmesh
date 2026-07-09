@@ -15,6 +15,7 @@ use EventMesh\Content\PerformerTaxonomy;
 use EventMesh\Services\ArtistMap;
 use EventMesh\Services\ConnectorManager;
 use EventMesh\Services\EventMediaEnricher;
+use EventMesh\Services\ProviderEnricher;
 use EventMesh\Sync\EventSynchronizer;
 use EventMesh\Support\Logger;
 
@@ -89,10 +90,19 @@ final class Kernel
         );
 
         $this->container->singleton(
+            ProviderEnricher::class,
+            fn (Container $container) => new ProviderEnricher(
+                $container->get(ArtistMap::class),
+                $container->get(Logger::class)
+            )
+        );
+
+        $this->container->singleton(
             EventSynchronizer::class,
             fn (Container $container) => new EventSynchronizer(
                 $container->get(Logger::class),
-                $container->get(EventMediaEnricher::class)
+                $container->get(EventMediaEnricher::class),
+                $container->get(ProviderEnricher::class)
             )
         );
 
