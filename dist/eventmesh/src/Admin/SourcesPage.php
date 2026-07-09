@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace EventMesh\Admin;
 
-use EventMesh\Content\EventPostType;
 use EventMesh\Services\ConnectorManager;
 
-final class DashboardPage
+final class SourcesPage
 {
     public function __construct(
         private readonly View $view,
@@ -18,12 +17,9 @@ final class DashboardPage
     public function render(): void
     {
         $this->view->render(
-            'dashboard',
+            'sources',
             [
-                'connector_count' => $this->connectors->count(),
-                'event_count' => wp_count_posts(EventPostType::NAME)->publish ?? 0,
-                'kernel_status' => __('Running', 'eventmesh'),
-                'version' => EVENTMESH_VERSION,
+                'source_rows' => $this->connectors->sourceRows(),
             ]
         );
     }
