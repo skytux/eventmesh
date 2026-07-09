@@ -150,7 +150,10 @@ final class HolviHtmlParser
         $nodes = $xpath->query(
             '//*[contains(concat(" ", normalize-space(@class), " "), " event ")' .
             ' or contains(concat(" ", normalize-space(@class), " "), " product ")' .
-            ' or @data-event-id]'
+            ' or contains(concat(" ", normalize-space(@class), " "), " store-item ")' .
+            ' or @data-event-id' .
+            ' or @itemtype="http://schema.org/Product"' .
+            ' or @itemtype="https://schema.org/Product"]'
         );
 
         if (false === $nodes) {
@@ -180,8 +183,9 @@ final class HolviHtmlParser
         $title = $this->firstText(
             $xpath,
             $element,
-            './/*[self::h1 or self::h2 or self::h3 or self::h4]' .
-            '|.//*[@itemprop="name"]'
+            './/*[@itemprop="name"]' .
+            '|.//*[contains(concat(" ", normalize-space(@class), " "), " store-item-name ")]' .
+            '|.//*[self::h1 or self::h2 or self::h3 or self::h4]'
         );
 
         if ('' === $title) {
@@ -192,10 +196,7 @@ final class HolviHtmlParser
             $this->firstAttribute($xpath, $element, './/a[@href]', 'href'),
             $sourceUrl
         );
-        $imageUrl = $this->absoluteUrl(
-            $this->firstAttribute($xpath, $element, './/img[@src]', 'src'),
-            $sourceUrl
-        );
+        $imageUrl = $this->imageUrlFromElement($xpath, $element, $sourceUrl);
         $dateText = $this->firstAttribute($xpath, $element, './/time[@datetime]', 'datetime');
 
         if ('' === $dateText) {
@@ -209,10 +210,57 @@ final class HolviHtmlParser
             $this->dateValue($dateText),
             null,
             $url,
-            $this->firstText($xpath, $element, './/*[@itemprop="description"]|.//p'),
+            $this->firstText(
+                $xpath,
+                $element,
+                './/*[@itemprop="description"]' .
+                '|.//*[contains(concat(" ", normalize-space(@class), " "), " store-item-description ")]'
+            ),
             $imageUrl,
             $this->firstText($xpath, $element, './/*[@itemprop="location"]')
         );
+    }
+
+    private function imageUrlFromElement(DOMXPath $xpath, DOMNode $context, string $sourceUrl): string
+    {
+        $imageNode = $this->firstElement($xpath, $context, './/*[@itemprop="image"]|.//img[@src]');
+
+        if (! $imageNode instanceof DOMElement) {
+            return '';
+        }
+
+        $imageUrl = trim($imageNode->getAttribute('content'));
+
+        if ('' === $imageUrl) {
+            $imageUrl = trim($imageNode->getAttribute('src'));
+        }
+
+        if ('' === $imageUrl) {
+            $imageUrl = trim($imageNode->getAttribute('style'));
+
+            if ('' !== $imageUrl) {
+                preg_match('/url\(([^)]+)\)/i', $imageUrl, $matches);
+
+                if (isset($matches[1])) {
+                    $imageUrl = trim($matches[1], " \t\n\r\0\x0B'\"");
+                }
+            }
+        }
+
+        return $this->absoluteUrl($imageUrl, $sourceUrl);
+    }
+
+    private function firstElement(DOMXPath $xpath, DOMNode $context, string $query): ?DOMElement
+    {
+        $nodes = $xpath->query($query, $context);
+
+        if (false === $nodes || 0 === $nodes->length) {
+            return null;
+        }
+
+        $node = $nodes->item(0);
+
+        return $node instanceof DOMElement ? $node : null;
     }
 
     private function firstText(
