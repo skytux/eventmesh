@@ -11,6 +11,8 @@ final class EventPostType
     public function boot(): void
     {
         add_action('init', [$this, 'register']);
+        add_action('add_meta_boxes', [$this, 'registerMetaBox']);
+        add_action('save_post_' . self::NAME, [$this, 'saveMetaBox'], 10, 2);
     }
 
     public function register(): void
@@ -57,6 +59,45 @@ final class EventPostType
         );
 
         $this->registerMeta();
+    }
+
+    public function registerMetaBox(): void
+    {
+        add_meta_box(
+            'eventmesh_event_details',
+            __('EventMesh details', 'eventmesh'),
+            [$this, 'renderMetaBox'],
+            self::NAME,
+            'side',
+            'default'
+        );
+    }
+
+    public function renderMetaBox(
+        \WP_Post $post
+    ): void {
+        $sourceId = get_post_meta($post->ID, '_eventmesh_source_id', true);
+        $externalId = get_post_meta($post->ID, '_eventmesh_external_id', true);
+        $sourceUrl = get_post_meta($post->ID, '_eventmesh_url', true);
+
+        echo '<p><strong>' . esc_html__('Source', 'eventmesh') . ':</strong> ' . esc_html((string) $sourceId) . '</p>';
+        echo '<p><strong>' . esc_html__('External ID', 'eventmesh') . ':</strong> ' . esc_html((string) $externalId) . '</p>';
+        echo '<p><strong>' . esc_html__('Remote URL', 'eventmesh') . ':</strong> ' . esc_url((string) $sourceUrl) . '</p>';
+    }
+
+    public function saveMetaBox(int $postId, \WP_Post $post): void
+    {
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+            return;
+        }
+
+        if (! current_user_can('edit_post', $postId)) {
+            return;
+        }
+
+        if ($post->post_type !== self::NAME) {
+            return;
+        }
     }
 
     private function registerMeta(): void
