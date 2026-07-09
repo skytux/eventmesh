@@ -19,6 +19,16 @@ final class Admin
             'admin_menu',
             [$this, 'registerMenus']
         );
+
+        add_action(
+            'admin_post_eventmesh_sync_holvi',
+            [$this, 'handleHolviSync']
+        );
+
+        add_action(
+            'admin_notices',
+            [$this, 'renderSyncNotice']
+        );
     }
 
     public function registerMenus(): void
@@ -67,6 +77,51 @@ final class Admin
             'manage_options',
             'eventmesh-settings',
             [$this->container->get(SettingsPage::class), 'render']
+        );
+    }
+
+    public function handleHolviSync(): void
+    {
+        if (! current_user_can('manage_options')) {
+            wp_die(esc_html__('You do not have permission to run this action.', 'eventmesh'));
+        }
+
+        check_admin_referer('eventmesh_sync_holvi');
+
+        $result = $this->container->get(DashboardPage::class)->syncHolvi();
+
+        set_transient(
+            'eventmesh_sync_notice',
+            [
+                'type' => $result['success'] ? 'success' : 'error',
+                'message' => $result['message'],
+            ],
+            60
+        );
+
+        wp_safe_redirect(
+            add_query_arg(
+                ['page' => 'eventmesh'],
+                admin_url('admin.php')
+            )
+        );
+        exit;
+    }
+
+    public function renderSyncNotice(): void
+    {
+        $notice = get_transient('eventmesh_sync_notice');
+
+        if (! is_array($notice)) {
+            return;
+        }
+
+        delete_transient('eventmesh_sync_notice');
+
+        printf(
+            '<div class="notice notice-%s is-dismissible"><p>%s</p></div>',
+            esc_attr((string) ($notice['type'] ?? 'info')),
+            esc_html((string) ($notice['message'] ?? ''))
         );
     }
 }
