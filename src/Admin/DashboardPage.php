@@ -26,6 +26,7 @@ final class DashboardPage
                 'event_count' => wp_count_posts(EventPostType::NAME)->publish ?? 0,
                 'kernel_status' => __('Running', 'eventmesh'),
                 'version' => EVENTMESH_VERSION,
+                'last_sync' => $this->lastSyncSummary(),
             ]
         );
     }
@@ -58,6 +59,8 @@ final class DashboardPage
         $result = $this->synchronizer->syncMany($events);
         $synced = $result['created'] + $result['updated'];
 
+        $this->persistSyncSummary($result, $synced);
+
         return [
             'success' => true,
             'synced' => $synced,
@@ -65,6 +68,44 @@ final class DashboardPage
                 _n('Synced %d event.', 'Synced %d events.', $synced, 'eventmesh'),
                 $synced
             ),
+        ];
+    }
+
+    /**
+     * @param array{created: int, updated: int, failed: int} $result
+     */
+    private function persistSyncSummary(array $result, int $synced): void
+    {
+        set_transient(
+            'eventmesh_last_sync',
+            [
+                'created' => $result['created'],
+                'updated' => $result['updated'],
+                'failed' => $result['failed'],
+                'synced' => $synced,
+                'timestamp' => time(),
+            ],
+            24 * HOUR_IN_SECONDS
+        );
+    }
+
+    /**
+     * @return array{created: int, updated: int, failed: int, synced: int, timestamp: int}|null
+     */
+    private function lastSyncSummary(): ?array
+    {
+        $summary = get_transient('eventmesh_last_sync');
+
+        if (! is_array($summary)) {
+            return null;
+        }
+
+        return [
+            'created' => (int) ($summary['created'] ?? 0),
+            'updated' => (int) ($summary['updated'] ?? 0),
+            'failed' => (int) ($summary['failed'] ?? 0),
+            'synced' => (int) ($summary['synced'] ?? 0),
+            'timestamp' => (int) ($summary['timestamp'] ?? 0),
         ];
     }
 }
