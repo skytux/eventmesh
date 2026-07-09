@@ -133,7 +133,8 @@ final class Kernel
         $this->container->singleton(
             SettingsPage::class,
             fn (Container $container) => new SettingsPage(
-                $container->get(View::class)
+                $container->get(View::class),
+                $container->get(ArtistMap::class)
             )
         );
 
