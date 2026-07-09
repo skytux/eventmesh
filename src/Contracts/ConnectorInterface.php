@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace EventMesh\Contracts;
 
+use EventMesh\Models\Event;
+
 interface ConnectorInterface
 {
     /**
@@ -19,7 +21,7 @@ interface ConnectorInterface
     /**
      * Fetch remote events.
      *
-     * @return array
+     * @return array<int, Event>
      */
     public function fetch(): array;
 }

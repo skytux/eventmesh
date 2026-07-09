@@ -31,7 +31,8 @@ final class Kernel
 
         do_action(
             'eventmesh/register_connectors',
-            $this->container->get(ConnectorManager::class)
+            $this->container->get(ConnectorManager::class),
+            $this->container
         );
 
         do_action(
