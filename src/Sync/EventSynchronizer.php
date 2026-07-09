@@ -6,13 +6,15 @@ namespace EventMesh\Sync;
 
 use EventMesh\Content\EventPostType;
 use EventMesh\Models\Event;
+use EventMesh\Services\EventMediaEnricher;
 use EventMesh\Support\Logger;
 use WP_Query;
 
 final class EventSynchronizer
 {
     public function __construct(
-        private readonly Logger $logger
+        private readonly Logger $logger,
+        private readonly EventMediaEnricher $mediaEnricher
     ) {
     }
 
@@ -49,6 +51,7 @@ final class EventSynchronizer
 
         $syncedPostId = (int) $result;
         $this->writeMeta($syncedPostId, $event);
+        $this->mediaEnricher->enrich($syncedPostId, $event);
 
         return $syncedPostId;
     }
