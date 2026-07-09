@@ -3,6 +3,7 @@
  * Settings admin view.
  *
  * @var string $holvi_source_urls Holvi source URLs configured for syncing.
+ * @var string $artist_map_json   Artist/provider mapping JSON.
  */
 
 declare(strict_types=1);
@@ -37,6 +38,25 @@ if (! defined('ABSPATH')) {
                         ><?php echo esc_textarea($holvi_source_urls); ?></textarea>
                         <p class="description">
                             <?php esc_html_e('Enter one Holvi event URL per line.', 'eventmesh'); ?>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="eventmesh_artist_map">
+                            <?php esc_html_e('Artist provider map', 'eventmesh'); ?>
+                        </label>
+                    </th>
+                    <td>
+                        <textarea
+                            id="eventmesh_artist_map"
+                            name="eventmesh_artist_map"
+                            rows="12"
+                            cols="80"
+                            class="large-text code"
+                        ><?php echo esc_textarea($artist_map_json); ?></textarea>
+                        <p class="description">
+                            <?php esc_html_e('Define a JSON map of artists to provider URLs such as spotify, youtube, mixcloud, bandcamp, and soundcloud.', 'eventmesh'); ?>
                         </p>
                     </td>
                 </tr>
