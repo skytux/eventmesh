@@ -29,6 +29,11 @@ final class Admin
             'admin_notices',
             [$this, 'renderSyncNotice']
         );
+
+        add_action(
+            'admin_post_eventmesh_save_settings',
+            [$this->container->get(SettingsPage::class), 'save']
+        );
     }
 
     public function registerMenus(): void
