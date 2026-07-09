@@ -18,6 +18,12 @@ if (! defined('ABSPATH')) {
 <div class="wrap">
     <h1><?php esc_html_e('Dashboard', 'eventmesh'); ?></h1>
 
+    <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+        <input type="hidden" name="action" value="eventmesh_sync_holvi">
+        <?php wp_nonce_field('eventmesh_sync_holvi'); ?>
+        <?php submit_button(__('Sync Holvi events', 'eventmesh')); ?>
+    </form>
+
     <table class="widefat striped">
         <tbody>
             <tr>
