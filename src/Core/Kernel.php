@@ -13,6 +13,7 @@ use EventMesh\Admin\View;
 use EventMesh\Content\EventPostType;
 use EventMesh\Content\PerformerTaxonomy;
 use EventMesh\Services\ConnectorManager;
+use EventMesh\Services\EventMediaEnricher;
 use EventMesh\Sync\EventSynchronizer;
 use EventMesh\Support\Logger;
 
@@ -75,9 +76,17 @@ final class Kernel
         );
 
         $this->container->singleton(
+            EventMediaEnricher::class,
+            fn (Container $container) => new EventMediaEnricher(
+                $container->get(Logger::class)
+            )
+        );
+
+        $this->container->singleton(
             EventSynchronizer::class,
             fn (Container $container) => new EventSynchronizer(
-                $container->get(Logger::class)
+                $container->get(Logger::class),
+                $container->get(EventMediaEnricher::class)
             )
         );
 
