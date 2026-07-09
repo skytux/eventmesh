@@ -10,7 +10,9 @@ use EventMesh\Admin\DiagnosticsPage;
 use EventMesh\Admin\SettingsPage;
 use EventMesh\Admin\SourcesPage;
 use EventMesh\Admin\View;
+use EventMesh\Content\EventPostType;
 use EventMesh\Services\ConnectorManager;
+use EventMesh\Sync\EventSynchronizer;
 use EventMesh\Support\Logger;
 
 final class Kernel
@@ -28,6 +30,9 @@ final class Kernel
 
         $admin = $this->container->get(Admin::class);
         $admin->boot();
+
+        $eventPostType = $this->container->get(EventPostType::class);
+        $eventPostType->boot();
 
         do_action(
             'eventmesh/register_connectors',
@@ -57,6 +62,18 @@ final class Kernel
             ConnectorManager::class,
             fn (Container $container) => new ConnectorManager(
                 $container->get(ConnectorRegistry::class)
+            )
+        );
+
+        $this->container->singleton(
+            EventPostType::class,
+            fn () => new EventPostType()
+        );
+
+        $this->container->singleton(
+            EventSynchronizer::class,
+            fn (Container $container) => new EventSynchronizer(
+                $container->get(Logger::class)
             )
         );
 

@@ -3,6 +3,7 @@
  * Dashboard admin view.
  *
  * @var int    $connector_count Number of registered connectors.
+ * @var int    $event_count     Number of published synchronized events.
  * @var string $kernel_status   Human-readable kernel status.
  * @var string $version         Plugin version.
  */
@@ -30,6 +31,10 @@ if (! defined('ABSPATH')) {
             <tr>
                 <th scope="row"><?php esc_html_e('Connectors', 'eventmesh'); ?></th>
                 <td><?php echo esc_html((string) $connector_count); ?></td>
+            </tr>
+            <tr>
+                <th scope="row"><?php esc_html_e('Published events', 'eventmesh'); ?></th>
+                <td><?php echo esc_html((string) $event_count); ?></td>
             </tr>
         </tbody>
     </table>

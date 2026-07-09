@@ -27,4 +27,21 @@ EventMesh\Support\Autoloader::register();
 
 require EVENTMESH_PLUGIN_DIR . 'src/Connectors/Holvi/register.php';
 
+register_activation_hook(
+	EVENTMESH_PLUGIN_FILE,
+	static function (): void {
+		$post_type = new EventMesh\Content\EventPostType();
+		$post_type->register();
+
+		flush_rewrite_rules();
+	}
+);
+
+register_deactivation_hook(
+	EVENTMESH_PLUGIN_FILE,
+	static function (): void {
+		flush_rewrite_rules();
+	}
+);
+
 EventMesh\Core\Plugin::boot();
