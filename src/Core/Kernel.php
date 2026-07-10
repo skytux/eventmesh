@@ -131,7 +131,8 @@ final class Kernel
             fn (Container $container) => new DashboardPage(
                 $container->get(View::class),
                 $container->get(ConnectorManager::class),
-                $container->get(EventSynchronizer::class)
+                $container->get(EventSynchronizer::class),
+                $container->get(SyncRunner::class)
             )
         );
 
