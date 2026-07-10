@@ -39,6 +39,7 @@ final class Admin
         add_action('init', [$this, 'scheduleBackgroundSync']);
         add_action('eventmesh/background_sync', [$this, 'runBackgroundSync']);
         add_shortcode('eventmesh_status', [$this, 'renderStatusShortcode']);
+        add_shortcode('eventmesh_events', [$this, 'renderEventsShortcode']);
     }
 
     public function registerMenus(): void
@@ -157,6 +158,22 @@ final class Admin
     public function renderStatusShortcode(array $attributes = []): string
     {
         return $this->container->get(DashboardPage::class)->renderStatusShortcode($attributes);
+    }
+
+    public function renderEventsShortcode(array $attributes = []): string
+    {
+        $eventQuery = $this->container->get(\EventMesh\Content\EventQuery::class);
+        $events = $eventQuery->recent(
+            [
+                'posts_per_page' => (int) ($attributes['count'] ?? 6),
+            ]
+        );
+
+        ob_start();
+
+        include EVENTMESH_PLUGIN_DIR . 'templates/frontend/events-list.php';
+
+        return (string) ob_get_clean();
     }
 
     public function renderSyncNotice(): void
