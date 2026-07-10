@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EventMesh\Admin;
 
 use EventMesh\Services\ArtistMap;
+use EventMesh\Services\HolviSourceManager;
 use EventMesh\Services\SourceSettings;
 
 final class SettingsPage
@@ -12,7 +13,8 @@ final class SettingsPage
     public function __construct(
         private readonly View $view,
         private readonly ArtistMap $artistMap,
-        private readonly SourceSettings $sourceSettings
+        private readonly SourceSettings $sourceSettings,
+        private readonly HolviSourceManager $holviSourceManager
     ) {
     }
 
@@ -25,6 +27,7 @@ final class SettingsPage
                 'artist_map_json' => wp_json_encode($this->artistMap->all(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) ?: '{}',
                 'source_settings' => $this->sourceSettings->all(),
                 'background_sync_enabled' => '1' === (string) get_option('eventmesh_enable_background_sync', '1'),
+                'holvi_sources' => $this->holviSourceManager->all(),
             ]
         );
     }
@@ -53,6 +56,10 @@ final class SettingsPage
             ? '1' === (string) $_POST['eventmesh_enable_background_sync']
             : false;
 
+        $holviSources = isset($_POST['eventmesh_holvi_sources'])
+            ? (array) $_POST['eventmesh_holvi_sources']
+            : [];
+
         $artistMapData = json_decode($artistMapJson, true);
 
         if (! is_array($artistMapData)) {
@@ -62,6 +69,8 @@ final class SettingsPage
         update_option('eventmesh_holvi_source_urls', $urls);
         update_option('eventmesh_artist_map', $artistMapJson);
         update_option('eventmesh_enable_background_sync', $backgroundSyncEnabled ? '1' : '0');
+
+        $this->holviSourceManager->save($holviSources);
 
         foreach ($sourceSettings as $sourceId => $enabled) {
             $this->sourceSettings->setEnabled((string) $sourceId, 1 === $enabled);

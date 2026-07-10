@@ -17,6 +17,7 @@ use EventMesh\Content\PerformerTaxonomy;
 use EventMesh\Services\ArtistMap;
 use EventMesh\Services\ConnectorManager;
 use EventMesh\Services\EventMediaEnricher;
+use EventMesh\Services\HolviSourceManager;
 use EventMesh\Services\ProviderEnricher;
 use EventMesh\Services\SourceSettings;
 use EventMesh\Services\SyncRunner;
@@ -128,6 +129,11 @@ final class Kernel
         );
 
         $this->container->singleton(
+            HolviSourceManager::class,
+            fn () => new HolviSourceManager()
+        );
+
+        $this->container->singleton(
             SyncRunner::class,
             fn (Container $container) => new SyncRunner(
                 $container->get(ConnectorManager::class),
@@ -178,7 +184,8 @@ final class Kernel
             fn (Container $container) => new SettingsPage(
                 $container->get(View::class),
                 $container->get(ArtistMap::class),
-                $container->get(SourceSettings::class)
+                $container->get(SourceSettings::class),
+                $container->get(HolviSourceManager::class)
             )
         );
 
