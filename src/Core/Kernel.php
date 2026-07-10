@@ -167,7 +167,8 @@ final class Kernel
             SourcesPage::class,
             fn (Container $container) => new SourcesPage(
                 $container->get(View::class),
-                $container->get(ConnectorManager::class)
+                $container->get(ConnectorManager::class),
+                $container->get(HolviSourceManager::class)
             )
         );
 
@@ -184,8 +185,7 @@ final class Kernel
             fn (Container $container) => new SettingsPage(
                 $container->get(View::class),
                 $container->get(ArtistMap::class),
-                $container->get(SourceSettings::class),
-                $container->get(HolviSourceManager::class)
+                $container->get(SourceSettings::class)
             )
         );
 
