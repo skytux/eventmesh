@@ -168,10 +168,19 @@ final class Admin
                 'posts_per_page' => (int) ($attributes['count'] ?? 6),
             ]
         );
+        $template = isset($attributes['template']) && is_string($attributes['template'])
+            ? sanitize_file_name($attributes['template'])
+            : 'events-list';
 
         ob_start();
 
-        include EVENTMESH_PLUGIN_DIR . 'templates/frontend/events-list.php';
+        $templatePath = EVENTMESH_PLUGIN_DIR . 'templates/frontend/' . $template . '.php';
+
+        if (is_readable($templatePath)) {
+            include $templatePath;
+        } else {
+            include EVENTMESH_PLUGIN_DIR . 'templates/frontend/events-list.php';
+        }
 
         return (string) ob_get_clean();
     }

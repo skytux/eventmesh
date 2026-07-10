@@ -30,17 +30,32 @@ final class EventQuery
         $events = [];
 
         foreach ($query->posts as $post) {
+            $postId = (int) $post->ID;
+            $meta = get_post_meta($postId);
+            $providers = [];
+
+            foreach ($meta as $key => $values) {
+                if (! str_starts_with($key, '_eventmesh_provider_')) {
+                    continue;
+                }
+
+                $providers[substr($key, strlen('_eventmesh_provider_'))] = (string) ($values[0] ?? '');
+            }
+
             $events[] = [
-                'id' => (int) $post->ID,
+                'id' => $postId,
                 'title' => $post->post_title,
                 'content' => $post->post_content,
                 'excerpt' => $post->post_excerpt,
                 'url' => get_permalink($post),
                 'image' => get_the_post_thumbnail_url($post, 'large'),
-                'starts_at' => get_post_meta($post->ID, '_eventmesh_starts_at', true),
-                'ends_at' => get_post_meta($post->ID, '_eventmesh_ends_at', true),
-                'venue_name' => get_post_meta($post->ID, '_eventmesh_venue_name', true),
-                'source_url' => get_post_meta($post->ID, '_eventmesh_url', true),
+                'image_id' => (int) get_post_thumbnail_id($post),
+                'starts_at' => get_post_meta($postId, '_eventmesh_starts_at', true),
+                'ends_at' => get_post_meta($postId, '_eventmesh_ends_at', true),
+                'venue_name' => get_post_meta($postId, '_eventmesh_venue_name', true),
+                'source_url' => get_post_meta($postId, '_eventmesh_url', true),
+                'providers' => $providers,
+                'post' => $post,
             ];
         }
 
