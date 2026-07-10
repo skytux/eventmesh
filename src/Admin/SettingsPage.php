@@ -24,6 +24,7 @@ final class SettingsPage
                 'holvi_source_urls' => get_option('eventmesh_holvi_source_urls', ''),
                 'artist_map_json' => wp_json_encode($this->artistMap->all(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) ?: '{}',
                 'source_settings' => $this->sourceSettings->all(),
+                'background_sync_enabled' => '1' === (string) get_option('eventmesh_enable_background_sync', '1'),
             ]
         );
     }
@@ -48,6 +49,10 @@ final class SettingsPage
             ? array_map('absint', (array) $_POST['eventmesh_source_enabled'])
             : [];
 
+        $backgroundSyncEnabled = isset($_POST['eventmesh_enable_background_sync'])
+            ? '1' === (string) $_POST['eventmesh_enable_background_sync']
+            : false;
+
         $artistMapData = json_decode($artistMapJson, true);
 
         if (! is_array($artistMapData)) {
@@ -56,6 +61,7 @@ final class SettingsPage
 
         update_option('eventmesh_holvi_source_urls', $urls);
         update_option('eventmesh_artist_map', $artistMapJson);
+        update_option('eventmesh_enable_background_sync', $backgroundSyncEnabled ? '1' : '0');
 
         foreach ($sourceSettings as $sourceId => $enabled) {
             $this->sourceSettings->setEnabled((string) $sourceId, 1 === $enabled);

@@ -5,6 +5,7 @@
  * @var string $holvi_source_urls Holvi source URLs configured for syncing.
  * @var string $artist_map_json   Artist/provider mapping JSON.
  * @var array<string, bool> $source_settings Source enablement settings.
+ * @var bool $background_sync_enabled Whether background sync is enabled.
  */
 
 declare(strict_types=1);
@@ -56,6 +57,20 @@ if (! defined('ABSPATH')) {
                                 <?php esc_html_e('Holvi', 'eventmesh'); ?>
                             </label>
                         </fieldset>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <?php esc_html_e('Background sync', 'eventmesh'); ?>
+                    </th>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="eventmesh_enable_background_sync" value="1" <?php checked($background_sync_enabled, true); ?> />
+                            <?php esc_html_e('Enable automatic background synchronization', 'eventmesh'); ?>
+                        </label>
+                        <p class="description">
+                            <?php esc_html_e('When enabled, EventMesh will try to sync sources automatically in the background.', 'eventmesh'); ?>
+                        </p>
                     </td>
                 </tr>
                 <tr>
