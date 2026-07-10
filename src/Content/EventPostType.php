@@ -13,6 +13,7 @@ final class EventPostType
         add_action('init', [$this, 'register']);
         add_action('add_meta_boxes', [$this, 'registerMetaBox']);
         add_action('save_post_' . self::NAME, [$this, 'saveMetaBox'], 10, 2);
+        add_filter('single_template', [$this, 'singleTemplate']);
     }
 
     public function register(): void
@@ -59,6 +60,23 @@ final class EventPostType
         );
 
         $this->registerMeta();
+    }
+
+    public function singleTemplate(string $template): string
+    {
+        $post = get_post();
+
+        if (! $post instanceof \WP_Post || self::NAME !== $post->post_type) {
+            return $template;
+        }
+
+        $customTemplate = EVENTMESH_PLUGIN_DIR . 'templates/frontend/single-event.php';
+
+        if (is_readable($customTemplate)) {
+            return $customTemplate;
+        }
+
+        return $template;
     }
 
     public function registerMetaBox(): void
