@@ -6,13 +6,15 @@ namespace EventMesh\Connectors\Holvi;
 
 use EventMesh\Contracts\ConnectorInterface;
 use EventMesh\Models\Event;
+use EventMesh\Services\HolviSourceManager;
 use EventMesh\Support\Logger;
 
 final class HolviConnector implements ConnectorInterface
 {
     public function __construct(
         private readonly HolviHtmlParser $parser,
-        private readonly Logger $logger
+        private readonly Logger $logger,
+        private readonly HolviSourceManager $sourceManager
     ) {
     }
 
@@ -86,24 +88,28 @@ final class HolviConnector implements ConnectorInterface
      */
     private function sourceUrls(): array
     {
-        $urls = get_option('eventmesh_holvi_source_urls', []);
+        $urls = $this->sourceManager->enabledUrls();
 
-        if (is_string($urls)) {
-            $urls = preg_split('/\r\n|\r|\n/', $urls) ?: [];
-        }
+        if ([] === $urls) {
+            $legacyUrls = get_option('eventmesh_holvi_source_urls', []);
 
-        if (! is_array($urls)) {
-            $urls = [];
-        }
+            if (is_string($legacyUrls)) {
+                $legacyUrls = preg_split('/\r\n|\r|\n/', $legacyUrls) ?: [];
+            }
 
-        $urls = array_values(
-            array_filter(
-                array_map(
-                    static fn (mixed $url): string => esc_url_raw((string) $url),
-                    $urls
+            if (! is_array($legacyUrls)) {
+                $legacyUrls = [];
+            }
+
+            $urls = array_values(
+                array_filter(
+                    array_map(
+                        static fn (mixed $url): string => esc_url_raw((string) $url),
+                        $legacyUrls
+                    )
                 )
-            )
-        );
+            );
+        }
 
         /**
          * Filters the configured Holvi source URLs.
