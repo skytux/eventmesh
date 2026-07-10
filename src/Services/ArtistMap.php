@@ -11,6 +11,13 @@ final class ArtistMap
      */
     public function all(): array
     {
+        $storedValue = get_option('eventmesh_artist_map', '');
+        $decoded = $this->decode($storedValue);
+
+        if (null !== $decoded) {
+            return $this->normalize($decoded);
+        }
+
         $path = EVENTMESH_PLUGIN_DIR . 'config/artist-map.json';
 
         if (! is_file($path)) {
@@ -23,12 +30,36 @@ final class ArtistMap
             return [];
         }
 
-        $decoded = json_decode($contents, true);
+        $decoded = $this->decode($contents);
 
-        if (! is_array($decoded)) {
+        if (null === $decoded) {
             return [];
         }
 
+        return $this->normalize($decoded);
+    }
+
+    /**
+     * @return array<mixed>|null
+     */
+    private function decode(string $json): ?array
+    {
+        $decoded = json_decode($json, true);
+
+        if (! is_array($decoded)) {
+            return null;
+        }
+
+        return $decoded;
+    }
+
+    /**
+     * @param array<mixed> $decoded
+     *
+     * @return array<string, array<string, string>>
+     */
+    private function normalize(array $decoded): array
+    {
         $result = [];
 
         foreach ($decoded as $artist => $providers) {
