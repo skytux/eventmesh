@@ -4,6 +4,7 @@
  *
  * @var string $holvi_source_urls Holvi source URLs configured for syncing.
  * @var string $artist_map_json   Artist/provider mapping JSON.
+ * @var array<string, bool> $source_settings Source enablement settings.
  */
 
 declare(strict_types=1);
@@ -39,6 +40,22 @@ if (! defined('ABSPATH')) {
                         <p class="description">
                             <?php esc_html_e('Enter one Holvi event URL per line.', 'eventmesh'); ?>
                         </p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <?php esc_html_e('Enabled sources', 'eventmesh'); ?>
+                    </th>
+                    <td>
+                        <fieldset>
+                            <legend class="screen-reader-text">
+                                <?php esc_html_e('Enabled sources', 'eventmesh'); ?>
+                            </legend>
+                            <label>
+                                <input type="checkbox" name="eventmesh_source_enabled[holvi]" value="1" <?php checked($source_settings['holvi'] ?? true, true); ?> />
+                                <?php esc_html_e('Holvi', 'eventmesh'); ?>
+                            </label>
+                        </fieldset>
                     </td>
                 </tr>
                 <tr>

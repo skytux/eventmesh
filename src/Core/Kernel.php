@@ -16,6 +16,7 @@ use EventMesh\Services\ArtistMap;
 use EventMesh\Services\ConnectorManager;
 use EventMesh\Services\EventMediaEnricher;
 use EventMesh\Services\ProviderEnricher;
+use EventMesh\Services\SourceSettings;
 use EventMesh\Services\SyncRunner;
 use EventMesh\Sync\EventSynchronizer;
 use EventMesh\Support\Logger;
@@ -108,11 +109,17 @@ final class Kernel
         );
 
         $this->container->singleton(
+            SourceSettings::class,
+            fn () => new SourceSettings()
+        );
+
+        $this->container->singleton(
             SyncRunner::class,
             fn (Container $container) => new SyncRunner(
                 $container->get(ConnectorManager::class),
                 $container->get(EventSynchronizer::class),
-                $container->get(Logger::class)
+                $container->get(Logger::class),
+                $container->get(SourceSettings::class)
             )
         );
 
@@ -156,7 +163,8 @@ final class Kernel
             SettingsPage::class,
             fn (Container $container) => new SettingsPage(
                 $container->get(View::class),
-                $container->get(ArtistMap::class)
+                $container->get(ArtistMap::class),
+                $container->get(SourceSettings::class)
             )
         );
 
