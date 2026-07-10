@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EventMesh\Admin;
 
 use EventMesh\Core\Container;
+use EventMesh\Services\SyncRunner;
 
 final class Admin
 {
@@ -34,6 +35,9 @@ final class Admin
             'admin_post_eventmesh_save_settings',
             [$this->container->get(SettingsPage::class), 'save']
         );
+
+        add_action('init', [$this, 'scheduleBackgroundSync']);
+        add_action('eventmesh/background_sync', [$this, 'runBackgroundSync']);
     }
 
     public function registerMenus(): void
@@ -111,6 +115,42 @@ final class Admin
             )
         );
         exit;
+    }
+
+    public function scheduleBackgroundSync(): void
+    {
+        if (! is_admin() && ! wp_doing_cron()) {
+            return;
+        }
+
+        if (wp_next_scheduled('eventmesh/background_sync')) {
+            return;
+        }
+
+        wp_schedule_event(time() + 300, 'hourly', 'eventmesh/background_sync');
+    }
+
+    public function runBackgroundSync(): void
+    {
+        $enabled = get_option('eventmesh_enable_background_sync', '1');
+
+        if ('1' !== $enabled) {
+            return;
+        }
+
+        $result = $this->container->get(SyncRunner::class)->run(['holvi']);
+
+        if ($result['processed'] > 0) {
+            $this->container->get(DashboardPage::class)->persistSyncSummary(
+                [
+                    'created' => $result['created'],
+                    'updated' => $result['updated'],
+                    'failed' => $result['failed'],
+                    'skipped' => $result['skipped'],
+                ],
+                $result['created'] + $result['updated']
+            );
+        }
     }
 
     public function renderSyncNotice(): void
