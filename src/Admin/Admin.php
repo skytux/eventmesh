@@ -37,6 +37,7 @@ final class Admin
         );
 
         add_action('init', [$this, 'scheduleBackgroundSync']);
+        add_action('init', [$this, 'registerBlock']);
         add_action('eventmesh/background_sync', [$this, 'runBackgroundSync']);
         add_shortcode('eventmesh_status', [$this, 'renderStatusShortcode']);
         add_shortcode('eventmesh_events', [$this, 'renderEventsShortcode']);
@@ -153,6 +154,11 @@ final class Admin
                 $result['created'] + $result['updated']
             );
         }
+    }
+
+    public function registerBlock(): void
+    {
+        $this->container->get(EventListBlock::class)->register();
     }
 
     public function renderStatusShortcode(array $attributes = []): string
