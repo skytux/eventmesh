@@ -7,6 +7,7 @@
  * @var string $kernel_status   Human-readable kernel status.
  * @var string $version         Plugin version.
  * @var array{created: int, updated: int, failed: int, skipped: int, synced: int, timestamp: int}|null $last_sync Summary of the most recent sync run.
+ * @var bool $background_sync_enabled Whether background sync is enabled.
  */
 
 declare(strict_types=1);
@@ -23,6 +24,16 @@ if (! defined('ABSPATH')) {
         <input type="hidden" name="action" value="eventmesh_sync_holvi">
         <?php wp_nonce_field('eventmesh_sync_holvi'); ?>
         <?php submit_button(__('Sync Holvi events', 'eventmesh')); ?>
+    </form>
+
+    <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" class="eventmesh-dashboard-toggle">
+        <input type="hidden" name="action" value="eventmesh_dashboard_toggle">
+        <?php wp_nonce_field('eventmesh_dashboard_toggle'); ?>
+        <label>
+            <input type="checkbox" name="eventmesh_enable_background_sync" value="1" <?php checked($background_sync_enabled, true); ?> />
+            <?php esc_html_e('Enable automatic background synchronization', 'eventmesh'); ?>
+        </label>
+        <?php submit_button(__('Save', 'eventmesh')); ?>
     </form>
 
     <table class="widefat striped">

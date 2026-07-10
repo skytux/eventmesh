@@ -36,6 +36,11 @@ final class Admin
             [$this->container->get(SettingsPage::class), 'save']
         );
 
+        add_action(
+            'admin_post_eventmesh_dashboard_toggle',
+            [$this->container->get(DashboardPage::class), 'saveBackgroundSyncToggle']
+        );
+
         add_action('init', [$this, 'scheduleBackgroundSync']);
         add_action('init', [$this, 'registerBlock']);
         add_action('eventmesh/background_sync', [$this, 'runBackgroundSync']);

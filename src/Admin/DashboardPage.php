@@ -28,9 +28,33 @@ final class DashboardPage
                 'event_count' => wp_count_posts(EventPostType::NAME)->publish ?? 0,
                 'kernel_status' => __('Running', 'eventmesh'),
                 'version' => EVENTMESH_VERSION,
+                'background_sync_enabled' => '1' === (string) get_option('eventmesh_enable_background_sync', '1'),
                 'last_sync' => $this->lastSyncSummary(),
             ]
         );
+    }
+
+    public function saveBackgroundSyncToggle(): void
+    {
+        if (! current_user_can('manage_options')) {
+            wp_die(esc_html__('You do not have permission to save this setting.', 'eventmesh'));
+        }
+
+        check_admin_referer('eventmesh_dashboard_toggle');
+
+        $enabled = isset($_POST['eventmesh_enable_background_sync'])
+            ? '1' === (string) $_POST['eventmesh_enable_background_sync']
+            : false;
+
+        update_option('eventmesh_enable_background_sync', $enabled ? '1' : '0');
+
+        wp_safe_redirect(
+            add_query_arg(
+                ['page' => 'eventmesh'],
+                admin_url('admin.php')
+            )
+        );
+        exit;
     }
 
     /**
