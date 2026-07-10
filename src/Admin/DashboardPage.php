@@ -6,6 +6,7 @@ namespace EventMesh\Admin;
 
 use EventMesh\Content\EventPostType;
 use EventMesh\Services\ConnectorManager;
+use EventMesh\Services\SyncRunner;
 use EventMesh\Sync\EventSynchronizer;
 
 final class DashboardPage
@@ -13,7 +14,8 @@ final class DashboardPage
     public function __construct(
         private readonly View $view,
         private readonly ConnectorManager $connectors,
-        private readonly EventSynchronizer $synchronizer
+        private readonly EventSynchronizer $synchronizer,
+        private readonly SyncRunner $syncRunner
     ) {
     }
 
@@ -46,9 +48,20 @@ final class DashboardPage
             ];
         }
 
-        $events = $connector->fetch();
+        $result = $this->syncRunner->run(['holvi']);
+        $synced = $result['created'] + $result['updated'];
 
-        if ([] === $events) {
+        $this->persistSyncSummary(
+            [
+                'created' => $result['created'],
+                'updated' => $result['updated'],
+                'failed' => $result['failed'],
+                'skipped' => $result['skipped'],
+            ],
+            $synced
+        );
+
+        if (0 === $result['processed']) {
             return [
                 'success' => true,
                 'synced' => 0,
@@ -56,17 +69,15 @@ final class DashboardPage
             ];
         }
 
-        $result = $this->synchronizer->syncMany($events);
-        $synced = $result['created'] + $result['updated'];
-
-        $this->persistSyncSummary($result, $synced);
-
         return [
             'success' => true,
             'synced' => $synced,
             'message' => sprintf(
-                _n('Synced %d event.', 'Synced %d events.', $synced, 'eventmesh'),
-                $synced
+                __('Created %1$d, updated %2$d, failed %3$d, skipped %4$d.', 'eventmesh'),
+                $result['created'],
+                $result['updated'],
+                $result['failed'],
+                $result['skipped']
             ),
         ];
     }
@@ -74,7 +85,7 @@ final class DashboardPage
     /**
      * @param array{created: int, updated: int, failed: int} $result
      */
-    private function persistSyncSummary(array $result, int $synced): void
+    public function persistSyncSummary(array $result, int $synced): void
     {
         set_transient(
             'eventmesh_last_sync',

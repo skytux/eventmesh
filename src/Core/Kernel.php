@@ -16,6 +16,7 @@ use EventMesh\Services\ArtistMap;
 use EventMesh\Services\ConnectorManager;
 use EventMesh\Services\EventMediaEnricher;
 use EventMesh\Services\ProviderEnricher;
+use EventMesh\Services\SyncRunner;
 use EventMesh\Sync\EventSynchronizer;
 use EventMesh\Support\Logger;
 
@@ -103,6 +104,15 @@ final class Kernel
                 $container->get(Logger::class),
                 $container->get(EventMediaEnricher::class),
                 $container->get(ProviderEnricher::class)
+            )
+        );
+
+        $this->container->singleton(
+            SyncRunner::class,
+            fn (Container $container) => new SyncRunner(
+                $container->get(ConnectorManager::class),
+                $container->get(EventSynchronizer::class),
+                $container->get(Logger::class)
             )
         );
 
