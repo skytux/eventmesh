@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace EventMesh\Services;
 
-use EventMesh\Contracts\ConnectorInterface;
 use EventMesh\Support\Logger;
 use EventMesh\Sync\EventSynchronizer;
 
@@ -13,7 +12,8 @@ final class SyncRunner
     public function __construct(
         private readonly ConnectorManager $connectors,
         private readonly EventSynchronizer $synchronizer,
-        private readonly Logger $logger
+        private readonly Logger $logger,
+        private readonly SourceSettings $sourceSettings
     ) {
     }
 
@@ -43,6 +43,10 @@ final class SyncRunner
         ];
 
         foreach ($ids as $connectorId) {
+            if (! $this->sourceSettings->isEnabled($connectorId)) {
+                continue;
+            }
+
             $connector = $this->connectors->get($connectorId);
 
             if (null === $connector) {
