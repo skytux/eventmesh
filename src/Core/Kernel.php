@@ -7,6 +7,7 @@ namespace EventMesh\Core;
 use EventMesh\Admin\Admin;
 use EventMesh\Admin\DashboardPage;
 use EventMesh\Admin\DiagnosticsPage;
+use EventMesh\Admin\EventListBlock;
 use EventMesh\Admin\SettingsPage;
 use EventMesh\Admin\SourcesPage;
 use EventMesh\Admin\View;
@@ -83,6 +84,13 @@ final class Kernel
         $this->container->singleton(
             EventQuery::class,
             fn () => new EventQuery()
+        );
+
+        $this->container->singleton(
+            EventListBlock::class,
+            fn (Container $container) => new EventListBlock(
+                $container->get(EventQuery::class)
+            )
         );
 
         $this->container->singleton(
