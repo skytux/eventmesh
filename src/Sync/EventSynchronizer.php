@@ -62,7 +62,7 @@ final class EventSynchronizer
     /**
      * @param array<int, Event> $events
      *
-     * @return array{created: int, updated: int, failed: int}
+     * @return array{created: int, updated: int, failed: int, skipped: int}
      */
     public function syncMany(array $events): array
     {
@@ -70,9 +70,15 @@ final class EventSynchronizer
             'created' => 0,
             'updated' => 0,
             'failed' => 0,
+            'skipped' => 0,
         ];
 
         foreach ($events as $event) {
+            if ('' === trim($event->title())) {
+                ++$result['skipped'];
+                continue;
+            }
+
             $existingPostId = $this->findExistingPostId($event);
             $postId = $this->sync($event);
 

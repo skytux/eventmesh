@@ -82,6 +82,7 @@ final class DashboardPage
                 'created' => $result['created'],
                 'updated' => $result['updated'],
                 'failed' => $result['failed'],
+                'skipped' => $result['skipped'],
                 'synced' => $synced,
                 'timestamp' => time(),
             ],
@@ -90,7 +91,7 @@ final class DashboardPage
     }
 
     /**
-     * @return array{created: int, updated: int, failed: int, synced: int, timestamp: int}|null
+     * @return array{created: int, updated: int, failed: int, skipped: int, synced: int, timestamp: int}|null
      */
     private function lastSyncSummary(): ?array
     {
@@ -104,6 +105,7 @@ final class DashboardPage
             'created' => (int) ($summary['created'] ?? 0),
             'updated' => (int) ($summary['updated'] ?? 0),
             'failed' => (int) ($summary['failed'] ?? 0),
+            'skipped' => (int) ($summary['skipped'] ?? 0),
             'synced' => (int) ($summary['synced'] ?? 0),
             'timestamp' => (int) ($summary['timestamp'] ?? 0),
         ];
