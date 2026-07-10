@@ -6,7 +6,7 @@
  * @var int    $event_count     Number of published synchronized events.
  * @var string $kernel_status   Human-readable kernel status.
  * @var string $version         Plugin version.
- * @var array{created: int, updated: int, failed: int, synced: int, timestamp: int}|null $last_sync Summary of the most recent sync run.
+ * @var array{created: int, updated: int, failed: int, skipped: int, synced: int, timestamp: int}|null $last_sync Summary of the most recent sync run.
  */
 
 declare(strict_types=1);
@@ -50,10 +50,11 @@ if (! defined('ABSPATH')) {
                         <?php esc_html_e('No sync yet.', 'eventmesh'); ?>
                     <?php else : ?>
                         <?php echo esc_html(sprintf(
-                            __('Created %1$d, updated %2$d, failed %3$d at %4$s.', 'eventmesh'),
+                            __('Created %1$d, updated %2$d, failed %3$d, skipped %4$d at %5$s.', 'eventmesh'),
                             $last_sync['created'],
                             $last_sync['updated'],
                             $last_sync['failed'],
+                            $last_sync['skipped'],
                             date_i18n(get_option('date_format') . ' ' . get_option('time_format'), $last_sync['timestamp'])
                         )); ?>
                     <?php endif; ?>
