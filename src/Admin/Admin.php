@@ -37,6 +37,11 @@ final class Admin
         );
 
         add_action(
+            'admin_post_eventmesh_save_sources',
+            [$this->container->get(SourcesPage::class), 'save']
+        );
+
+        add_action(
             'admin_post_eventmesh_dashboard_toggle',
             [$this->container->get(DashboardPage::class), 'saveBackgroundSyncToggle']
         );
