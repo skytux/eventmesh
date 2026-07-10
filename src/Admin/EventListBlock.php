@@ -19,6 +19,8 @@ final class EventListBlock
             return;
         }
 
+        $this->registerPattern();
+
         $assetFile = EVENTMESH_PLUGIN_DIR . 'build/event-list-block.asset.php';
 
         if (! is_readable($assetFile)) {
@@ -41,6 +43,13 @@ final class EventListBlock
             [
                 'editor_script' => 'eventmesh-event-list-block',
                 'render_callback' => [$this, 'render'],
+                'title' => __('EventMesh events list', 'eventmesh'),
+                'category' => 'widgets',
+                'icon' => 'calendar-alt',
+                'keywords' => [__('events', 'eventmesh'), __('calendar', 'eventmesh'), __('eventmesh', 'eventmesh')],
+                'supports' => [
+                    'html' => false,
+                ],
                 'attributes' => [
                     'count' => [
                         'type' => 'number',
@@ -89,6 +98,13 @@ final class EventListBlock
             'eventmesh/event-list',
             [
                 'render_callback' => [$this, 'render'],
+                'title' => __('EventMesh events list', 'eventmesh'),
+                'category' => 'widgets',
+                'icon' => 'calendar-alt',
+                'keywords' => [__('events', 'eventmesh'), __('calendar', 'eventmesh'), __('eventmesh', 'eventmesh')],
+                'supports' => [
+                    'html' => false,
+                ],
                 'attributes' => [
                     'count' => [
                         'type' => 'number',
@@ -99,6 +115,31 @@ final class EventListBlock
                         'default' => 'events-list',
                     ],
                 ],
+            ]
+        );
+    }
+
+    private function registerPattern(): void
+    {
+        if (! function_exists('register_block_pattern') || ! function_exists('register_block_pattern_category')) {
+            return;
+        }
+
+        register_block_pattern_category(
+            'eventmesh',
+            [
+                'label' => __('EventMesh', 'eventmesh'),
+            ]
+        );
+
+        register_block_pattern(
+            'eventmesh/event-list-pattern',
+            [
+                'title' => __('EventMesh events', 'eventmesh'),
+                'description' => __('Displays a curated list of upcoming events.', 'eventmesh'),
+                'content' => '<!-- wp:eventmesh/event-list {"count":3,"template":"events-list"} /-->',
+                'categories' => ['eventmesh'],
+                'keywords' => [__('events', 'eventmesh'), __('calendar', 'eventmesh')],
             ]
         );
     }
