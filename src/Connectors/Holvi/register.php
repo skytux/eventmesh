@@ -6,6 +6,7 @@ use EventMesh\Connectors\Holvi\HolviConnector;
 use EventMesh\Connectors\Holvi\HolviHtmlParser;
 use EventMesh\Core\Container;
 use EventMesh\Services\ConnectorManager;
+use EventMesh\Services\HolviSourceManager;
 use EventMesh\Support\Logger;
 
 if (! defined('ABSPATH')) {
@@ -18,7 +19,8 @@ add_action(
         $connectors->register(
             new HolviConnector(
                 new HolviHtmlParser(),
-                $container->get(Logger::class)
+                $container->get(Logger::class),
+                $container->get(HolviSourceManager::class)
             )
         );
     },
