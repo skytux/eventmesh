@@ -38,6 +38,7 @@ final class Admin
 
         add_action('init', [$this, 'scheduleBackgroundSync']);
         add_action('eventmesh/background_sync', [$this, 'runBackgroundSync']);
+        add_shortcode('eventmesh_status', [$this, 'renderStatusShortcode']);
     }
 
     public function registerMenus(): void
@@ -151,6 +152,11 @@ final class Admin
                 $result['created'] + $result['updated']
             );
         }
+    }
+
+    public function renderStatusShortcode(array $attributes = []): string
+    {
+        return $this->container->get(DashboardPage::class)->renderStatusShortcode($attributes);
     }
 
     public function renderSyncNotice(): void

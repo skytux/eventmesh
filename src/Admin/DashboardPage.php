@@ -41,12 +41,16 @@ final class DashboardPage
         $connector = $this->connectors->get('holvi');
 
         if (null === $connector) {
+            $this->markSyncState('error', __('No Holvi connector is registered.', 'eventmesh'));
+
             return [
                 'success' => false,
                 'synced' => 0,
                 'message' => __('No Holvi connector is registered.', 'eventmesh'),
             ];
         }
+
+        $this->markSyncState('running', __('Sync in progress…', 'eventmesh'));
 
         $result = $this->syncRunner->run(['holvi']);
         $synced = $result['created'] + $result['updated'];
@@ -62,6 +66,8 @@ final class DashboardPage
         );
 
         if (0 === $result['processed']) {
+            $this->markSyncState('completed', __('No Holvi events were found.', 'eventmesh'));
+
             return [
                 'success' => true,
                 'synced' => 0,
@@ -69,16 +75,20 @@ final class DashboardPage
             ];
         }
 
+        $message = sprintf(
+            __('Created %1$d, updated %2$d, failed %3$d, skipped %4$d.', 'eventmesh'),
+            $result['created'],
+            $result['updated'],
+            $result['failed'],
+            $result['skipped']
+        );
+
+        $this->markSyncState('completed', $message);
+
         return [
             'success' => true,
             'synced' => $synced,
-            'message' => sprintf(
-                __('Created %1$d, updated %2$d, failed %3$d, skipped %4$d.', 'eventmesh'),
-                $result['created'],
-                $result['updated'],
-                $result['failed'],
-                $result['skipped']
-            ),
+            'message' => $message,
         ];
     }
 
@@ -102,9 +112,57 @@ final class DashboardPage
     }
 
     /**
+     * @param array<string, mixed> $attributes
+     */
+    public function renderStatusShortcode(array $attributes = []): string
+    {
+        $syncState = $this->syncState();
+        $lastSync = $this->lastSyncSummary();
+        $nextRun = wp_next_scheduled('eventmesh/background_sync');
+        $enabled = '1' === (string) get_option('eventmesh_enable_background_sync', '1');
+
+        ob_start();
+
+        include EVENTMESH_PLUGIN_DIR . 'templates/frontend/sync-status.php';
+
+        return (string) ob_get_clean();
+    }
+
+    /**
+     * @return array{status: string, message: string, timestamp: int}|null
+     */
+    public function syncState(): ?array
+    {
+        $state = get_transient('eventmesh_sync_status');
+
+        if (! is_array($state)) {
+            return null;
+        }
+
+        return [
+            'status' => (string) ($state['status'] ?? 'idle'),
+            'message' => (string) ($state['message'] ?? ''),
+            'timestamp' => (int) ($state['timestamp'] ?? 0),
+        ];
+    }
+
+    private function markSyncState(string $status, string $message): void
+    {
+        set_transient(
+            'eventmesh_sync_status',
+            [
+                'status' => $status,
+                'message' => $message,
+                'timestamp' => time(),
+            ],
+            2 * HOUR_IN_SECONDS
+        );
+    }
+
+    /**
      * @return array{created: int, updated: int, failed: int, skipped: int, synced: int, timestamp: int}|null
      */
-    private function lastSyncSummary(): ?array
+    public function lastSyncSummary(): ?array
     {
         $summary = get_transient('eventmesh_last_sync');
 
