@@ -7,6 +7,7 @@ namespace EventMesh\Sync;
 use EventMesh\Content\EventPostType;
 use EventMesh\Models\Event;
 use EventMesh\Services\EventMediaEnricher;
+use EventMesh\Services\ProviderEmbedEnricher;
 use EventMesh\Services\ProviderEnricher;
 use EventMesh\Support\Logger;
 use WP_Query;
@@ -16,7 +17,8 @@ final class EventSynchronizer
     public function __construct(
         private readonly Logger $logger,
         private readonly EventMediaEnricher $mediaEnricher,
-        private readonly ProviderEnricher $providerEnricher
+        private readonly ProviderEnricher $providerEnricher,
+        private readonly ProviderEmbedEnricher $providerEmbedEnricher
     ) {
     }
 
@@ -55,6 +57,7 @@ final class EventSynchronizer
         $this->writeMeta($syncedPostId, $event);
         $this->mediaEnricher->enrich($syncedPostId, $event);
         $this->providerEnricher->enrich($syncedPostId, $event);
+        $this->providerEmbedEnricher->enrich($syncedPostId);
 
         return $syncedPostId;
     }
@@ -97,6 +100,80 @@ final class EventSynchronizer
         return $result;
     }
 
+    /**
+     * Move published posts for a source to Draft when they're no longer
+     * present in that source's latest fetch (cancelled/removed upstream).
+     *
+     * A post that reappears at the source later is naturally republished by
+     * sync(), which looks posts up regardless of status and always writes
+     * post_status => 'publish'.
+     *
+     * @param array<int, string> $seenExternalIds External IDs present in the current fetch.
+     */
+    public function pruneStale(string $sourceId, array $seenExternalIds): int
+    {
+        $query = new WP_Query(
+            [
+                'post_type' => EventPostType::NAME,
+                'post_status' => 'publish',
+                'posts_per_page' => -1,
+                'fields' => 'ids',
+                'no_found_rows' => true,
+                'meta_query' => [
+                    [
+                        'key' => '_eventmesh_source_id',
+                        'value' => $sourceId,
+                        'compare' => '=',
+                    ],
+                ],
+            ]
+        );
+
+        $archived = 0;
+
+        foreach ($query->posts as $postId) {
+            $postId = (int) $postId;
+            $externalId = (string) get_post_meta($postId, '_eventmesh_external_id', true);
+
+            if (in_array($externalId, $seenExternalIds, true)) {
+                continue;
+            }
+
+            $result = wp_update_post(
+                [
+                    'ID' => $postId,
+                    'post_status' => 'draft',
+                ],
+                true
+            );
+
+            if (is_wp_error($result)) {
+                $this->logger->error(
+                    sprintf(
+                        'Failed to archive stale event #%d: %s',
+                        $postId,
+                        $result->get_error_message()
+                    )
+                );
+                continue;
+            }
+
+            ++$archived;
+        }
+
+        if ($archived > 0) {
+            $this->logger->info(
+                sprintf(
+                    'Archived %d stale event(s) for source "%s".',
+                    $archived,
+                    $sourceId
+                )
+            );
+        }
+
+        return $archived;
+    }
+
     private function findExistingPostId(Event $event): int
     {
         $query = new WP_Query(
@@ -132,9 +209,18 @@ final class EventSynchronizer
         update_post_meta($postId, '_eventmesh_source_id', $event->sourceId());
         update_post_meta($postId, '_eventmesh_external_id', $event->externalId());
         update_post_meta($postId, '_eventmesh_starts_at', $event->startsAt()?->format(DATE_ATOM) ?? '');
+        update_post_meta($postId, '_eventmesh_starts_at_year_known', $event->startsAtYearKnown() ? '1' : '');
         update_post_meta($postId, '_eventmesh_ends_at', $event->endsAt()?->format(DATE_ATOM) ?? '');
         update_post_meta($postId, '_eventmesh_url', esc_url_raw($event->url()));
         update_post_meta($postId, '_eventmesh_image_url', esc_url_raw($event->imageUrl()));
-        update_post_meta($postId, '_eventmesh_venue_name', sanitize_text_field($event->venueName()));
+        update_post_meta($postId, '_eventmesh_sold_out', $event->soldOut() ? '1' : '');
+
+        // Venue is often unreliable to auto-extract; once someone has
+        // manually filled it in (or a previous sync found one), a sync that
+        // finds nothing this time should not blank it out. Only overwrite
+        // when this fetch actually found a venue.
+        if ('' !== trim($event->venueName())) {
+            update_post_meta($postId, '_eventmesh_venue_name', sanitize_text_field($event->venueName()));
+        }
     }
 }

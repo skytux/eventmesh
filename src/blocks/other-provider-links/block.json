@@ -1,0 +1,40 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "eventmesh/other-provider-links",
+  "title": "EventMesh other provider links",
+  "category": "widgets",
+  "icon": "admin-links",
+  "description": "Lists any of the current event's provider links other than the one already shown as a compact embed. Rendered directly in PHP, not via Block Bindings.",
+  "keywords": ["providers", "links", "eventmesh"],
+  "usesContext": ["postId"],
+  "supports": {
+    "html": false,
+    "color": {
+      "background": true,
+      "text": true,
+      "link": true
+    },
+    "typography": {
+      "fontSize": true,
+      "lineHeight": true,
+      "fontFamily": true,
+      "fontWeight": true,
+      "fontStyle": true,
+      "textDecoration": true,
+      "textTransform": true,
+      "letterSpacing": true
+    },
+    "spacing": {
+      "margin": true,
+      "padding": true
+    },
+    "border": {
+      "color": true,
+      "radius": true,
+      "style": true,
+      "width": true
+    }
+  },
+  "editorScript": "file:./index.js"
+}

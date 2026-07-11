@@ -24,4 +24,13 @@ interface ConnectorInterface
      * @return array<int, Event>
      */
     public function fetch(): array;
+
+    /**
+     * Number of source fetches that failed during the most recent fetch() call.
+     *
+     * Used to gate destructive follow-up actions (like pruning events that
+     * disappeared) so a transient network failure is never mistaken for an
+     * event genuinely no longer existing at the source.
+     */
+    public function fetchErrors(): int;
 }

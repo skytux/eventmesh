@@ -20,7 +20,25 @@ final class SyncRunner
     /**
      * @param array<int, string>|null $connectorIds
      *
-     * @return array{success: bool, processed: int, created: int, updated: int, failed: int, skipped: int, connectors: array<int, array{id: string, label: string, events: int, created: int, updated: int, failed: int, skipped: int}>}
+     * @return array{
+     *     success: bool,
+     *     processed: int,
+     *     created: int,
+     *     updated: int,
+     *     failed: int,
+     *     skipped: int,
+     *     archived: int,
+     *     connectors: array<int, array{
+     *         id: string,
+     *         label: string,
+     *         events: int,
+     *         created: int,
+     *         updated: int,
+     *         failed: int,
+     *         skipped: int,
+     *         archived: int
+     *     }>
+     * }
      */
     public function run(?array $connectorIds = null): array
     {
@@ -39,6 +57,7 @@ final class SyncRunner
             'updated' => 0,
             'failed' => 0,
             'skipped' => 0,
+            'archived' => 0,
             'connectors' => [],
         ];
 
@@ -56,12 +75,31 @@ final class SyncRunner
             $events = $connector->fetch();
             $eventCount = count($events);
             $syncResult = $this->synchronizer->syncMany($events);
+            $archived = 0;
+
+            if (0 === $connector->fetchErrors()) {
+                $seenExternalIds = array_map(
+                    static fn ($event) => $event->externalId(),
+                    $events
+                );
+
+                $archived = $this->synchronizer->pruneStale($connectorId, $seenExternalIds);
+            } else {
+                $this->logger->warning(
+                    sprintf(
+                        'Skipped stale-event cleanup for connector "%s": %d source fetch(es) failed.',
+                        $connector->label(),
+                        $connector->fetchErrors()
+                    )
+                );
+            }
 
             $summary['processed'] += $eventCount;
             $summary['created'] += $syncResult['created'];
             $summary['updated'] += $syncResult['updated'];
             $summary['failed'] += $syncResult['failed'];
             $summary['skipped'] += $syncResult['skipped'];
+            $summary['archived'] += $archived;
             $summary['connectors'][] = [
                 'id' => $connectorId,
                 'label' => $connector->label(),
@@ -70,16 +108,18 @@ final class SyncRunner
                 'updated' => $syncResult['updated'],
                 'failed' => $syncResult['failed'],
                 'skipped' => $syncResult['skipped'],
+                'archived' => $archived,
             ];
 
             $this->logger->info(
                 sprintf(
-                    'Completed sync for connector "%s": created=%d updated=%d failed=%d skipped=%d',
+                    'Completed sync for connector "%s": created=%d updated=%d failed=%d skipped=%d archived=%d',
                     $connector->label(),
                     $syncResult['created'],
                     $syncResult['updated'],
                     $syncResult['failed'],
-                    $syncResult['skipped']
+                    $syncResult['skipped'],
+                    $archived
                 )
             );
         }

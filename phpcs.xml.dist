@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<ruleset name="EventMesh">
+    <description>Coding standard for the EventMesh plugin.</description>
+
+    <arg name="basepath" value="."/>
+    <arg name="colors"/>
+    <arg name="extensions" value="php"/>
+    <arg value="ps"/>
+
+    <file>src</file>
+
+    <!--
+        The codebase follows PSR-12 (camelCase, strict_types, short array
+        syntax) rather than classic WordPress style, so only the
+        security-relevant WPCS sniffs are pulled in on top of that -
+        escaping, nonce verification, and i18n - rather than the full
+        WordPress-Extra ruleset, which would fight the project's actual style.
+    -->
+    <rule ref="PSR12"/>
+
+    <rule ref="WordPress.Security.EscapeOutput">
+        <!-- Flags variables interpolated into exception messages as unescaped
+             output, but exception messages are never rendered as HTML. -->
+        <exclude name="WordPress.Security.EscapeOutput.ExceptionNotEscaped"/>
+    </rule>
+    <rule ref="WordPress.Security.NonceVerification"/>
+    <rule ref="WordPress.WP.I18n"/>
+
+    <config name="testVersion" value="8.2-"/>
+    <config name="ignore_warnings_on_exit" value="1"/>
+</ruleset>

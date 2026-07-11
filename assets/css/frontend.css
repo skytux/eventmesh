@@ -1,0 +1,27 @@
+.eventmesh-event-past,
+.eventmesh-events-list__item--past {
+    opacity: 0.55;
+}
+
+/*
+ * Only overrides color/border - relies on wp-block-button__link/
+ * wp-element-button (always present alongside this class) for padding,
+ * border-radius, and font-size, so the sold-out button is exactly the same
+ * size and shape as the regular ticket button, not just similarly styled.
+ */
+.eventmesh-ticket-button--secondary {
+    background: transparent !important;
+    color: inherit !important;
+    border: 1px solid currentColor;
+    opacity: 0.75;
+}
+
+.eventmesh-provider-embed {
+    max-height: 70px;
+    overflow: hidden;
+}
+
+.eventmesh-provider-embed iframe {
+    max-height: 70px;
+    width: 100%;
+}

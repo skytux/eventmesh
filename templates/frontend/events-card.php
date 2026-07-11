@@ -13,16 +13,24 @@ if (! defined('ABSPATH')) {
     <?php foreach ($events as $event) : ?>
         <?php $image = (string) ($event['image'] ?? ''); ?>
         <?php $title = (string) ($event['title'] ?? ''); ?>
-        <article class="eventmesh-event-card">
+        <?php $soldOut = ! empty($event['sold_out']); ?>
+        <article class="eventmesh-event-card<?php echo ! empty($event['is_past']) ? ' eventmesh-event-past' : ''; ?>">
             <?php if ('' !== $image) : ?>
                 <img src="<?php echo esc_url($image); ?>" alt="<?php echo esc_attr($title); ?>" />
             <?php endif; ?>
-            <h3><?php echo esc_html($title); ?></h3>
+            <h3<?php echo $soldOut ? ' style="text-decoration:line-through"' : ''; ?>><?php echo esc_html($title); ?></h3>
             <?php if (! empty($event['excerpt'])) : ?>
                 <p><?php echo esc_html((string) $event['excerpt']); ?></p>
             <?php endif; ?>
             <?php if (! empty($event['source_url'])) : ?>
-                <p><a class="button" href="<?php echo esc_url((string) $event['source_url']); ?>"><?php esc_html_e('Tickets', 'eventmesh'); ?></a></p>
+                <p>
+                    <a
+                        class="button<?php echo $soldOut ? ' eventmesh-ticket-button--secondary' : ''; ?>"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href="<?php echo esc_url((string) $event['source_url']); ?>"
+                    ><?php echo $soldOut ? esc_html__('Sold out', 'eventmesh') : esc_html__('Tickets', 'eventmesh'); ?></a>
+                </p>
             <?php endif; ?>
             <?php if (! empty($event['providers'])) : ?>
                 <ul>

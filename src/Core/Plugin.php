@@ -6,31 +6,31 @@ namespace EventMesh\Core;
 
 final class Plugin
 {
-	private static ?self $instance = null;
+    private static ?self $instance = null;
 
-	private Kernel $kernel;
+    private Kernel $kernel;
 
-	public static function boot(): void
-	{
-		if (self::$instance instanceof self) {
-			return;
-		}
+    public static function boot(): void
+    {
+        if (self::$instance instanceof self) {
+            return;
+        }
 
-		self::$instance = new self();
-	}
+        self::$instance = new self();
+    }
 
-	private function __construct()
-	{
-		$this->kernel = new Kernel();
+    private function __construct()
+    {
+        $this->kernel = new Kernel();
 
-		add_action(
-			'plugins_loaded',
-			[$this, 'init']
-		);
-	}
+        add_action(
+            'plugins_loaded',
+            [$this, 'init']
+        );
+    }
 
-	public function init(): void
-	{
-		$this->kernel->boot();
-	}
+    public function init(): void
+    {
+        $this->kernel->boot();
+    }
 }
