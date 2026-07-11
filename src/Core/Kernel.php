@@ -11,13 +11,16 @@ use EventMesh\Admin\EventListBlock;
 use EventMesh\Admin\SettingsPage;
 use EventMesh\Admin\SourcesPage;
 use EventMesh\Admin\View;
+use EventMesh\Connectors\Holvi\HolviHtmlParser;
 use EventMesh\Content\EventPostType;
 use EventMesh\Content\EventQuery;
 use EventMesh\Content\PerformerTaxonomy;
+use EventMesh\Content\SingleEventTemplate;
 use EventMesh\Services\ArtistMap;
 use EventMesh\Services\ConnectorManager;
 use EventMesh\Services\EventMediaEnricher;
 use EventMesh\Services\HolviSourceManager;
+use EventMesh\Services\ProviderEmbedEnricher;
 use EventMesh\Services\ProviderEnricher;
 use EventMesh\Services\SourceSettings;
 use EventMesh\Services\SyncRunner;
@@ -42,6 +45,12 @@ final class Kernel
 
         $eventPostType = $this->container->get(EventPostType::class);
         $eventPostType->boot();
+
+        $eventQuery = $this->container->get(EventQuery::class);
+        $eventQuery->boot();
+
+        $singleEventTemplate = $this->container->get(SingleEventTemplate::class);
+        $singleEventTemplate->boot();
 
         $performerTaxonomy = $this->container->get(PerformerTaxonomy::class);
         $performerTaxonomy->boot();
@@ -78,8 +87,17 @@ final class Kernel
         );
 
         $this->container->singleton(
+            ProviderEmbedEnricher::class,
+            fn (Container $container) => new ProviderEmbedEnricher(
+                $container->get(Logger::class)
+            )
+        );
+
+        $this->container->singleton(
             EventPostType::class,
-            fn () => new EventPostType()
+            fn (Container $container) => new EventPostType(
+                $container->get(ProviderEmbedEnricher::class)
+            )
         );
 
         $this->container->singleton(
@@ -88,9 +106,20 @@ final class Kernel
         );
 
         $this->container->singleton(
+            SingleEventTemplate::class,
+            fn () => new SingleEventTemplate()
+        );
+
+        $this->container->singleton(
+            HolviHtmlParser::class,
+            fn () => new HolviHtmlParser()
+        );
+
+        $this->container->singleton(
             EventListBlock::class,
             fn (Container $container) => new EventListBlock(
-                $container->get(EventQuery::class)
+                $container->get(EventQuery::class),
+                $container->get(HolviHtmlParser::class)
             )
         );
 
@@ -119,7 +148,8 @@ final class Kernel
             fn (Container $container) => new EventSynchronizer(
                 $container->get(Logger::class),
                 $container->get(EventMediaEnricher::class),
-                $container->get(ProviderEnricher::class)
+                $container->get(ProviderEnricher::class),
+                $container->get(ProviderEmbedEnricher::class)
             )
         );
 
@@ -185,7 +215,8 @@ final class Kernel
             fn (Container $container) => new SettingsPage(
                 $container->get(View::class),
                 $container->get(ArtistMap::class),
-                $container->get(SourceSettings::class)
+                $container->get(SourceSettings::class),
+                $container->get(Admin::class)
             )
         );
 

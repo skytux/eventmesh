@@ -6,6 +6,8 @@
  * @var string $artist_map_json   Artist/provider mapping JSON.
  * @var array<string, bool> $source_settings Source enablement settings.
  * @var bool $background_sync_enabled Whether background sync is enabled.
+ * @var string $sync_interval Currently configured background sync interval key.
+ * @var array<string, string> $sync_intervals Available interval keys mapped to labels.
  */
 
 declare(strict_types=1);
@@ -56,6 +58,25 @@ if (! defined('ABSPATH')) {
                 </tr>
                 <tr>
                     <th scope="row">
+                        <label for="eventmesh_sync_interval">
+                            <?php esc_html_e('Sync interval', 'eventmesh'); ?>
+                        </label>
+                    </th>
+                    <td>
+                        <select id="eventmesh_sync_interval" name="eventmesh_sync_interval">
+                            <?php foreach ($sync_intervals as $interval_key => $interval_label) : ?>
+                                <option value="<?php echo esc_attr($interval_key); ?>" <?php selected($sync_interval, $interval_key); ?>>
+                                    <?php echo esc_html($interval_label); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <p class="description">
+                            <?php esc_html_e('How often background sync runs. Actual timing still depends on site traffic unless real server cron is configured.', 'eventmesh'); ?>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
                         <label for="eventmesh_artist_map">
                             <?php esc_html_e('Artist provider map', 'eventmesh'); ?>
                         </label>
@@ -77,5 +98,21 @@ if (! defined('ABSPATH')) {
         </table>
 
         <?php submit_button(__('Save Settings', 'eventmesh')); ?>
+    </form>
+
+    <hr />
+
+    <h2><?php esc_html_e('Factory reset', 'eventmesh'); ?></h2>
+    <p class="description">
+        <?php esc_html_e('Removes every synced event and performer term, and resets all EventMesh settings to their defaults. The plugin itself stays installed and active. This cannot be undone.', 'eventmesh'); ?>
+    </p>
+    <form
+        method="post"
+        action="<?php echo esc_url(admin_url('admin-post.php')); ?>"
+        onsubmit="return window.confirm('<?php echo esc_js(__('This will permanently delete all synced events and reset every EventMesh setting. Continue?', 'eventmesh')); ?>');"
+    >
+        <input type="hidden" name="action" value="eventmesh_factory_reset">
+        <?php wp_nonce_field('eventmesh_factory_reset'); ?>
+        <?php submit_button(__('Factory Reset', 'eventmesh'), 'delete'); ?>
     </form>
 </div>

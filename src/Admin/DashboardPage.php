@@ -30,6 +30,7 @@ final class DashboardPage
                 'version' => EVENTMESH_VERSION,
                 'background_sync_enabled' => '1' === (string) get_option('eventmesh_enable_background_sync', '1'),
                 'last_sync' => $this->lastSyncSummary(),
+                'next_sync_timestamp' => wp_next_scheduled('eventmesh/background_sync'),
             ]
         );
     }
@@ -85,6 +86,7 @@ final class DashboardPage
                 'updated' => $result['updated'],
                 'failed' => $result['failed'],
                 'skipped' => $result['skipped'],
+                'archived' => $result['archived'],
             ],
             $synced
         );
@@ -100,11 +102,13 @@ final class DashboardPage
         }
 
         $message = sprintf(
-            __('Created %1$d, updated %2$d, failed %3$d, skipped %4$d.', 'eventmesh'),
+            /* translators: 1: created count, 2: updated count, 3: failed count, 4: skipped count, 5: archived count */
+            __('Created %1$d, updated %2$d, failed %3$d, skipped %4$d, archived %5$d.', 'eventmesh'),
             $result['created'],
             $result['updated'],
             $result['failed'],
-            $result['skipped']
+            $result['skipped'],
+            $result['archived']
         );
 
         $this->markSyncState('completed', $message);
@@ -117,7 +121,7 @@ final class DashboardPage
     }
 
     /**
-     * @param array{created: int, updated: int, failed: int} $result
+     * @param array{created: int, updated: int, failed: int, skipped: int, archived?: int} $result
      */
     public function persistSyncSummary(array $result, int $synced): void
     {
@@ -128,6 +132,7 @@ final class DashboardPage
                 'updated' => $result['updated'],
                 'failed' => $result['failed'],
                 'skipped' => $result['skipped'],
+                'archived' => $result['archived'] ?? 0,
                 'synced' => $synced,
                 'timestamp' => time(),
             ],
@@ -184,7 +189,7 @@ final class DashboardPage
     }
 
     /**
-     * @return array{created: int, updated: int, failed: int, skipped: int, synced: int, timestamp: int}|null
+     * @return array{created: int, updated: int, failed: int, skipped: int, archived: int, synced: int, timestamp: int}|null
      */
     public function lastSyncSummary(): ?array
     {
@@ -199,6 +204,7 @@ final class DashboardPage
             'updated' => (int) ($summary['updated'] ?? 0),
             'failed' => (int) ($summary['failed'] ?? 0),
             'skipped' => (int) ($summary['skipped'] ?? 0),
+            'archived' => (int) ($summary['archived'] ?? 0),
             'synced' => (int) ($summary['synced'] ?? 0),
             'timestamp' => (int) ($summary['timestamp'] ?? 0),
         ];

@@ -6,30 +6,30 @@ namespace EventMesh\Support;
 
 final class Autoloader
 {
-	private const PREFIX = 'EventMesh\\';
+    private const PREFIX = 'EventMesh\\';
 
-	public static function register(): void
-	{
-		spl_autoload_register(
-			[self::class, 'autoload']
-		);
-	}
+    public static function register(): void
+    {
+        spl_autoload_register(
+            [self::class, 'autoload']
+        );
+    }
 
-	private static function autoload(string $class): void
-	{
-		if (! str_starts_with($class, self::PREFIX)) {
-			return;
-		}
+    private static function autoload(string $class): void
+    {
+        if (! str_starts_with($class, self::PREFIX)) {
+            return;
+        }
 
-		$relative = substr($class, strlen(self::PREFIX));
+        $relative = substr($class, strlen(self::PREFIX));
 
-		$file = EVENTMESH_PLUGIN_DIR .
-			'src/' .
-			str_replace('\\', DIRECTORY_SEPARATOR, $relative) .
-			'.php';
+        $file = EVENTMESH_PLUGIN_DIR .
+            'src/' .
+            str_replace('\\', DIRECTORY_SEPARATOR, $relative) .
+            '.php';
 
-		if (is_readable($file)) {
-			require $file;
-		}
-	}
+        if (is_readable($file)) {
+            require $file;
+        }
+    }
 }

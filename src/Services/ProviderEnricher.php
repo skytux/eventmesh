@@ -24,17 +24,22 @@ final class ProviderEnricher
 
         $artistName = $this->artistNameFromEvent($event);
 
-        if ('' === $artistName) {
-            return;
-        }
+        // Provider links parsed directly off this specific event's own
+        // Holvi page take priority; the manually-configured artist map only
+        // fills in whatever provider Holvi didn't mention for this artist.
+        $providers = $event->providers();
 
-        $providers = $this->artistMap->forArtist($artistName);
+        if ('' !== $artistName) {
+            $providers = array_merge($this->artistMap->forArtist($artistName), $providers);
+        }
 
         if ([] === $providers) {
             return;
         }
 
-        $this->attachPerformerTerm($postId, $artistName);
+        if ('' !== $artistName) {
+            $this->attachPerformerTerm($postId, $artistName);
+        }
 
         foreach ($providers as $provider => $url) {
             $url = trim((string) $url);

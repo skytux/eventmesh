@@ -37,6 +37,11 @@ final class Admin
         );
 
         add_action(
+            'admin_post_eventmesh_factory_reset',
+            [$this->container->get(SettingsPage::class), 'factoryReset']
+        );
+
+        add_action(
             'admin_post_eventmesh_save_sources',
             [$this->container->get(SourcesPage::class), 'save']
         );
@@ -46,11 +51,53 @@ final class Admin
             [$this->container->get(DashboardPage::class), 'saveBackgroundSyncToggle']
         );
 
+        add_filter('cron_schedules', [$this, 'registerCronSchedules']);
         add_action('init', [$this, 'scheduleBackgroundSync']);
         add_action('init', [$this, 'registerBlock']);
+        add_action('wp_enqueue_scripts', [$this, 'enqueueFrontendStyles']);
         add_action('eventmesh/background_sync', [$this, 'runBackgroundSync']);
         add_shortcode('eventmesh_status', [$this, 'renderStatusShortcode']);
         add_shortcode('eventmesh_events', [$this, 'renderEventsShortcode']);
+    }
+
+    /**
+     * @return array<string, array{interval: int, display: string}>
+     */
+    public function availableSyncIntervals(): array
+    {
+        return [
+            'eventmesh_15min' => __('Every 15 minutes', 'eventmesh'),
+            'eventmesh_30min' => __('Every 30 minutes', 'eventmesh'),
+            'hourly' => __('Hourly', 'eventmesh'),
+            'twicedaily' => __('Twice daily', 'eventmesh'),
+            'daily' => __('Daily', 'eventmesh'),
+        ];
+    }
+
+    /**
+     * @param array<string, array{interval: int, display: string}> $schedules
+     *
+     * @return array<string, array{interval: int, display: string}>
+     */
+    public function registerCronSchedules(array $schedules): array
+    {
+        $schedules['eventmesh_15min'] = [
+            'interval' => 15 * MINUTE_IN_SECONDS,
+            'display' => __('Every 15 minutes', 'eventmesh'),
+        ];
+        $schedules['eventmesh_30min'] = [
+            'interval' => 30 * MINUTE_IN_SECONDS,
+            'display' => __('Every 30 minutes', 'eventmesh'),
+        ];
+
+        return $schedules;
+    }
+
+    public function configuredSyncInterval(): string
+    {
+        $configured = (string) get_option('eventmesh_sync_interval', 'hourly');
+
+        return array_key_exists($configured, $this->availableSyncIntervals()) ? $configured : 'hourly';
     }
 
     public function registerMenus(): void
@@ -136,11 +183,18 @@ final class Admin
             return;
         }
 
-        if (wp_next_scheduled('eventmesh/background_sync')) {
+        $configuredInterval = $this->configuredSyncInterval();
+        $scheduled = wp_get_scheduled_event('eventmesh/background_sync');
+
+        if (false !== $scheduled && $scheduled->schedule === $configuredInterval) {
             return;
         }
 
-        wp_schedule_event(time() + 300, 'hourly', 'eventmesh/background_sync');
+        if (false !== $scheduled) {
+            wp_unschedule_event($scheduled->timestamp, 'eventmesh/background_sync');
+        }
+
+        wp_schedule_event(time() + 300, $configuredInterval, 'eventmesh/background_sync');
     }
 
     public function runBackgroundSync(): void
@@ -160,6 +214,7 @@ final class Admin
                     'updated' => $result['updated'],
                     'failed' => $result['failed'],
                     'skipped' => $result['skipped'],
+                    'archived' => $result['archived'],
                 ],
                 $result['created'] + $result['updated']
             );
@@ -169,6 +224,22 @@ final class Admin
     public function registerBlock(): void
     {
         $this->container->get(EventListBlock::class)->register();
+    }
+
+    public function enqueueFrontendStyles(): void
+    {
+        $path = EVENTMESH_PLUGIN_DIR . 'assets/css/frontend.css';
+
+        if (! is_readable($path)) {
+            return;
+        }
+
+        wp_enqueue_style(
+            'eventmesh-frontend',
+            EVENTMESH_PLUGIN_URL . 'assets/css/frontend.css',
+            [],
+            (string) filemtime($path)
+        );
     }
 
     public function renderStatusShortcode(array $attributes = []): string
