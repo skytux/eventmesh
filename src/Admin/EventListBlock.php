@@ -376,14 +376,7 @@ final class EventListBlock
             return '';
         }
 
-        // This block reuses core/button's own CSS classes for visual parity
-        // rather than shipping its own stylesheet, but the frontend only
-        // loads a block's styles when that exact block is actually present
-        // on the page - since no real core/button instance exists here,
-        // its stylesheet (border-radius etc.) would otherwise never load,
-        // making this button look right in the editor (which loads every
-        // block's styles) but square/unstyled on the frontend.
-        wp_enqueue_block_style('core/button');
+        $this->enqueueCoreButtonStyle();
 
         $url = (string) get_post_meta($postId, '_eventmesh_url', true);
 
@@ -421,6 +414,34 @@ final class EventListBlock
         );
 
         return sprintf('<a %s>%s</a>', $wrapperAttributes, esc_html($text));
+    }
+
+    /**
+     * This block reuses core/button's own CSS classes (wp-block-button__link
+     * / wp-element-button) for visual parity rather than shipping its own
+     * stylesheet, but the frontend only loads a block's styles when that
+     * exact block is actually present on the page - since no real
+     * core/button instance exists here, its stylesheet (border-radius etc.)
+     * would otherwise never load, making this button look right in the
+     * editor (which loads every block's styles) but square/unstyled on the
+     * frontend.
+     *
+     * Core registers each block's style under the handle "wp-block-{name}",
+     * so enqueuing "wp-block-button" pulls in exactly that stylesheet. The
+     * registered-check guards against a WP build/theme where the handle
+     * isn't present, so this can never fatal. (wp_enqueue_block_style() is
+     * deliberately NOT used - that function is for *registering* a new block
+     * style and requires a second $args argument describing the source.)
+     */
+    private function enqueueCoreButtonStyle(): void
+    {
+        if (! function_exists('wp_style_is') || ! function_exists('wp_enqueue_style')) {
+            return;
+        }
+
+        if (wp_style_is('wp-block-button', 'registered')) {
+            wp_enqueue_style('wp-block-button');
+        }
     }
 
     /**
