@@ -1,7 +1,8 @@
-( function ( blocks, element, blockEditor ) {
+( function ( blocks, element, blockEditor, i18n ) {
 	var el = element.createElement;
 	var useBlockProps = blockEditor.useBlockProps;
 	var RichText = blockEditor.RichText;
+	var __ = i18n.__;
 
 	blocks.registerBlockType( 'eventmesh/ticket-button', {
 		edit: function ( props ) {
@@ -30,7 +31,7 @@
 					onChange: function ( value ) {
 						setAttributes( { text: value } );
 					},
-					placeholder: 'Tickets',
+					placeholder: __( 'Tickets', 'eventmesh' ),
 					allowedFormats: [],
 				} )
 			);
@@ -39,4 +40,4 @@
 			return null;
 		},
 	} );
-} )( window.wp.blocks, window.wp.element, window.wp.blockEditor );
+} )( window.wp.blocks, window.wp.element, window.wp.blockEditor, window.wp.i18n );

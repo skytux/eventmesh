@@ -18,6 +18,7 @@ final class EventListBlockPatternsTest extends TestCase
     private function registerAndCapturePatterns(): array
     {
         Functions\when('__')->returnArg(1);
+        Functions\when('esc_html__')->returnArg(1);
         Functions\when('register_block_type')->justReturn(null);
         Functions\when('register_block_pattern_category')->justReturn(null);
 
@@ -140,5 +141,14 @@ final class EventListBlockPatternsTest extends TestCase
             $embedPosition,
             'The provider embed must appear before the collapsed "Show more" details, not inside it.'
         );
+    }
+
+    public function testShowMoreAndNoResultsTextAreTranslatedNotHardcoded(): void
+    {
+        $content = $this->queryLoopPatternContent();
+
+        self::assertStringContainsString('<summary>Show more</summary>', $content);
+        self::assertStringContainsString('<p>No events found.</p>', $content);
+        self::assertStringNotContainsString('__EVENTMESH_', $content, 'A translation placeholder was left unreplaced.');
     }
 }
