@@ -10,6 +10,7 @@
   "usesContext": ["postId"],
   "supports": {
     "html": false,
+    "shadow": true,
     "color": {
       "background": true,
       "text": true,

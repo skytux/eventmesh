@@ -25,6 +25,7 @@ final class EventListBlockRenderersTest extends TestCase
         );
         Functions\when('date_i18n')->alias(static fn (string $format, int $timestamp) => gmdate($format, $timestamp));
         Functions\when('wp_kses')->returnArg(1);
+        Functions\when('wp_enqueue_block_style')->justReturn(null);
     }
 
     private function block(): EventListBlock
