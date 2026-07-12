@@ -136,9 +136,12 @@ final class EventPostType
         $externalId = get_post_meta($post->ID, '_eventmesh_external_id', true);
         $sourceUrl = get_post_meta($post->ID, '_eventmesh_url', true);
 
-        echo '<p><strong>' . esc_html__('Source', 'eventmesh') . ':</strong> ' . esc_html((string) $sourceId) . '</p>';
-        echo '<p><strong>' . esc_html__('External ID', 'eventmesh') . ':</strong> ' . esc_html((string) $externalId) . '</p>';
-        echo '<p><strong>' . esc_html__('Remote URL', 'eventmesh') . ':</strong> ' . esc_url((string) $sourceUrl) . '</p>';
+        echo '<p><strong>' . esc_html__('Source', 'eventmesh') . ':</strong> '
+            . esc_html((string) $sourceId) . '</p>';
+        echo '<p><strong>' . esc_html__('External ID', 'eventmesh') . ':</strong> '
+            . esc_html((string) $externalId) . '</p>';
+        echo '<p><strong>' . esc_html__('Remote URL', 'eventmesh') . ':</strong> '
+            . esc_url((string) $sourceUrl) . '</p>';
 
         wp_nonce_field('eventmesh_save_providers_' . $post->ID, 'eventmesh_providers_nonce');
 

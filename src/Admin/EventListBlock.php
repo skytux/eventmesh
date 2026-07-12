@@ -597,6 +597,9 @@ final class EventListBlock
      */
     private function registerQueryLoopPattern(): void
     {
+        // WordPress block delimiter comments require their JSON attributes on
+        // a single line, so the long lines in this markup can't be wrapped.
+        // phpcs:disable Generic.Files.LineLength.TooLong
         $content = <<<'HTML'
 <!-- wp:query {"query":{"perPage":6,"pages":0,"offset":0,"postType":"eventmesh_event","order":"asc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"}} -->
 <div class="wp-block-query">
@@ -659,6 +662,7 @@ final class EventListBlock
 </div>
 <!-- /wp:query -->
 HTML;
+        // phpcs:enable Generic.Files.LineLength.TooLong
 
         $content = strtr(
             $content,
@@ -673,6 +677,7 @@ HTML;
             [
                 'title' => __('EventMesh events (editable layout)', 'eventmesh'),
                 'description' => __(
+                    // phpcs:ignore Generic.Files.LineLength.TooLong -- single translatable string, must not be split for extraction
                     'A Query Loop of events built mostly from ordinary blocks (columns, group, details) so the layout can be freely rearranged, restyled, or extended after inserting it.',
                     'eventmesh'
                 ),
