@@ -82,4 +82,50 @@ final class DummyConnectorTest extends TestCase
 
         self::assertNotEmpty($canceled, 'A CANCELED-titled event is needed to test the strike-through behavior.');
     }
+
+    public function testFetchIncludesSeveralUpcomingEvents(): void
+    {
+        $now = new \DateTimeImmutable('now');
+        $events = (new DummyConnector())->fetch();
+
+        $upcoming = array_filter(
+            $events,
+            static fn ($event) => null !== $event->startsAt()
+                && $event->startsAt() > $now
+                && ! $event->soldOut()
+                && ! str_contains($event->title(), 'CANCELED')
+        );
+
+        self::assertGreaterThanOrEqual(2, count($upcoming), 'The demo dataset should show more than one plain upcoming event.');
+    }
+
+    public function testFetchIncludesACanceledPastEvent(): void
+    {
+        $now = new \DateTimeImmutable('now');
+        $events = (new DummyConnector())->fetch();
+
+        $canceledPast = array_filter(
+            $events,
+            static fn ($event) => str_contains($event->title(), 'CANCELED')
+                && null !== $event->startsAt()
+                && $event->startsAt() < $now
+        );
+
+        self::assertNotEmpty($canceledPast, 'A canceled past event is needed to show strike-through in the past section.');
+    }
+
+    public function testFetchIncludesAnEventThatIsBothCanceledAndSoldOut(): void
+    {
+        $events = (new DummyConnector())->fetch();
+
+        $canceledSoldOut = array_filter(
+            $events,
+            static fn ($event) => $event->soldOut() && str_contains($event->title(), 'CANCELED')
+        );
+
+        self::assertNotEmpty(
+            $canceledSoldOut,
+            'A canceled-and-sold-out combination is needed to test precedence between the two states.'
+        );
+    }
 }

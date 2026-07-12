@@ -9,15 +9,20 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-// Inert in production - opt in on a dev/staging site only, by adding
-// define('EVENTMESH_ENABLE_TEST_CONNECTOR', true); to wp-config.php.
-if (! defined('EVENTMESH_ENABLE_TEST_CONNECTOR') || ! EVENTMESH_ENABLE_TEST_CONNECTOR) {
-    return;
-}
-
 add_action(
     'eventmesh/register_connectors',
     static function (ConnectorManager $connectors): void {
+        // Off by default so a production install never ships sample data.
+        // Enable it either way that fits the site: the wp-config constant
+        // (locked-down or CI setups) or the Settings-page toggle (a dev/
+        // staging admin who can't - or would rather not - edit wp-config).
+        $viaConstant = defined('EVENTMESH_ENABLE_TEST_CONNECTOR') && EVENTMESH_ENABLE_TEST_CONNECTOR;
+        $viaOption = '1' === (string) get_option('eventmesh_enable_test_connector', '0');
+
+        if (! $viaConstant && ! $viaOption) {
+            return;
+        }
+
         $connectors->register(new DummyConnector());
     }
 );

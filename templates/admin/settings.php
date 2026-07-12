@@ -9,6 +9,8 @@
  * @var string $sync_interval Currently configured background sync interval key.
  * @var array<string, string> $sync_intervals Available interval keys mapped to labels.
  * @var bool $delete_data_on_uninstall Whether uninstalling the plugin should also delete its data.
+ * @var bool $enable_test_connector Whether the built-in dummy/test connector is enabled.
+ * @var bool $test_connector_forced Whether the wp-config constant forces the test connector on.
  */
 
 declare(strict_types=1);
@@ -92,6 +94,24 @@ if (! defined('ABSPATH')) {
                         ><?php echo esc_textarea($artist_map_json); ?></textarea>
                         <p class="description">
                             <?php esc_html_e('Define a JSON map of artists to provider URLs such as spotify, youtube, mixcloud, bandcamp, and soundcloud.', 'eventmesh'); ?>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <?php esc_html_e('Test connector', 'eventmesh'); ?>
+                    </th>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="eventmesh_enable_test_connector" value="1" <?php checked($enable_test_connector || $test_connector_forced, true); ?> <?php disabled($test_connector_forced, true); ?> />
+                            <?php esc_html_e('Enable the built-in test connector (sample event data, no network calls)', 'eventmesh'); ?>
+                        </label>
+                        <p class="description">
+                            <?php if ($test_connector_forced) : ?>
+                                <?php esc_html_e('Forced on by the EVENTMESH_ENABLE_TEST_CONNECTOR constant in wp-config.php.', 'eventmesh'); ?>
+                            <?php else : ?>
+                                <?php esc_html_e('For development and demos only. Adds a "Dummy (testing)" source with sample upcoming, sold-out, canceled, and past events. Leave off in production.', 'eventmesh'); ?>
+                            <?php endif; ?>
                         </p>
                     </td>
                 </tr>

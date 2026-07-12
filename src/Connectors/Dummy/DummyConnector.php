@@ -35,6 +35,7 @@ final class DummyConnector implements ConnectorInterface
         $now = new DateTimeImmutable('now');
 
         return [
+            // --- Upcoming (plain) ---
             new Event(
                 sourceId: $this->id(),
                 externalId: 'dummy-upcoming-1',
@@ -51,16 +52,30 @@ final class DummyConnector implements ConnectorInterface
             ),
             new Event(
                 sourceId: $this->id(),
-                externalId: 'dummy-sold-out-1',
-                title: 'Dummy Sold Out Show',
-                startsAt: $now->modify('+14 days'),
+                externalId: 'dummy-upcoming-2',
+                title: 'Dummy Weekend Matinee',
+                startsAt: $now->modify('+3 days'),
                 endsAt: null,
-                url: 'https://example.test/dummy-sold-out-1',
-                description: 'A sample sold-out upcoming event.',
+                url: 'https://example.test/dummy-upcoming-2',
+                description: 'Another upcoming event, sooner than the first, to show ordering.',
                 imageUrl: '',
-                venueName: 'Dummy Venue Hall',
+                venueName: 'Riverside Club',
                 startsAtYearKnown: true,
-                soldOut: true,
+                soldOut: false,
+                providers: []
+            ),
+            new Event(
+                sourceId: $this->id(),
+                externalId: 'dummy-upcoming-3',
+                title: 'Dummy Season Finale',
+                startsAt: $now->modify('+28 days'),
+                endsAt: null,
+                url: 'https://example.test/dummy-upcoming-3',
+                description: 'A later upcoming event, furthest out in the future.',
+                imageUrl: '',
+                venueName: 'Grand Theatre',
+                startsAtYearKnown: true,
+                soldOut: false,
                 providers: []
             ),
             new Event(
@@ -77,6 +92,82 @@ final class DummyConnector implements ConnectorInterface
                 soldOut: false,
                 providers: []
             ),
+
+            // --- Sold out (upcoming) ---
+            new Event(
+                sourceId: $this->id(),
+                externalId: 'dummy-sold-out-1',
+                title: 'Dummy Sold Out Show',
+                startsAt: $now->modify('+14 days'),
+                endsAt: null,
+                url: 'https://example.test/dummy-sold-out-1',
+                description: 'A sample sold-out upcoming event.',
+                imageUrl: '',
+                venueName: 'Dummy Venue Hall',
+                startsAtYearKnown: true,
+                soldOut: true,
+                providers: []
+            ),
+            new Event(
+                sourceId: $this->id(),
+                externalId: 'dummy-sold-out-2',
+                title: 'Dummy Sold Out Club Night',
+                startsAt: $now->modify('+5 days'),
+                endsAt: null,
+                url: 'https://example.test/dummy-sold-out-2',
+                description: 'A second sold-out upcoming event, to show dimming among upcoming events.',
+                imageUrl: '',
+                venueName: 'Riverside Club',
+                startsAtYearKnown: true,
+                soldOut: true,
+                providers: []
+            ),
+
+            // --- Canceled ---
+            new Event(
+                sourceId: $this->id(),
+                externalId: 'dummy-canceled-1',
+                title: 'Dummy Canceled Show CANCELED',
+                startsAt: $now->modify('+10 days'),
+                endsAt: null,
+                url: 'https://example.test/dummy-canceled-1',
+                description: 'A sample upcoming event whose title contains the CANCELED keyword.',
+                imageUrl: '',
+                venueName: 'Dummy Venue Hall',
+                startsAtYearKnown: true,
+                soldOut: false,
+                providers: []
+            ),
+            new Event(
+                sourceId: $this->id(),
+                externalId: 'dummy-canceled-past-1',
+                title: 'Dummy Old Gig CANCELED',
+                startsAt: $now->modify('-3 days'),
+                endsAt: null,
+                url: 'https://example.test/dummy-canceled-past-1',
+                description: 'A past event that was canceled, to show strike-through in the past section.',
+                imageUrl: '',
+                venueName: 'Grand Theatre',
+                startsAtYearKnown: true,
+                soldOut: false,
+                providers: []
+            ),
+            new Event(
+                sourceId: $this->id(),
+                externalId: 'dummy-canceled-sold-out-1',
+                title: 'Dummy Festival Slot CANCELED',
+                startsAt: $now->modify('+12 days'),
+                endsAt: null,
+                url: 'https://example.test/dummy-canceled-sold-out-1',
+                description: 'An event that is both marked sold out and canceled, to test that combination.',
+                imageUrl: '',
+                venueName: 'Open Air Grounds',
+                startsAtYearKnown: true,
+                soldOut: true,
+                providers: []
+            ),
+
+            // --- Past ---
             new Event(
                 sourceId: $this->id(),
                 externalId: 'dummy-past-1',
@@ -93,6 +184,22 @@ final class DummyConnector implements ConnectorInterface
             ),
             new Event(
                 sourceId: $this->id(),
+                externalId: 'dummy-past-2',
+                title: 'Dummy Last Month Show',
+                startsAt: $now->modify('-30 days'),
+                endsAt: null,
+                url: 'https://example.test/dummy-past-2',
+                description: 'An older past event, furthest back, to show past ordering.',
+                imageUrl: '',
+                venueName: 'Riverside Club',
+                startsAtYearKnown: true,
+                soldOut: false,
+                providers: []
+            ),
+
+            // --- Past + sold out ---
+            new Event(
+                sourceId: $this->id(),
                 externalId: 'dummy-past-sold-out-1',
                 title: 'Dummy Past Sold Out Show',
                 startsAt: $now->modify('-14 days'),
@@ -103,20 +210,6 @@ final class DummyConnector implements ConnectorInterface
                 venueName: 'Dummy Venue Hall',
                 startsAtYearKnown: true,
                 soldOut: true,
-                providers: []
-            ),
-            new Event(
-                sourceId: $this->id(),
-                externalId: 'dummy-canceled-1',
-                title: 'Dummy Canceled Show CANCELED',
-                startsAt: $now->modify('+10 days'),
-                endsAt: null,
-                url: 'https://example.test/dummy-canceled-1',
-                description: 'A sample event whose title contains the CANCELED keyword.',
-                imageUrl: '',
-                venueName: 'Dummy Venue Hall',
-                startsAtYearKnown: true,
-                soldOut: false,
                 providers: []
             ),
         ];
