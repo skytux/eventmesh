@@ -22,8 +22,8 @@ final class Admin
         );
 
         add_action(
-            'admin_post_eventmesh_sync_holvi',
-            [$this, 'handleHolviSync']
+            'admin_post_eventmesh_sync',
+            [$this, 'handleSync']
         );
 
         add_action(
@@ -149,15 +149,15 @@ final class Admin
         );
     }
 
-    public function handleHolviSync(): void
+    public function handleSync(): void
     {
         if (! current_user_can('manage_options')) {
             wp_die(esc_html__('You do not have permission to run this action.', 'eventmesh'));
         }
 
-        check_admin_referer('eventmesh_sync_holvi');
+        check_admin_referer('eventmesh_sync');
 
-        $result = $this->container->get(DashboardPage::class)->syncHolvi();
+        $result = $this->container->get(DashboardPage::class)->runSync();
 
         set_transient(
             'eventmesh_sync_notice',
@@ -205,7 +205,7 @@ final class Admin
             return;
         }
 
-        $result = $this->container->get(SyncRunner::class)->run(['holvi']);
+        $result = $this->container->get(SyncRunner::class)->run();
 
         if ($result['processed'] > 0) {
             $this->container->get(DashboardPage::class)->persistSyncSummary(

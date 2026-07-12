@@ -25,7 +25,11 @@ require EVENTMESH_PLUGIN_DIR . 'src/Support/Autoloader.php';
 
 EventMesh\Support\Autoloader::register();
 
-require EVENTMESH_PLUGIN_DIR . 'src/Connectors/Holvi/register.php';
+// Each connector's own register.php hooks eventmesh/register_connectors -
+// dropping in a new connector directory is enough, no edit needed here.
+foreach (glob(EVENTMESH_PLUGIN_DIR . 'src/Connectors/*/register.php') ?: [] as $connector_register_file) {
+	require $connector_register_file;
+}
 
 register_activation_hook(
 	EVENTMESH_PLUGIN_FILE,
