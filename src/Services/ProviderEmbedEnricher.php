@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace EventMesh\Services;
 
+use EventMesh\Support\EmbedHtmlSanitizer;
 use EventMesh\Support\Logger;
 
 /**
@@ -93,7 +94,7 @@ final class ProviderEmbedEnricher
             return;
         }
 
-        update_post_meta($postId, '_eventmesh_embed_html', $html);
+        update_post_meta($postId, '_eventmesh_embed_html', EmbedHtmlSanitizer::sanitize($html));
         update_post_meta($postId, '_eventmesh_embed_source_url', $url);
     }
 

@@ -214,8 +214,6 @@ final class EventPostType
             '_eventmesh_image_url',
             '_eventmesh_venue_name',
             '_eventmesh_sold_out',
-            '_eventmesh_embed_html',
-            '_eventmesh_embed_source_url',
         ];
 
         foreach ($fields as $field) {
@@ -227,6 +225,22 @@ final class EventPostType
                     'single' => true,
                     'show_in_rest' => true,
                     'auth_callback' => static fn (): bool => current_user_can('edit_posts'),
+                ]
+            );
+        }
+
+        // Computed by ProviderEmbedEnricher from a trusted oEmbed response,
+        // never meant to be user-edited - kept out of REST entirely rather
+        // than relying on auth_callback, since there's no legitimate case
+        // for any REST client to write raw embed HTML directly.
+        foreach (['_eventmesh_embed_html', '_eventmesh_embed_source_url'] as $field) {
+            register_post_meta(
+                self::NAME,
+                $field,
+                [
+                    'type' => 'string',
+                    'single' => true,
+                    'show_in_rest' => false,
                 ]
             );
         }

@@ -25,7 +25,7 @@ if (! defined('ABSPATH')) {
                     <?php endif; ?>
                     <h3<?php echo $soldOut ? ' style="text-decoration:line-through"' : ''; ?>><a href="<?php echo esc_url((string) ($event['url'] ?? '#')); ?>"><?php echo esc_html((string) ($event['title'] ?? '')); ?></a></h3>
                     <?php if (! empty($event['embed_html'])) : ?>
-                        <div class="eventmesh-provider-embed"><?php echo $event['embed_html']; ?></div>
+                        <div class="eventmesh-provider-embed"><?php echo EventMesh\Support\EmbedHtmlSanitizer::sanitize((string) $event['embed_html']); ?></div>
                     <?php endif; ?>
                     <?php if (! empty($event['starts_at'])) : ?>
                         <p><strong><?php esc_html_e('Starts:', 'eventmesh'); ?></strong> <?php echo esc_html((string) $event['starts_at']); ?></p>

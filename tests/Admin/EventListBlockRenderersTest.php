@@ -24,6 +24,7 @@ final class EventListBlockRenderersTest extends TestCase
                 . implode('', array_map(static fn ($k, $v) => sprintf(' %s="%s"', $k, $v), array_keys($extra), $extra))
         );
         Functions\when('date_i18n')->alias(static fn (string $format, int $timestamp) => gmdate($format, $timestamp));
+        Functions\when('wp_kses')->returnArg(1);
     }
 
     private function block(): EventListBlock
