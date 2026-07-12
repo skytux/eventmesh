@@ -28,6 +28,7 @@ final class SettingsPage
                 'background_sync_enabled' => '1' === (string) get_option('eventmesh_enable_background_sync', '1'),
                 'sync_interval' => $this->admin->configuredSyncInterval(),
                 'sync_intervals' => $this->admin->availableSyncIntervals(),
+                'delete_data_on_uninstall' => '1' === (string) get_option('eventmesh_delete_data_on_uninstall', '0'),
             ]
         );
     }
@@ -56,6 +57,10 @@ final class SettingsPage
             ? sanitize_key((string) $_POST['eventmesh_sync_interval'])
             : 'hourly';
 
+        $deleteDataOnUninstall = isset($_POST['eventmesh_delete_data_on_uninstall'])
+            ? '1' === (string) $_POST['eventmesh_delete_data_on_uninstall']
+            : false;
+
         if (! array_key_exists($syncInterval, $this->admin->availableSyncIntervals())) {
             $syncInterval = 'hourly';
         }
@@ -69,6 +74,7 @@ final class SettingsPage
         update_option('eventmesh_artist_map', $artistMapJson);
         update_option('eventmesh_enable_background_sync', $backgroundSyncEnabled ? '1' : '0');
         update_option('eventmesh_sync_interval', $syncInterval);
+        update_option('eventmesh_delete_data_on_uninstall', $deleteDataOnUninstall ? '1' : '0');
 
         foreach ($sourceSettings as $sourceId => $enabled) {
             $this->sourceSettings->setEnabled((string) $sourceId, 1 === $enabled);
