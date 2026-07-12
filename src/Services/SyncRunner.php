@@ -9,6 +9,26 @@ use EventMesh\Sync\EventSynchronizer;
 
 final class SyncRunner
 {
+    /**
+     * Guards against two sync runs executing concurrently - WP-Cron's
+     * well-known double-fire behavior, or a manual "Sync now" click while a
+     * background run is in flight, would otherwise race
+     * EventSynchronizer::sync()'s find-then-insert and risk duplicate posts.
+     * TTL is a crash backstop only: released in a finally block on every
+     * normal exit, so this is just insurance against a run that died
+     * mid-way without ever releasing it.
+     */
+    private const LOCK_TRANSIENT = 'eventmesh_sync_lock';
+    private const LOCK_TTL_SECONDS = 300;
+
+    /**
+     * Updated after every actual run attempt (lock permitting), regardless
+     * of outcome - the authoritative "is the sync pipeline still alive"
+     * signal used by CronFallbackTrigger, independent of DashboardPage's
+     * user-facing "last sync summary" transient.
+     */
+    private const LAST_ATTEMPT_OPTION = 'eventmesh_last_sync_attempt_at';
+
     public function __construct(
         private readonly ConnectorManager $connectors,
         private readonly EventSynchronizer $synchronizer,
@@ -42,6 +62,47 @@ final class SyncRunner
      */
     public function run(?array $connectorIds = null): array
     {
+        if (get_transient(self::LOCK_TRANSIENT)) {
+            $this->logger->warning('Skipped sync run: another sync is already in progress.');
+
+            return $this->emptySummary();
+        }
+
+        set_transient(self::LOCK_TRANSIENT, time(), self::LOCK_TTL_SECONDS);
+
+        try {
+            return $this->runLocked($connectorIds);
+        } finally {
+            delete_transient(self::LOCK_TRANSIENT);
+            update_option(self::LAST_ATTEMPT_OPTION, time());
+        }
+    }
+
+    /**
+     * @param array<int, string>|null $connectorIds
+     *
+     * @return array{
+     *     success: bool,
+     *     processed: int,
+     *     created: int,
+     *     updated: int,
+     *     failed: int,
+     *     skipped: int,
+     *     archived: int,
+     *     connectors: array<int, array{
+     *         id: string,
+     *         label: string,
+     *         events: int,
+     *         created: int,
+     *         updated: int,
+     *         failed: int,
+     *         skipped: int,
+     *         archived: int
+     *     }>
+     * }
+     */
+    private function runLocked(?array $connectorIds): array
+    {
         $ids = [];
 
         if (null === $connectorIds) {
@@ -50,16 +111,7 @@ final class SyncRunner
             $ids = array_values(array_filter(array_map('strval', $connectorIds)));
         }
 
-        $summary = [
-            'success' => true,
-            'processed' => 0,
-            'created' => 0,
-            'updated' => 0,
-            'failed' => 0,
-            'skipped' => 0,
-            'archived' => 0,
-            'connectors' => [],
-        ];
+        $summary = $this->emptySummary();
 
         foreach ($ids as $connectorId) {
             if (! $this->sourceSettings->isEnabled($connectorId)) {
@@ -125,5 +177,40 @@ final class SyncRunner
         }
 
         return $summary;
+    }
+
+    /**
+     * @return array{
+     *     success: bool,
+     *     processed: int,
+     *     created: int,
+     *     updated: int,
+     *     failed: int,
+     *     skipped: int,
+     *     archived: int,
+     *     connectors: array<int, array{
+     *         id: string,
+     *         label: string,
+     *         events: int,
+     *         created: int,
+     *         updated: int,
+     *         failed: int,
+     *         skipped: int,
+     *         archived: int
+     *     }>
+     * }
+     */
+    private function emptySummary(): array
+    {
+        return [
+            'success' => true,
+            'processed' => 0,
+            'created' => 0,
+            'updated' => 0,
+            'failed' => 0,
+            'skipped' => 0,
+            'archived' => 0,
+            'connectors' => [],
+        ];
     }
 }
