@@ -5,6 +5,7 @@
 	var InspectorControls = blockEditor.InspectorControls;
 	var PanelBody = components.PanelBody;
 	var SelectControl = components.SelectControl;
+	var ToggleControl = components.ToggleControl;
 	var ServerSideRender = serverSideRender;
 
 	blocks.registerBlockType( 'eventmesh/event-field', {
@@ -31,6 +32,29 @@
 							],
 							onChange: function ( value ) {
 								setAttributes( { field: value } );
+							},
+						} ),
+						el( SelectControl, {
+							label: __( 'HTML tag', 'eventmesh' ),
+							value: attributes.tag,
+							options: [
+								{ label: __( 'Heading 1', 'eventmesh' ), value: 'h1' },
+								{ label: __( 'Heading 2', 'eventmesh' ), value: 'h2' },
+								{ label: __( 'Heading 3', 'eventmesh' ), value: 'h3' },
+								{ label: __( 'Heading 4', 'eventmesh' ), value: 'h4' },
+								{ label: __( 'Heading 5', 'eventmesh' ), value: 'h5' },
+								{ label: __( 'Heading 6', 'eventmesh' ), value: 'h6' },
+								{ label: __( 'Paragraph', 'eventmesh' ), value: 'p' },
+							],
+							onChange: function ( value ) {
+								setAttributes( { tag: value } );
+							},
+						} ),
+						el( ToggleControl, {
+							label: __( 'Link to the event page', 'eventmesh' ),
+							checked: !! attributes.linked,
+							onChange: function ( value ) {
+								setAttributes( { linked: value } );
 							},
 						} )
 					)

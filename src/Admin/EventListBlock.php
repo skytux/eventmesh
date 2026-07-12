@@ -147,8 +147,8 @@ final class EventListBlock
 
         return match ($field) {
             'title' => $this->renderTitleField($postId, $attributes),
-            'venue' => $this->renderVenueField($postId),
-            default => $this->renderStartsAtField($postId),
+            'venue' => $this->renderVenueField($postId, $attributes),
+            default => $this->renderStartsAtField($postId, $attributes),
         };
     }
 
@@ -165,31 +165,15 @@ final class EventListBlock
 
         $title = $this->holviHtmlParser->stripDateForDisplay($title);
         $soldOut = '1' === (string) get_post_meta($postId, '_eventmesh_sold_out', true);
-
-        $tag = isset($attributes['tag']) && is_string($attributes['tag']) && '' !== $attributes['tag']
-            ? $attributes['tag']
-            : 'h4';
-        $linked = ! isset($attributes['linked']) || (bool) $attributes['linked'];
-
         $strikethrough = $soldOut ? ' style="text-decoration:line-through"' : '';
-        $inner = $linked
-            ? $this->linkedTitle($postId, $title, $strikethrough)
-            : sprintf('<span%s>%s</span>', $strikethrough, esc_html($title));
 
-        return sprintf('<%1$s %2$s>%3$s</%1$s>', esc_html($tag), get_block_wrapper_attributes(), $inner);
+        return $this->renderTextField($postId, $attributes, $title, 'h4', $strikethrough);
     }
 
-    private function linkedTitle(int $postId, string $title, string $strikethrough): string
-    {
-        return sprintf(
-            '<a href="%s"%s>%s</a>',
-            esc_url((string) get_permalink($postId)),
-            $strikethrough,
-            esc_html($title)
-        );
-    }
-
-    private function renderVenueField(int $postId): string
+    /**
+     * @param array<string, mixed> $attributes
+     */
+    private function renderVenueField(int $postId, array $attributes): string
     {
         $venue = (string) get_post_meta($postId, '_eventmesh_venue_name', true);
 
@@ -197,10 +181,13 @@ final class EventListBlock
             return '';
         }
 
-        return sprintf('<p %s>%s</p>', get_block_wrapper_attributes(), esc_html($venue));
+        return $this->renderTextField($postId, $attributes, $venue, 'p');
     }
 
-    private function renderStartsAtField(int $postId): string
+    /**
+     * @param array<string, mixed> $attributes
+     */
+    private function renderStartsAtField(int $postId, array $attributes): string
     {
         $formatted = $this->formattedStartDate($postId);
 
@@ -208,7 +195,44 @@ final class EventListBlock
             return '';
         }
 
-        return sprintf('<p %s>%s</p>', get_block_wrapper_attributes(), esc_html($formatted));
+        return $this->renderTextField($postId, $attributes, $formatted, 'p');
+    }
+
+    /**
+     * Shared by all three event-field variants: wraps $text in the
+     * attributes-chosen tag (falling back to $defaultTag), optionally
+     * linking it to the event's own permalink - "linked" defaults to true
+     * (matching block.json) so existing title fields keep working exactly
+     * as before, but is overridden to false on the single-event template's
+     * own fields, since a field linking back to the very page it's already
+     * on is meaningless there.
+     *
+     * @param array<string, mixed> $attributes
+     */
+    private function renderTextField(
+        int $postId,
+        array $attributes,
+        string $text,
+        string $defaultTag,
+        string $extraAttrs = ''
+    ): string {
+        $tag = isset($attributes['tag']) && is_string($attributes['tag']) && '' !== $attributes['tag']
+            ? $attributes['tag']
+            : $defaultTag;
+        $linked = ! isset($attributes['linked']) || (bool) $attributes['linked'];
+
+        $inner = match (true) {
+            $linked => sprintf(
+                '<a href="%s"%s>%s</a>',
+                esc_url((string) get_permalink($postId)),
+                $extraAttrs,
+                esc_html($text)
+            ),
+            '' !== $extraAttrs => sprintf('<span%s>%s</span>', $extraAttrs, esc_html($text)),
+            default => esc_html($text),
+        };
+
+        return sprintf('<%1$s %2$s>%3$s</%1$s>', esc_html($tag), get_block_wrapper_attributes(), $inner);
     }
 
     /**

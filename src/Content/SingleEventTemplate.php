@@ -37,8 +37,8 @@ final class SingleEventTemplate
     private const DEFAULT_CONTENT = <<<'HTML'
 <!-- wp:post-featured-image {"height":"360px"} /-->
 <!-- wp:eventmesh/event-field {"field":"title","tag":"h1","linked":false} /-->
-<!-- wp:eventmesh/event-field {"field":"starts_at"} /-->
-<!-- wp:eventmesh/event-field {"field":"venue"} /-->
+<!-- wp:eventmesh/event-field {"field":"starts_at","linked":false} /-->
+<!-- wp:eventmesh/event-field {"field":"venue","linked":false} /-->
 <!-- wp:eventmesh/provider-embed {"style":{"spacing":{"margin":{"top":"1em","bottom":"1em"}}}} /-->
 <!-- wp:eventmesh/ticket-button /-->
 <!-- wp:eventmesh/other-provider-links /-->

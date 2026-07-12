@@ -49,6 +49,7 @@ final class EventListBlockRenderersTest extends TestCase
 
     public function testRenderEventFieldStartsAtRendersTheFormattedDate(): void
     {
+        Functions\when('get_permalink')->justReturn('https://example.test/events/some-band/');
         Functions\when('get_post_meta')->alias(
             static function (int $postId, string $key) {
                 return match ($key) {
@@ -131,6 +132,7 @@ final class EventListBlockRenderersTest extends TestCase
 
     public function testRenderEventFieldVenueRendersTheVenueName(): void
     {
+        Functions\when('get_permalink')->justReturn('https://example.test/events/some-band/');
         Functions\when('get_post_meta')->justReturn('The Basement Club');
 
         $html = $this->block()->renderEventField(['field' => 'venue'], '', $this->blockInstance(['postId' => 42]));
@@ -145,6 +147,31 @@ final class EventListBlockRenderersTest extends TestCase
         $html = $this->block()->renderEventField(['field' => 'venue'], '', $this->blockInstance(['postId' => 42]));
 
         self::assertSame('', $html);
+    }
+
+    public function testRenderEventFieldVenueLinksToTheEventPageByDefault(): void
+    {
+        Functions\when('get_permalink')->justReturn('https://example.test/events/some-band/');
+        Functions\when('get_post_meta')->justReturn('The Basement Club');
+
+        $html = $this->block()->renderEventField(['field' => 'venue'], '', $this->blockInstance(['postId' => 42]));
+
+        self::assertStringContainsString('<a href="https://example.test/events/some-band/">', $html);
+    }
+
+    public function testRenderEventFieldVenueCanBeConfiguredAsAnH2Unlinked(): void
+    {
+        Functions\when('get_post_meta')->justReturn('The Basement Club');
+
+        $html = $this->block()->renderEventField(
+            ['field' => 'venue', 'tag' => 'h2', 'linked' => false],
+            '',
+            $this->blockInstance(['postId' => 42])
+        );
+
+        self::assertStringStartsWith('<h2 ', $html);
+        self::assertStringEndsWith('</h2>', $html);
+        self::assertStringNotContainsString('<a ', $html);
     }
 
     public function testRenderEventFieldReturnsEmptyStringWithoutAPostIdInContext(): void
