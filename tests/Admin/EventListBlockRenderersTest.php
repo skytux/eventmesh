@@ -25,7 +25,12 @@ final class EventListBlockRenderersTest extends TestCase
         );
         Functions\when('date_i18n')->alias(static fn (string $format, int $timestamp) => gmdate($format, $timestamp));
         Functions\when('wp_kses')->returnArg(1);
-        Functions\when('wp_enqueue_block_style')->justReturn(null);
+        // Real function names/signatures (matching WordPress core) so a
+        // wrong-arity call would surface here as a MissingFunctionExpectations
+        // error, the way the live ArgumentCountError fatal did - see the
+        // dedicated enqueue test below.
+        Functions\when('wp_style_is')->justReturn(true);
+        Functions\when('wp_enqueue_style')->justReturn(true);
     }
 
     private function block(): EventListBlock
@@ -239,6 +244,57 @@ final class EventListBlockRenderersTest extends TestCase
         $html = $this->block()->renderTicketButton(['text' => 'Buy now'], '', $this->blockInstance(['postId' => 42]));
 
         self::assertStringContainsString('Buy now', $html);
+    }
+
+    public function testRenderTicketButtonEnqueuesTheCoreButtonStylesheetByHandle(): void
+    {
+        Functions\when('get_post_meta')->justReturn('https://holvi.com/shop/MiaRenwall/product/abc123/');
+
+        $registeredCheck = null;
+        $enqueued = null;
+        Functions\when('wp_style_is')->alias(
+            static function (string $handle, string $status) use (&$registeredCheck): bool {
+                $registeredCheck = [$handle, $status];
+
+                return true;
+            }
+        );
+        Functions\when('wp_enqueue_style')->alias(
+            static function (string $handle) use (&$enqueued): bool {
+                $enqueued = $handle;
+
+                return true;
+            }
+        );
+
+        $this->block()->renderTicketButton([], '', $this->blockInstance(['postId' => 42]));
+
+        // Guards against the live ArgumentCountError: it must enqueue core's
+        // already-registered button style handle (single-arg wp_enqueue_style),
+        // gated behind a registered-check - never call wp_enqueue_block_style(),
+        // whose required second argument caused the fatal.
+        self::assertSame(['wp-block-button', 'registered'], $registeredCheck);
+        self::assertSame('wp-block-button', $enqueued);
+    }
+
+    public function testRenderTicketButtonDoesNotEnqueueWhenTheCoreButtonStyleIsNotRegistered(): void
+    {
+        Functions\when('get_post_meta')->justReturn('https://holvi.com/shop/MiaRenwall/product/abc123/');
+        Functions\when('wp_style_is')->justReturn(false);
+
+        $enqueueCalled = false;
+        Functions\when('wp_enqueue_style')->alias(
+            static function () use (&$enqueueCalled): bool {
+                $enqueueCalled = true;
+
+                return true;
+            }
+        );
+
+        $html = $this->block()->renderTicketButton([], '', $this->blockInstance(['postId' => 42]));
+
+        self::assertFalse($enqueueCalled, 'Must not enqueue an unregistered handle.');
+        self::assertStringStartsWith('<a ', $html, 'The button itself must still render regardless.');
     }
 
     public function testRenderTicketButtonShowsSoldOutLabelAndSecondaryStyleWhenSoldOut(): void
