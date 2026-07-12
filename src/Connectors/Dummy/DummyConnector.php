@@ -91,6 +91,34 @@ final class DummyConnector implements ConnectorInterface
                 soldOut: false,
                 providers: []
             ),
+            new Event(
+                sourceId: $this->id(),
+                externalId: 'dummy-past-sold-out-1',
+                title: 'Dummy Past Sold Out Show',
+                startsAt: $now->modify('-14 days'),
+                endsAt: null,
+                url: 'https://example.test/dummy-past-sold-out-1',
+                description: 'A sample event that is both past and sold out, to test that combination.',
+                imageUrl: '',
+                venueName: 'Dummy Venue Hall',
+                startsAtYearKnown: true,
+                soldOut: true,
+                providers: []
+            ),
+            new Event(
+                sourceId: $this->id(),
+                externalId: 'dummy-canceled-1',
+                title: 'Dummy Canceled Show CANCELED',
+                startsAt: $now->modify('+10 days'),
+                endsAt: null,
+                url: 'https://example.test/dummy-canceled-1',
+                description: 'A sample event whose title contains the CANCELED keyword.',
+                imageUrl: '',
+                venueName: 'Dummy Venue Hall',
+                startsAtYearKnown: true,
+                soldOut: false,
+                providers: []
+            ),
         ];
     }
 

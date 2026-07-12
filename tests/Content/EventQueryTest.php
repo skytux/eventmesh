@@ -133,6 +133,34 @@ final class EventQueryTest extends TestCase
         );
     }
 
+    public function testRecentDetectsCanceledInTheTitle(): void
+    {
+        $post = new \WP_Post(1, 'eventmesh_event', 'Some Band 12.8.2026 CANCELED');
+        $this->queueQueryResults([$post]);
+
+        Functions\when('get_post_meta')->alias(
+            static fn (int $postId, string $key = '', bool $single = false) => '' === $key ? [] : ''
+        );
+
+        $events = (new EventQuery())->recent();
+
+        self::assertTrue($events[0]['is_canceled']);
+    }
+
+    public function testRecentDoesNotFlagAnOrdinaryTitleAsCanceled(): void
+    {
+        $post = new \WP_Post(1, 'eventmesh_event', 'Some Band 12.8.2026');
+        $this->queueQueryResults([$post]);
+
+        Functions\when('get_post_meta')->alias(
+            static fn (int $postId, string $key = '', bool $single = false) => '' === $key ? [] : ''
+        );
+
+        $events = (new EventQuery())->recent();
+
+        self::assertFalse($events[0]['is_canceled']);
+    }
+
     public function testMarkQueryLoopUpcomingFirstSetsTheFlagForEventmeshQueries(): void
     {
         $result = (new EventQuery())->markQueryLoopUpcomingFirst(['post_type' => 'eventmesh_event']);

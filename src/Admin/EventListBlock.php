@@ -7,6 +7,7 @@ namespace EventMesh\Admin;
 use EventMesh\Connectors\Holvi\HolviHtmlParser;
 use EventMesh\Content\EventQuery;
 use EventMesh\Support\EmbedHtmlSanitizer;
+use EventMesh\Support\EventStatus;
 use EventMesh\Support\KnownProviders;
 
 final class EventListBlock
@@ -64,14 +65,16 @@ final class EventListBlock
         // "upcoming events first, past events sorted to the bottom" -
         // override it server-side regardless of what the editor UI shows.
         add_filter('query_loop_block_query_vars', [$this->eventQuery, 'markQueryLoopUpcomingFirst']);
-        add_filter('render_block', [$this, 'markPastEventRow'], 10, 3);
+        add_filter('render_block', [$this, 'markEventRowStatus'], 10, 3);
     }
 
     /**
-     * Adds a visual "past" marker class to an event row's wrapping columns
-     * block once its start date has passed, so a stale Holvi listing that
-     * hasn't been removed from the source sinks visually instead of looking
-     * identical to an upcoming one. Scoped narrowly to core/columns blocks
+     * Adds visual "past"/"sold out" marker classes to an event row's
+     * wrapping columns block, so a stale Holvi listing that hasn't been
+     * removed from the source, or a sold-out event, sinks visually instead
+     * of looking identical to a regular upcoming one. Both classes are
+     * independent (a sold-out event can be upcoming or past) and can both
+     * apply to the same row. Scoped narrowly to core/columns blocks
      * carrying the row's own className, rather than post_type generally, to
      * avoid any effect on unrelated columns elsewhere on a page.
      *
@@ -84,7 +87,7 @@ final class EventListBlock
      *
      * @param array<string, mixed> $parsedBlock
      */
-    public function markPastEventRow(string $blockContent, array $parsedBlock, $blockInstance): string
+    public function markEventRowStatus(string $blockContent, array $parsedBlock, $blockInstance): string
     {
         if ('core/columns' !== ($parsedBlock['blockName'] ?? '')) {
             return $blockContent;
@@ -98,20 +101,29 @@ final class EventListBlock
 
         $postId = $this->contextPostId($blockInstance);
 
-        if ($postId && $this->isPastEvent($postId)) {
-            // The rendered content's very first class="..." attribute
-            // belongs to this block's own root wrapper element (its
-            // children, already rendered into $blockContent by this point,
-            // come after it) - safe to target with a single replacement.
-            $blockContent = (string) preg_replace(
-                '/class="/',
-                'class="eventmesh-event-past ',
-                $blockContent,
-                1
-            );
+        if (0 === $postId) {
+            return $blockContent;
         }
 
-        return $blockContent;
+        $extraClasses = trim(
+            ($this->isPastEvent($postId) ? 'eventmesh-event-past ' : '') .
+            ($this->isSoldOut($postId) ? 'eventmesh-sold-out-row ' : '')
+        );
+
+        if ('' === $extraClasses) {
+            return $blockContent;
+        }
+
+        // The rendered content's very first class="..." attribute belongs
+        // to this block's own root wrapper element (its children, already
+        // rendered into $blockContent by this point, come after it) - safe
+        // to target with a single replacement.
+        return (string) preg_replace(
+            '/class="/',
+            'class="' . $extraClasses . ' ',
+            $blockContent,
+            1
+        );
     }
 
     private function isPastEvent(int $postId): bool
@@ -123,6 +135,11 @@ final class EventListBlock
         }
 
         return $startsAt < (new \DateTimeImmutable('now'))->format(\DATE_ATOM);
+    }
+
+    private function isSoldOut(int $postId): bool
+    {
+        return '1' === (string) get_post_meta($postId, '_eventmesh_sold_out', true);
     }
 
     /**
@@ -164,8 +181,7 @@ final class EventListBlock
         }
 
         $title = $this->holviHtmlParser->stripDateForDisplay($title);
-        $soldOut = '1' === (string) get_post_meta($postId, '_eventmesh_sold_out', true);
-        $strikethrough = $soldOut ? ' style="text-decoration:line-through"' : '';
+        $strikethrough = EventStatus::isCanceled($title) ? ' style="text-decoration:line-through"' : '';
 
         return $this->renderTextField($postId, $attributes, $title, 'h4', $strikethrough);
     }
@@ -195,7 +211,9 @@ final class EventListBlock
             return '';
         }
 
-        return $this->renderTextField($postId, $attributes, $formatted, 'p');
+        $strikethrough = EventStatus::isCanceled(get_the_title($postId)) ? ' style="text-decoration:line-through"' : '';
+
+        return $this->renderTextField($postId, $attributes, $formatted, 'p', $strikethrough);
     }
 
     /**

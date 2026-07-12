@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EventMesh\Content;
 
 use DateTimeImmutable;
+use EventMesh\Support\EventStatus;
 use WP_Query;
 
 final class EventQuery
@@ -94,6 +95,7 @@ final class EventQuery
                 'sold_out' => '1' === (string) get_post_meta($postId, '_eventmesh_sold_out', true),
                 'embed_html' => get_post_meta($postId, '_eventmesh_embed_html', true),
                 'is_past' => '' !== $startsAt && $startsAt < $now,
+                'is_canceled' => EventStatus::isCanceled($post->post_title),
                 'providers' => $providers,
                 'post' => $post,
             ];

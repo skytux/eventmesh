@@ -56,4 +56,30 @@ final class DummyConnectorTest extends TestCase
 
         self::assertNotEmpty($past, 'A past event is needed to exercise upcoming/past sorting.');
     }
+
+    public function testFetchIncludesAnEventThatIsBothPastAndSoldOut(): void
+    {
+        $events = (new DummyConnector())->fetch();
+
+        $pastAndSoldOut = array_filter(
+            $events,
+            static fn ($event) => $event->soldOut()
+                && null !== $event->startsAt()
+                && $event->startsAt() < new \DateTimeImmutable('now')
+        );
+
+        self::assertNotEmpty(
+            $pastAndSoldOut,
+            'A past-and-sold-out combination is needed to test that the past divider still shows correctly.'
+        );
+    }
+
+    public function testFetchIncludesAnEventWithCanceledInTheTitle(): void
+    {
+        $events = (new DummyConnector())->fetch();
+
+        $canceled = array_filter($events, static fn ($event) => str_contains($event->title(), 'CANCELED'));
+
+        self::assertNotEmpty($canceled, 'A CANCELED-titled event is needed to test the strike-through behavior.');
+    }
 }
