@@ -32,6 +32,9 @@ final class SettingsPage
                 'sync_interval' => $this->admin->configuredSyncInterval(),
                 'sync_intervals' => $this->admin->availableSyncIntervals(),
                 'delete_data_on_uninstall' => '1' === (string) get_option('eventmesh_delete_data_on_uninstall', '0'),
+                'enable_test_connector' => '1' === (string) get_option('eventmesh_enable_test_connector', '0'),
+                'test_connector_forced' => defined('EVENTMESH_ENABLE_TEST_CONNECTOR')
+                    && EVENTMESH_ENABLE_TEST_CONNECTOR,
             ]
         );
     }
@@ -64,6 +67,10 @@ final class SettingsPage
             ? '1' === (string) $_POST['eventmesh_delete_data_on_uninstall']
             : false;
 
+        $enableTestConnector = isset($_POST['eventmesh_enable_test_connector'])
+            ? '1' === (string) $_POST['eventmesh_enable_test_connector']
+            : false;
+
         if (! array_key_exists($syncInterval, $this->admin->availableSyncIntervals())) {
             $syncInterval = 'hourly';
         }
@@ -78,6 +85,7 @@ final class SettingsPage
         update_option('eventmesh_enable_background_sync', $backgroundSyncEnabled ? '1' : '0');
         update_option('eventmesh_sync_interval', $syncInterval);
         update_option('eventmesh_delete_data_on_uninstall', $deleteDataOnUninstall ? '1' : '0');
+        update_option('eventmesh_enable_test_connector', $enableTestConnector ? '1' : '0');
 
         foreach ($sourceSettings as $sourceId => $enabled) {
             $this->sourceSettings->setEnabled((string) $sourceId, 1 === $enabled);
