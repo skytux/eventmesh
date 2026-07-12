@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace EventMesh\Tests\Services;
 
 use Brain\Monkey\Functions;
+use EventMesh\Admin\DashboardPage;
+use EventMesh\Admin\View;
 use EventMesh\Core\ConnectorRegistry;
 use EventMesh\Services\ArtistMap;
 use EventMesh\Services\ConnectorManager;
@@ -64,11 +66,37 @@ final class CronFallbackTriggerTest extends TestCase
             }
         );
         Functions\when('wp_get_schedules')->justReturn(['hourly' => ['interval' => 3600]]);
+
+        // Rescheduling (only reached by the "runs inline" tests) and the
+        // translation helpers the dashboard's summary persistence leans on.
+        Functions\when('wp_next_scheduled')->justReturn(false);
+        Functions\when('wp_unschedule_event')->justReturn(true);
+        Functions\when('wp_schedule_event')->justReturn(true);
+        Functions\when('__')->returnArg();
     }
 
     private function trigger(): CronFallbackTrigger
     {
-        return new CronFallbackTrigger(new Logger(), $this->syncRunner());
+        $syncRunner = $this->syncRunner();
+
+        return new CronFallbackTrigger(new Logger(), $syncRunner, $this->dashboardPage($syncRunner));
+    }
+
+    private function dashboardPage(SyncRunner $syncRunner): DashboardPage
+    {
+        $logger = new Logger();
+
+        return new DashboardPage(
+            new View(),
+            new ConnectorManager(new ConnectorRegistry()),
+            new EventSynchronizer(
+                $logger,
+                new EventMediaEnricher($logger),
+                new ProviderEnricher(new ArtistMap(), $logger),
+                new ProviderEmbedEnricher($logger)
+            ),
+            $syncRunner
+        );
     }
 
     /**
@@ -169,7 +197,62 @@ final class CronFallbackTriggerTest extends TestCase
 
         $this->trigger()->maybeRunFallbackSync();
 
-        self::assertTrue($called, 'fastcgi_finish_request() must be called when available, to avoid delaying the visitor.');
+        self::assertTrue(
+            $called,
+            'fastcgi_finish_request() must be called when available, to avoid delaying the visitor.'
+        );
         self::assertGreaterThan(time() - 5, $this->options['eventmesh_last_sync_attempt_at'] ?? 0);
+    }
+
+    public function testUpdatesTheDashboardLastSyncSummaryAfterAFallbackRun(): void
+    {
+        $this->options['eventmesh_last_sync_attempt_at'] = time() - (3 * HOUR_IN_SECONDS);
+        Functions\when('fastcgi_finish_request')->justReturn(true);
+
+        $this->trigger()->maybeRunFallbackSync();
+
+        self::assertArrayHasKey(
+            'eventmesh_last_sync',
+            $this->transients,
+            'A fallback run must record the last-sync summary the dashboard reads, not just run silently.'
+        );
+        self::assertGreaterThan(time() - 5, $this->transients['eventmesh_last_sync']['timestamp'] ?? 0);
+    }
+
+    public function testAdvancesTheScheduledRunAfterAFallbackRun(): void
+    {
+        $this->options['eventmesh_last_sync_attempt_at'] = time() - (3 * HOUR_IN_SECONDS);
+        Functions\when('fastcgi_finish_request')->justReturn(true);
+
+        $scheduledAt = null;
+        Functions\when('wp_schedule_event')->alias(
+            function (int $timestamp, string $recurrence, string $hook) use (&$scheduledAt): bool {
+                $scheduledAt = $timestamp;
+
+                return true;
+            }
+        );
+
+        $this->trigger()->maybeRunFallbackSync();
+
+        self::assertNotNull($scheduledAt, 'The fallback must push the next scheduled run forward.');
+        self::assertGreaterThan(time(), $scheduledAt);
+    }
+
+    public function testRunsInlineWhenOnlyAStaleLockRemains(): void
+    {
+        $this->options['eventmesh_last_sync_attempt_at'] = time() - (3 * HOUR_IN_SECONDS);
+        Functions\when('fastcgi_finish_request')->justReturn(true);
+        // A lock older than the 300s TTL is one SyncRunner would itself
+        // reclaim - it must not permanently block the fallback.
+        $this->transients['eventmesh_sync_lock'] = time() - 3600;
+
+        $this->trigger()->maybeRunFallbackSync();
+
+        self::assertGreaterThan(
+            time() - 5,
+            $this->options['eventmesh_last_sync_attempt_at'] ?? 0,
+            'A stale lock must not stop the fallback from running.'
+        );
     }
 }

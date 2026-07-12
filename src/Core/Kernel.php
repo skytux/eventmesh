@@ -226,7 +226,8 @@ final class Kernel
             CronFallbackTrigger::class,
             fn (Container $container) => new CronFallbackTrigger(
                 $container->get(Logger::class),
-                $container->get(SyncRunner::class)
+                $container->get(SyncRunner::class),
+                $container->get(DashboardPage::class)
             )
         );
 

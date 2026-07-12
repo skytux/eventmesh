@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace EventMesh\Services;
 
+use EventMesh\Admin\DashboardPage;
 use EventMesh\Support\Logger;
 
 /**
@@ -30,9 +31,17 @@ final class CronFallbackTrigger
     private const RATE_LIMIT_MIN_SECONDS = 300;
     private const SYNC_LOCK_TRANSIENT = 'eventmesh_sync_lock';
 
+    /**
+     * Mirrors SyncRunner::LOCK_TTL_SECONDS - a lock older than this is one
+     * SyncRunner would itself reclaim, so we don't treat it as "running".
+     */
+    private const SYNC_LOCK_TTL_SECONDS = 300;
+    private const CRON_HOOK = 'eventmesh/background_sync';
+
     public function __construct(
         private readonly Logger $logger,
-        private readonly SyncRunner $syncRunner
+        private readonly SyncRunner $syncRunner,
+        private readonly DashboardPage $dashboardPage
     ) {
     }
 
@@ -59,9 +68,13 @@ final class CronFallbackTrigger
             return;
         }
 
-        if (get_transient(self::SYNC_LOCK_TRANSIENT)) {
-            // A sync is already running (cron fired just fine, or another
-            // visitor's fallback beat us to it) - nothing to do.
+        if ($this->syncIsGenuinelyRunning()) {
+            // A sync is already in flight (cron fired just fine, or another
+            // visitor's fallback beat us to it) - nothing to do. A *stale*
+            // lock, though, must not block us: the fallback exists precisely
+            // for when cron is broken, so if we deferred to a leftover lock
+            // forever nothing would ever reclaim it. SyncRunner::run() does
+            // the actual reclaiming; here we just decline to defer to it.
             return;
         }
 
@@ -92,6 +105,17 @@ final class CronFallbackTrigger
         return false;
     }
 
+    private function syncIsGenuinelyRunning(): bool
+    {
+        $lock = get_transient(self::SYNC_LOCK_TRANSIENT);
+
+        if (false === $lock) {
+            return false;
+        }
+
+        return (time() - (int) $lock) < self::SYNC_LOCK_TTL_SECONDS;
+    }
+
     private function isOverdue(): bool
     {
         $lastAttempt = (int) get_option('eventmesh_last_sync_attempt_at', 0);
@@ -102,12 +126,18 @@ final class CronFallbackTrigger
         return time() >= $lastAttempt + (2 * $interval);
     }
 
-    private function configuredIntervalSeconds(): int
+    private function configuredIntervalSlug(): string
     {
         $configured = (string) get_option('eventmesh_sync_interval', 'hourly');
+
+        return array_key_exists($configured, wp_get_schedules()) ? $configured : 'hourly';
+    }
+
+    private function configuredIntervalSeconds(): int
+    {
         $schedules = wp_get_schedules();
 
-        return (int) ($schedules[$configured]['interval'] ?? HOUR_IN_SECONDS);
+        return (int) ($schedules[$this->configuredIntervalSlug()]['interval'] ?? HOUR_IN_SECONDS);
     }
 
     private function runInline(): void
@@ -128,15 +158,55 @@ final class CronFallbackTrigger
 
         $result = $this->syncRunner->run();
 
+        // Record the outcome the same way the dashboard's own "Sync now" and
+        // the WP-Cron handler do, so the dashboard's "Last sync" reflects a
+        // fallback run too (previously it silently didn't), and push the next
+        // scheduled run forward so "Next scheduled sync" stops showing an
+        // ever-overdue time and WP-Cron doesn't immediately re-fire.
+        $this->dashboardPage->persistSyncSummary(
+            [
+                'created' => $result['created'],
+                'updated' => $result['updated'],
+                'failed' => $result['failed'],
+                'skipped' => $result['skipped'],
+                'archived' => $result['archived'],
+            ],
+            $result['created'] + $result['updated']
+        );
+
+        $this->rescheduleNextRun();
+
         $this->logger->info(
             sprintf(
-                'Fallback sync completed: created=%d updated=%d failed=%d skipped=%d archived=%d.',
+                'Fallback sync completed (next run rescheduled): ' .
+                'created=%d updated=%d failed=%d skipped=%d archived=%d.',
                 $result['created'],
                 $result['updated'],
                 $result['failed'],
                 $result['skipped'],
                 $result['archived']
             )
+        );
+    }
+
+    /**
+     * Advances the recurring background_sync event past the occurrence this
+     * fallback just covered. WP-Cron reschedules itself when IT fires the
+     * event, but a fallback run happens entirely outside that machinery, so
+     * without this the schedule would stay stuck in the past.
+     */
+    private function rescheduleNextRun(): void
+    {
+        $existing = wp_next_scheduled(self::CRON_HOOK);
+
+        if (false !== $existing) {
+            wp_unschedule_event($existing, self::CRON_HOOK);
+        }
+
+        wp_schedule_event(
+            time() + $this->configuredIntervalSeconds(),
+            $this->configuredIntervalSlug(),
+            self::CRON_HOOK
         );
     }
 }
