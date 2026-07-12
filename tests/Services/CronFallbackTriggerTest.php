@@ -26,21 +26,25 @@ final class CronFallbackTriggerTest extends TestCase
     /** @var array<string, mixed> */
     private array $transients = [];
 
-    private bool $syncRan = false;
-
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->options = [];
         $this->transients = [];
-        $this->syncRan = false;
 
         Functions\when('is_admin')->justReturn(false);
         Functions\when('wp_doing_cron')->justReturn(false);
         Functions\when('wp_doing_ajax')->justReturn(false);
         Functions\when('get_option')->alias(
             fn (string $name, $default = false) => $this->options[$name] ?? $default
+        );
+        Functions\when('update_option')->alias(
+            function (string $name, $value) {
+                $this->options[$name] = $value;
+
+                return true;
+            }
         );
         Functions\when('get_transient')->alias(
             fn (string $name) => $this->transients[$name] ?? false
@@ -60,9 +64,6 @@ final class CronFallbackTriggerTest extends TestCase
             }
         );
         Functions\when('wp_get_schedules')->justReturn(['hourly' => ['interval' => 3600]]);
-        Functions\when('wp_generate_password')->justReturn('test-token');
-        Functions\when('apply_filters')->alias(static fn ($tag, $value) => $value);
-        Functions\when('admin_url')->alias(static fn (string $path) => 'https://example.test/wp-admin/' . $path);
     }
 
     private function trigger(): CronFallbackTrigger
@@ -96,56 +97,23 @@ final class CronFallbackTriggerTest extends TestCase
     {
         Functions\when('is_admin')->justReturn(true);
 
-        $remoteCalled = false;
-        Functions\when('wp_remote_post')->alias(
-            function () use (&$remoteCalled) {
-                $remoteCalled = true;
+        $this->trigger()->maybeRunFallbackSync();
 
-                return [];
-            }
-        );
-
-        $this->trigger()->maybeTriggerFallback();
-
-        self::assertFalse($remoteCalled);
+        self::assertArrayNotHasKey('eventmesh_last_sync_attempt_at', $this->options);
     }
 
     public function testDoesNothingWhenNotOverdue(): void
     {
-        $this->options['eventmesh_last_sync_attempt_at'] = time();
+        $recentAttempt = time() - 10;
+        $this->options['eventmesh_last_sync_attempt_at'] = $recentAttempt;
 
-        $remoteCalled = false;
-        Functions\when('wp_remote_post')->alias(
-            function () use (&$remoteCalled) {
-                $remoteCalled = true;
+        $this->trigger()->maybeRunFallbackSync();
 
-                return [];
-            }
+        self::assertSame(
+            $recentAttempt,
+            $this->options['eventmesh_last_sync_attempt_at'],
+            'SyncRunner::run() (which updates this) must not have been called.'
         );
-
-        $this->trigger()->maybeTriggerFallback();
-
-        self::assertFalse($remoteCalled);
-    }
-
-    public function testFiresANonBlockingLoopbackWhenOverdue(): void
-    {
-        $this->options['eventmesh_last_sync_attempt_at'] = time() - (3 * HOUR_IN_SECONDS);
-
-        $capturedArgs = null;
-        Functions\when('wp_remote_post')->alias(
-            function (string $url, array $args) use (&$capturedArgs) {
-                $capturedArgs = $args;
-
-                return [];
-            }
-        );
-
-        $this->trigger()->maybeTriggerFallback();
-
-        self::assertNotNull($capturedArgs);
-        self::assertFalse($capturedArgs['blocking']);
-        self::assertSame('eventmesh_run_fallback_sync', $capturedArgs['body']['action']);
     }
 
     public function testDoesNothingWhenASyncIsAlreadyLocked(): void
@@ -153,18 +121,13 @@ final class CronFallbackTriggerTest extends TestCase
         $this->options['eventmesh_last_sync_attempt_at'] = time() - (3 * HOUR_IN_SECONDS);
         $this->transients['eventmesh_sync_lock'] = time();
 
-        $remoteCalled = false;
-        Functions\when('wp_remote_post')->alias(
-            function () use (&$remoteCalled) {
-                $remoteCalled = true;
+        $this->trigger()->maybeRunFallbackSync();
 
-                return [];
-            }
+        self::assertSame(
+            time() - (3 * HOUR_IN_SECONDS),
+            $this->options['eventmesh_last_sync_attempt_at'],
+            'Must not have run a second sync on top of the one already locked.'
         );
-
-        $this->trigger()->maybeTriggerFallback();
-
-        self::assertFalse($remoteCalled);
     }
 
     public function testDoesNothingWhenRateLimitGateIsAlreadySet(): void
@@ -172,46 +135,41 @@ final class CronFallbackTriggerTest extends TestCase
         $this->options['eventmesh_last_sync_attempt_at'] = time() - (3 * HOUR_IN_SECONDS);
         $this->transients['eventmesh_cron_fallback_gate'] = true;
 
-        $remoteCalled = false;
-        Functions\when('wp_remote_post')->alias(
-            function () use (&$remoteCalled) {
-                $remoteCalled = true;
+        $this->trigger()->maybeRunFallbackSync();
 
-                return [];
-            }
-        );
-
-        $this->trigger()->maybeTriggerFallback();
-
-        self::assertFalse($remoteCalled);
+        self::assertSame(time() - (3 * HOUR_IN_SECONDS), $this->options['eventmesh_last_sync_attempt_at']);
     }
 
-    public function testHandleFallbackRequestRejectsAnInvalidToken(): void
+    public function testRunsTheSyncInlineWhenOverdueWithoutFastcgiFinishRequest(): void
     {
-        $this->transients['eventmesh_cron_fallback_token'] = 'the-real-token';
-        $_POST['token'] = 'wrong-token';
+        $this->options['eventmesh_last_sync_attempt_at'] = time() - (3 * HOUR_IN_SECONDS);
 
-        Functions\when('sanitize_text_field')->alias(static fn ($value) => $value);
-        Functions\when('wp_unslash')->alias(static fn ($value) => $value);
+        // Deliberately not stubbing fastcgi_finish_request: in the real CLI
+        // test environment it genuinely doesn't exist, exercising the
+        // "not available" branch truthfully rather than by assertion alone.
+        $this->trigger()->maybeRunFallbackSync();
 
-        $died = null;
-        Functions\when('wp_die')->alias(
-            function (...$args) use (&$died) {
-                $died = $args;
+        self::assertGreaterThan(
+            time() - 5,
+            $this->options['eventmesh_last_sync_attempt_at'] ?? 0,
+            'SyncRunner::run() must have actually run and updated the last-attempt option.'
+        );
+    }
 
-                throw new \RuntimeException('wp_die called');
+    public function testCallsFastcgiFinishRequestFirstWhenAvailable(): void
+    {
+        $this->options['eventmesh_last_sync_attempt_at'] = time() - (3 * HOUR_IN_SECONDS);
+
+        $called = false;
+        Functions\when('fastcgi_finish_request')->alias(
+            function () use (&$called): void {
+                $called = true;
             }
         );
 
-        try {
-            $this->trigger()->handleFallbackRequest();
-            self::fail('Expected wp_die to be called for an invalid token.');
-        } catch (\RuntimeException $exception) {
-            self::assertSame('wp_die called', $exception->getMessage());
-        }
+        $this->trigger()->maybeRunFallbackSync();
 
-        self::assertSame(['response' => 403], $died[2] ?? null);
-
-        unset($_POST['token']);
+        self::assertTrue($called, 'fastcgi_finish_request() must be called when available, to avoid delaying the visitor.');
+        self::assertGreaterThan(time() - 5, $this->options['eventmesh_last_sync_attempt_at'] ?? 0);
     }
 }

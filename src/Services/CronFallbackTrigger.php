@@ -8,19 +8,26 @@ use EventMesh\Support\Logger;
 
 /**
  * Backstop for when WP-Cron never fires - DISABLE_WP_CRON, a host that
- * blocks WordPress's own loopback, or anything else that silently stops the
- * background_sync schedule. On an ordinary front-end page view, if the sync
- * pipeline looks overdue, fires a non-blocking loopback request (the same
- * blocking=false/short-timeout pattern WP core's own spawn_cron() uses) that
- * runs a sync in the background - the visitor's page is never delayed.
+ * blocks WordPress's own loopback requests, or anything else that silently
+ * stops the background_sync schedule.
+ *
+ * Deliberately does NOT use a loopback HTTP request (unlike WP core's own
+ * spawn_cron(), and unlike an earlier version of this class): a host that
+ * blocks loopback requests would break that mechanism for exactly the same
+ * reason it broke WP-Cron's own. Instead, on an ordinary front-end page
+ * view, if the sync pipeline looks overdue, this runs the sync directly, in
+ * the same PHP process, with no new HTTP request involved at all - so it
+ * works regardless of whether loopback requests are blocked.
+ * fastcgi_finish_request() (available under PHP-FPM, the same technique
+ * wp-cron.php itself uses) flushes the response to the visitor first when
+ * available, so there's no perceived delay; without it (e.g. mod_php), the
+ * one rate-limited visitor's request simply takes a bit longer to finish -
+ * still far better than the sync never running at all.
  */
 final class CronFallbackTrigger
 {
     private const RATE_LIMIT_TRANSIENT = 'eventmesh_cron_fallback_gate';
     private const RATE_LIMIT_MIN_SECONDS = 300;
-    private const TOKEN_TRANSIENT = 'eventmesh_cron_fallback_token';
-    private const TOKEN_TTL_SECONDS = 30;
-    private const AJAX_ACTION = 'eventmesh_run_fallback_sync';
     private const SYNC_LOCK_TRANSIENT = 'eventmesh_sync_lock';
 
     public function __construct(
@@ -31,11 +38,10 @@ final class CronFallbackTrigger
 
     public function boot(): void
     {
-        add_action('shutdown', [$this, 'maybeTriggerFallback']);
-        add_action('wp_ajax_nopriv_' . self::AJAX_ACTION, [$this, 'handleFallbackRequest']);
+        add_action('shutdown', [$this, 'maybeRunFallbackSync']);
     }
 
-    public function maybeTriggerFallback(): void
+    public function maybeRunFallbackSync(): void
     {
         if (! $this->isEligibleRequest()) {
             return;
@@ -55,35 +61,11 @@ final class CronFallbackTrigger
 
         if (get_transient(self::SYNC_LOCK_TRANSIENT)) {
             // A sync is already running (cron fired just fine, or another
-            // fallback loopback beat us to it) - nothing to do.
+            // visitor's fallback beat us to it) - nothing to do.
             return;
         }
 
-        $this->fireLoopback();
-    }
-
-    public function handleFallbackRequest(): void
-    {
-        // Not a user-submitted form, so a wp_verify_nonce()-style nonce
-        // doesn't apply here (this request is unauthenticated/nopriv, fired
-        // by our own server-side loopback) - the single-use, hash_equals()
-        // -checked transient token below is this endpoint's actual
-        // authentication, verified immediately after this read.
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing
-        $token = isset($_POST['token']) ? sanitize_text_field(wp_unslash((string) $_POST['token'])) : '';
-        $stored = get_transient(self::TOKEN_TRANSIENT);
-
-        if ('' === $token || ! is_string($stored) || '' === $stored || ! hash_equals($stored, $token)) {
-            wp_die('', '', ['response' => 403]);
-        }
-
-        delete_transient(self::TOKEN_TRANSIENT);
-
-        $this->logger->info('Cron fallback triggered a sync run (WP-Cron looked overdue).');
-
-        $this->syncRunner->run();
-
-        wp_die('', '', ['response' => 200]);
+        $this->runInline();
     }
 
     private function isEligibleRequest(): bool
@@ -128,22 +110,33 @@ final class CronFallbackTrigger
         return (int) ($schedules[$configured]['interval'] ?? HOUR_IN_SECONDS);
     }
 
-    private function fireLoopback(): void
+    private function runInline(): void
     {
-        $token = wp_generate_password(32, false);
-        set_transient(self::TOKEN_TRANSIENT, $token, self::TOKEN_TTL_SECONDS);
+        $canFinishRequest = function_exists('fastcgi_finish_request');
 
-        wp_remote_post(
-            admin_url('admin-ajax.php'),
-            [
-                'timeout' => 0.01,
-                'blocking' => false,
-                'sslverify' => apply_filters('https_local_ssl_verify', false),
-                'body' => [
-                    'action' => self::AJAX_ACTION,
-                    'token' => $token,
-                ],
-            ]
+        $this->logger->info(
+            sprintf(
+                'Background sync looked overdue - running a fallback sync inline ' .
+                '(fastcgi_finish_request available: %s).',
+                $canFinishRequest ? 'yes' : 'no, this request will take a little longer to finish'
+            )
+        );
+
+        if ($canFinishRequest) {
+            fastcgi_finish_request();
+        }
+
+        $result = $this->syncRunner->run();
+
+        $this->logger->info(
+            sprintf(
+                'Fallback sync completed: created=%d updated=%d failed=%d skipped=%d archived=%d.',
+                $result['created'],
+                $result['updated'],
+                $result['failed'],
+                $result['skipped'],
+                $result['archived']
+            )
         );
     }
 }
