@@ -451,4 +451,61 @@ final class EventListBlockRenderersTest extends TestCase
 
         self::assertSame('', $html);
     }
+
+    public function testRenderPastEventsMarkerRendersOnceForTheFirstPastEvent(): void
+    {
+        Functions\when('get_post_meta')->justReturn('2000-01-01T00:00:00+00:00');
+
+        $block = $this->block();
+        $first = $block->renderPastEventsMarker([], '', $this->blockInstance(['postId' => 1]));
+        $second = $block->renderPastEventsMarker([], '', $this->blockInstance(['postId' => 2]));
+
+        self::assertStringContainsString('Past Events', $first);
+        self::assertStringStartsWith('<h3 ', $first);
+        self::assertSame('', $second, 'Must only render once per loop, not for every subsequent past event.');
+    }
+
+    public function testRenderPastEventsMarkerReturnsEmptyStringForAnUpcomingEvent(): void
+    {
+        Functions\when('get_post_meta')->justReturn('2999-01-01T00:00:00+00:00');
+
+        $html = $this->block()->renderPastEventsMarker([], '', $this->blockInstance(['postId' => 1]));
+
+        self::assertSame('', $html);
+    }
+
+    public function testRenderPastEventsMarkerReturnsEmptyStringWithoutAPostIdInContext(): void
+    {
+        $html = $this->block()->renderPastEventsMarker([], '', $this->blockInstance([]));
+
+        self::assertSame('', $html);
+    }
+
+    public function testRenderPastEventsMarkerRespectsCustomTextAndTag(): void
+    {
+        Functions\when('get_post_meta')->justReturn('2000-01-01T00:00:00+00:00');
+
+        $html = $this->block()->renderPastEventsMarker(
+            ['text' => 'Archive', 'tag' => 'h2'],
+            '',
+            $this->blockInstance(['postId' => 1])
+        );
+
+        self::assertStringStartsWith('<h2 ', $html);
+        self::assertStringContainsString('Archive', $html);
+    }
+
+    public function testResetPastEventsMarkerAllowsTheMarkerToRenderAgainForANewLoop(): void
+    {
+        Functions\when('get_post_meta')->justReturn('2000-01-01T00:00:00+00:00');
+
+        $block = $this->block();
+        $block->renderPastEventsMarker([], '', $this->blockInstance(['postId' => 1]));
+
+        $block->resetPastEventsMarker([]);
+
+        $afterReset = $block->renderPastEventsMarker([], '', $this->blockInstance(['postId' => 2]));
+
+        self::assertStringContainsString('Past Events', $afterReset);
+    }
 }

@@ -12,6 +12,15 @@ use EventMesh\Support\KnownProviders;
 
 final class EventListBlock
 {
+    /**
+     * Tracks whether eventmesh/past-events-marker has already rendered its
+     * heading for the Query Loop currently being rendered - reset by
+     * resetPastEventsMarker() right as each Query Loop's own query is built
+     * (before any of its rows render), so multiple Query Loops on the same
+     * page (or repeated page renders) don't interfere with each other.
+     */
+    private bool $pastEventsMarkerShown = false;
+
     public function __construct(
         private readonly EventQuery $eventQuery,
         private readonly HolviHtmlParser $holviHtmlParser
@@ -61,11 +70,59 @@ final class EventListBlock
             ]
         );
 
+        register_block_type(
+            EVENTMESH_PLUGIN_DIR . 'src/blocks/past-events-marker',
+            [
+                'render_callback' => [$this, 'renderPastEventsMarker'],
+            ]
+        );
+
         // The Query Loop block's own query attributes can't express
         // "upcoming events first, past events sorted to the bottom" -
         // override it server-side regardless of what the editor UI shows.
         add_filter('query_loop_block_query_vars', [$this->eventQuery, 'markQueryLoopUpcomingFirst']);
+        add_filter('query_loop_block_query_vars', [$this, 'resetPastEventsMarker']);
         add_filter('render_block', [$this, 'markEventRowStatus'], 10, 3);
+    }
+
+    /**
+     * @param array<string, mixed> $query
+     *
+     * @return array<string, mixed>
+     */
+    public function resetPastEventsMarker(array $query): array
+    {
+        $this->pastEventsMarkerShown = false;
+
+        return $query;
+    }
+
+    /**
+     * Renders a heading exactly once per Query Loop, the first time a post
+     * whose start date has passed comes through - since rows already arrive
+     * upcoming-first-then-past (applyUpcomingFirstClauses()), that's exactly
+     * the upcoming/past transition point, with no look-ahead needed.
+     *
+     * @param array<string, mixed> $attributes
+     */
+    public function renderPastEventsMarker(array $attributes, string $content, $block): string
+    {
+        $postId = $this->contextPostId($block);
+
+        if (0 === $postId || $this->pastEventsMarkerShown || ! $this->isPastEvent($postId)) {
+            return '';
+        }
+
+        $this->pastEventsMarkerShown = true;
+
+        $tag = isset($attributes['tag']) && is_string($attributes['tag']) && '' !== $attributes['tag']
+            ? $attributes['tag']
+            : 'h3';
+        $text = isset($attributes['text']) && is_string($attributes['text']) && '' !== trim($attributes['text'])
+            ? $attributes['text']
+            : __('Past Events', 'eventmesh');
+
+        return sprintf('<%1$s %2$s>%3$s</%1$s>', esc_html($tag), get_block_wrapper_attributes(), esc_html($text));
     }
 
     /**
@@ -523,6 +580,7 @@ final class EventListBlock
 <!-- wp:query {"query":{"perPage":6,"pages":0,"offset":0,"postType":"eventmesh_event","order":"asc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"}} -->
 <div class="wp-block-query">
 <!-- wp:post-template -->
+<!-- wp:eventmesh/past-events-marker /-->
 <!-- wp:columns {"verticalAlignment":"top","className":"eventmesh-event-row"} -->
 <div class="wp-block-columns are-vertically-aligned-top eventmesh-event-row">
 
