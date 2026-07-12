@@ -18,6 +18,7 @@ use EventMesh\Content\PerformerTaxonomy;
 use EventMesh\Content\SingleEventTemplate;
 use EventMesh\Services\ArtistMap;
 use EventMesh\Services\ConnectorManager;
+use EventMesh\Services\CronFallbackTrigger;
 use EventMesh\Services\EventMediaEnricher;
 use EventMesh\Services\HolviSourceManager;
 use EventMesh\Services\ProviderEmbedEnricher;
@@ -51,6 +52,9 @@ final class Kernel
 
         $singleEventTemplate = $this->container->get(SingleEventTemplate::class);
         $singleEventTemplate->boot();
+
+        $cronFallbackTrigger = $this->container->get(CronFallbackTrigger::class);
+        $cronFallbackTrigger->boot();
 
         $performerTaxonomy = $this->container->get(PerformerTaxonomy::class);
         $performerTaxonomy->boot();
@@ -170,6 +174,14 @@ final class Kernel
                 $container->get(EventSynchronizer::class),
                 $container->get(Logger::class),
                 $container->get(SourceSettings::class)
+            )
+        );
+
+        $this->container->singleton(
+            CronFallbackTrigger::class,
+            fn (Container $container) => new CronFallbackTrigger(
+                $container->get(Logger::class),
+                $container->get(SyncRunner::class)
             )
         );
 
