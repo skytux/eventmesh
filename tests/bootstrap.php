@@ -120,6 +120,41 @@ if (! class_exists('WP_Post')) {
     }
 }
 
+/**
+ * Minimal stand-in for WP_Theme_JSON_Data (WP 6.1+), only covering
+ * update_with() - records what it was called with and returns a new
+ * instance carrying the merged data, so BlockAppearanceTools can be unit
+ * tested without a real WP theme.json resolver.
+ */
+if (! class_exists('WP_Theme_JSON_Data')) {
+    class WP_Theme_JSON_Data
+    {
+        /**
+         * @param array<string, mixed> $data
+         */
+        public function __construct(
+            public array $data = []
+        ) {
+        }
+
+        /**
+         * @param array<string, mixed> $newData
+         */
+        public function update_with(array $newData): self
+        {
+            return new self(array_replace_recursive($this->data, $newData));
+        }
+
+        /**
+         * @return array<string, mixed>
+         */
+        public function get_data(): array
+        {
+            return $this->data;
+        }
+    }
+}
+
 if (! class_exists('WP_Error')) {
     class WP_Error
     {
