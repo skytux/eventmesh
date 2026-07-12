@@ -9,6 +9,13 @@ use EventMesh\Services\SyncRunner;
 
 final class Admin
 {
+    /**
+     * Shared across every EventMesh admin page/action - a single place to
+     * change if a dedicated capability is ever introduced instead of
+     * reusing WordPress's own manage_options.
+     */
+    public const CAPABILITY = 'manage_options';
+
     public function __construct(
         private readonly Container $container
     ) {
@@ -105,7 +112,7 @@ final class Admin
         add_menu_page(
             __('EventMesh', 'eventmesh'),
             __('EventMesh', 'eventmesh'),
-            'manage_options',
+            self::CAPABILITY,
             'eventmesh',
             [$this->container->get(DashboardPage::class), 'render'],
             'dashicons-share',
@@ -116,7 +123,7 @@ final class Admin
             'eventmesh',
             __('Dashboard', 'eventmesh'),
             __('Dashboard', 'eventmesh'),
-            'manage_options',
+            self::CAPABILITY,
             'eventmesh',
             [$this->container->get(DashboardPage::class), 'render']
         );
@@ -125,7 +132,7 @@ final class Admin
             'eventmesh',
             __('Sources', 'eventmesh'),
             __('Sources', 'eventmesh'),
-            'manage_options',
+            self::CAPABILITY,
             'eventmesh-sources',
             [$this->container->get(SourcesPage::class), 'render']
         );
@@ -134,7 +141,7 @@ final class Admin
             'eventmesh',
             __('Diagnostics', 'eventmesh'),
             __('Diagnostics', 'eventmesh'),
-            'manage_options',
+            self::CAPABILITY,
             'eventmesh-diagnostics',
             [$this->container->get(DiagnosticsPage::class), 'render']
         );
@@ -143,7 +150,7 @@ final class Admin
             'eventmesh',
             __('Settings', 'eventmesh'),
             __('Settings', 'eventmesh'),
-            'manage_options',
+            self::CAPABILITY,
             'eventmesh-settings',
             [$this->container->get(SettingsPage::class), 'render']
         );
@@ -151,7 +158,7 @@ final class Admin
 
     public function handleSync(): void
     {
-        if (! current_user_can('manage_options')) {
+        if (! current_user_can(self::CAPABILITY)) {
             wp_die(esc_html__('You do not have permission to run this action.', 'eventmesh'));
         }
 
