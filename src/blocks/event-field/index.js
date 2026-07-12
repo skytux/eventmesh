@@ -62,6 +62,9 @@
 				el( ServerSideRender, {
 					block: 'eventmesh/event-field',
 					attributes: attributes,
+					EmptyResponsePlaceholder: function () {
+						return null;
+					},
 				} )
 			);
 		},

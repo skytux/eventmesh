@@ -47,6 +47,9 @@
 				el( ServerSideRender, {
 					block: 'eventmesh/event-list',
 					attributes: attributes,
+					EmptyResponsePlaceholder: function () {
+						return null;
+					},
 				} )
 			);
 		},
