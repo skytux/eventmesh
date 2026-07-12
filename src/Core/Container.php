@@ -45,4 +45,12 @@ final class Container
     {
         return isset($this->bindings[$id]);
     }
+
+    /**
+     * @return array<int, string>
+     */
+    public function registeredIds(): array
+    {
+        return array_keys($this->bindings);
+    }
 }
