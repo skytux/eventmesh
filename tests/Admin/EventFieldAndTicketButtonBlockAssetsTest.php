@@ -24,6 +24,7 @@ final class EventFieldAndTicketButtonBlockAssetsTest extends TestCase
             'ticket-button' => [__DIR__ . '/../../src/blocks/ticket-button', 'eventmesh/ticket-button'],
             'provider-embed' => [__DIR__ . '/../../src/blocks/provider-embed', 'eventmesh/provider-embed'],
             'other-provider-links' => [__DIR__ . '/../../src/blocks/other-provider-links', 'eventmesh/other-provider-links'],
+            'past-events-marker' => [__DIR__ . '/../../src/blocks/past-events-marker', 'eventmesh/past-events-marker'],
         ];
     }
 
