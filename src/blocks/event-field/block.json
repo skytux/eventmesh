@@ -23,7 +23,8 @@
       "fontStyle": true,
       "textDecoration": true,
       "textTransform": true,
-      "letterSpacing": true
+      "letterSpacing": true,
+      "textAlign": true
     },
     "spacing": {
       "margin": true,
