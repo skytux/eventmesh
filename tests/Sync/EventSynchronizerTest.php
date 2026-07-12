@@ -32,6 +32,7 @@ final class EventSynchronizerTest extends TestCase
         // every sync() call; '' means "nothing to embed" so it no-ops
         // without needing wp_remote_get stubbed in tests that don't care.
         Functions\when('get_post_meta')->justReturn('');
+        Functions\when('wp_kses')->returnArg(1);
     }
 
     private function synchronizer(): EventSynchronizer

@@ -6,6 +6,7 @@ namespace EventMesh\Admin;
 
 use EventMesh\Connectors\Holvi\HolviHtmlParser;
 use EventMesh\Content\EventQuery;
+use EventMesh\Support\EmbedHtmlSanitizer;
 use EventMesh\Support\KnownProviders;
 
 final class EventListBlock
@@ -339,7 +340,7 @@ final class EventListBlock
         return sprintf(
             '<div %s><div class="eventmesh-provider-embed">%s</div></div>',
             get_block_wrapper_attributes(),
-            $html
+            EmbedHtmlSanitizer::sanitize($html)
         );
     }
 

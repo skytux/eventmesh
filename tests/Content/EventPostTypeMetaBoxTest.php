@@ -23,6 +23,7 @@ final class EventPostTypeMetaBoxTest extends TestCase
         Functions\when('esc_url')->alias(static fn ($value) => $value);
         Functions\when('wp_nonce_field')->justReturn('');
         Functions\when('current_user_can')->justReturn(true);
+        Functions\when('wp_kses')->returnArg(1);
     }
 
     protected function tearDown(): void
