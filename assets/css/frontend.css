@@ -22,15 +22,18 @@
 }
 
 /*
- * Only overrides color/border - relies on wp-block-button__link/
- * wp-element-button (always present alongside this class) for padding,
- * border-radius, and font-size, so the sold-out button is exactly the same
- * size and shape as the regular ticket button, not just similarly styled.
+ * Only overrides color - relies on wp-block-button__link/wp-element-button
+ * (always present alongside this class) for padding, border-radius, and
+ * font-size, so the sold-out button is exactly the same size and shape as
+ * the regular ticket button, not just similarly styled. An inset box-shadow
+ * is used instead of a real border specifically because a real border adds
+ * to the element's box size (the regular button has none), which made this
+ * button render very slightly larger than the regular one.
  */
 .eventmesh-ticket-button--secondary {
     background: transparent !important;
     color: inherit !important;
-    border: 1px solid currentColor;
+    box-shadow: inset 0 0 0 1px currentColor;
     opacity: 0.75;
 }
 

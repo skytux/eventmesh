@@ -301,6 +301,15 @@ final class EventListBlock
             return '';
         }
 
+        // This block reuses core/button's own CSS classes for visual parity
+        // rather than shipping its own stylesheet, but the frontend only
+        // loads a block's styles when that exact block is actually present
+        // on the page - since no real core/button instance exists here,
+        // its stylesheet (border-radius etc.) would otherwise never load,
+        // making this button look right in the editor (which loads every
+        // block's styles) but square/unstyled on the frontend.
+        wp_enqueue_block_style('core/button');
+
         $url = (string) get_post_meta($postId, '_eventmesh_url', true);
 
         if ('' === $url) {
