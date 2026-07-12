@@ -14,8 +14,13 @@ if (! defined('ABSPATH')) {
         <p><?php esc_html_e('No events are available yet.', 'eventmesh'); ?></p>
     <?php else : ?>
         <ul class="eventmesh-events-list__items">
+            <?php $pastDividerShown = false; ?>
             <?php foreach ($events as $event) : ?>
                 <?php $soldOut = ! empty($event['sold_out']); ?>
+                <?php if (! $pastDividerShown && ! empty($event['is_past'])) : ?>
+                    <?php $pastDividerShown = true; ?>
+                    <li class="eventmesh-events-divider"><?php esc_html_e('Past Events', 'eventmesh'); ?></li>
+                <?php endif; ?>
                 <li class="eventmesh-events-list__item<?php echo ! empty($event['is_past']) ? ' eventmesh-events-list__item--past' : ''; ?>">
                     <?php $image = (string) ($event['image'] ?? ''); ?>
                     <?php if ('' !== $image) : ?>
@@ -24,6 +29,9 @@ if (! defined('ABSPATH')) {
                         </a>
                     <?php endif; ?>
                     <h3<?php echo $soldOut ? ' style="text-decoration:line-through"' : ''; ?>><a href="<?php echo esc_url((string) ($event['url'] ?? '#')); ?>"><?php echo esc_html((string) ($event['title'] ?? '')); ?></a></h3>
+                    <?php if ($soldOut) : ?>
+                        <p class="eventmesh-sold-out-label"><?php esc_html_e('Sold out', 'eventmesh'); ?></p>
+                    <?php endif; ?>
                     <?php if (! empty($event['embed_html'])) : ?>
                         <div class="eventmesh-provider-embed"><?php echo EventMesh\Support\EmbedHtmlSanitizer::sanitize((string) $event['embed_html']); ?></div>
                     <?php endif; ?>
@@ -46,16 +54,7 @@ if (! defined('ABSPATH')) {
                             ><?php echo $soldOut ? esc_html__('Sold out', 'eventmesh') : esc_html__('Tickets', 'eventmesh'); ?></a>
                         </p>
                     <?php endif; ?>
-                    <?php if (! empty($event['providers'])) : ?>
-                        <ul class="eventmesh-events-list__providers">
-                            <?php foreach ($event['providers'] as $provider => $url) : ?>
-                                <?php if ('' === trim((string) $url)) : ?>
-                                    <?php continue; ?>
-                                <?php endif; ?>
-                                <li><a href="<?php echo esc_url((string) $url); ?>"><?php echo esc_html(ucfirst((string) $provider)); ?></a></li>
-                            <?php endforeach; ?>
-                        </ul>
-                    <?php endif; ?>
+                    <?php include __DIR__ . '/partials/event-meta.php'; ?>
                 </li>
             <?php endforeach; ?>
         </ul>

@@ -3,6 +3,24 @@
     opacity: 0.55;
 }
 
+.eventmesh-events-divider {
+    margin: 1.5em 0 1em;
+    padding-top: 1em;
+    border-top: 1px solid currentColor;
+    font-weight: bold;
+    text-transform: uppercase;
+    opacity: 0.75;
+}
+
+.eventmesh-events-divider--grid {
+    grid-column: 1 / -1;
+}
+
+.eventmesh-sold-out-label {
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
 /*
  * Only overrides color/border - relies on wp-block-button__link/
  * wp-element-button (always present alongside this class) for padding,
