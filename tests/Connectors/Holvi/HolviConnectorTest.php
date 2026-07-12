@@ -171,4 +171,75 @@ final class HolviConnectorTest extends TestCase
         self::assertCount($itemCount, $events, 'All discovered events should still be returned, even unenriched ones.');
         self::assertSame(15, $detailFetchCount, 'Only MAX_DETAIL_FETCHES_PER_RUN detail pages should be fetched in a single run.');
     }
+
+    public function testDetailPageEnrichmentPrioritizesEventsNotYetEnrichedOverPreviousRuns(): void
+    {
+        $itemCount = 20;
+        $items = '';
+
+        for ($i = 1; $i <= $itemCount; ++$i) {
+            $items .= sprintf(
+                '<div class="product"><h2 itemprop="name">Band %1$d 1.1.2030</h2><a href="/product/%1$d/">Details</a></div>',
+                $i
+            );
+        }
+
+        $listingBody = '<!DOCTYPE html><html><body>' . $items . '</body></html>';
+        $fetchedDetailUrls = [];
+        $storedEnrichedAt = [];
+
+        Functions\when('get_option')->alias(
+            function (string $name, $default = false) use (&$storedEnrichedAt) {
+                if ('eventmesh_holvi_detail_enriched_at' === $name) {
+                    return $storedEnrichedAt;
+                }
+
+                return [['id' => 'main', 'url' => self::LISTING_URL, 'enabled' => true]];
+            }
+        );
+        Functions\when('update_option')->alias(
+            function (string $name, $value) use (&$storedEnrichedAt) {
+                if ('eventmesh_holvi_detail_enriched_at' === $name) {
+                    $storedEnrichedAt = $value;
+                }
+
+                return true;
+            }
+        );
+
+        Functions\when('wp_remote_get')->alias(
+            function (string $url) use ($listingBody, &$fetchedDetailUrls) {
+                if (self::LISTING_URL === $url) {
+                    return ['__body' => $listingBody];
+                }
+
+                $fetchedDetailUrls[] = $url;
+
+                return new \WP_Error('unreached', 'not needed for this test');
+            }
+        );
+
+        // First run: no prior enrichment history, so the first 15 (by
+        // listing order, since all are equally "never enriched") get
+        // attempted, leaving events 16-20 untouched.
+        $this->connector()->fetch();
+
+        self::assertCount(15, $fetchedDetailUrls);
+        self::assertContains('https://shop.holvi.com/product/1/', $fetchedDetailUrls);
+        self::assertNotContains('https://shop.holvi.com/product/16/', $fetchedDetailUrls);
+
+        // Second run: events 1-15 now have a recent timestamp, so events
+        // 16-20 (never enriched) must be prioritized first this time -
+        // proving the budget doesn't starve the same trailing events forever.
+        $fetchedDetailUrls = [];
+        $this->connector()->fetch();
+
+        foreach (range(16, 20) as $i) {
+            self::assertContains(
+                "https://shop.holvi.com/product/{$i}/",
+                $fetchedDetailUrls,
+                "Event {$i}, never enriched in run 1, must be prioritized in run 2."
+            );
+        }
+    }
 }

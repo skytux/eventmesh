@@ -30,6 +30,16 @@ final class HolviConnector implements ConnectorInterface
     private const DETAIL_FETCH_TIME_BUDGET_SECONDS = 20.0;
     private const DETAIL_FETCH_TIMEOUT = 10;
 
+    /**
+     * Persists a per-externalId "last enrichment attempt" timestamp so
+     * priority across runs isn't just listing order: never-enriched events
+     * go first, then the longest-stale ones - a source with more listings
+     * than one run's budget still gets every event enriched within a
+     * bounded number of runs, instead of the same leading events winning
+     * every time and everything past the budget never being reached.
+     */
+    private const DETAIL_ENRICHED_AT_OPTION = 'eventmesh_holvi_detail_enriched_at';
+
     private int $fetchErrors = 0;
 
     public function __construct(
@@ -104,26 +114,69 @@ final class HolviConnector implements ConnectorInterface
             );
         }
 
-        $enriched = [];
-        $detailFetchesRemaining = self::MAX_DETAIL_FETCHES_PER_RUN;
-        $deadline = microtime(true) + self::DETAIL_FETCH_TIME_BUDGET_SECONDS;
-
-        foreach ($events as $event) {
-            if ($detailFetchesRemaining <= 0 || '' === $event->url() || microtime(true) >= $deadline) {
-                $enriched[] = $event;
-                continue;
-            }
-
-            --$detailFetchesRemaining;
-            $enriched[] = $this->enrichWithDetailPage($event);
-        }
-
-        return $enriched;
+        return $this->enrichEvents($events);
     }
 
     public function fetchErrors(): int
     {
         return $this->fetchErrors;
+    }
+
+    /**
+     * @param array<int, Event> $events
+     *
+     * @return array<int, Event>
+     */
+    private function enrichEvents(array $events): array
+    {
+        $enrichedAt = get_option(self::DETAIL_ENRICHED_AT_OPTION, []);
+
+        if (! is_array($enrichedAt)) {
+            $enrichedAt = [];
+        }
+
+        $indices = array_keys($events);
+
+        usort(
+            $indices,
+            static function (int $a, int $b) use ($events, $enrichedAt): int {
+                $timeA = (int) ($enrichedAt[$events[$a]->externalId()] ?? 0);
+                $timeB = (int) ($enrichedAt[$events[$b]->externalId()] ?? 0);
+
+                return $timeA <=> $timeB;
+            }
+        );
+
+        $detailFetchesRemaining = self::MAX_DETAIL_FETCHES_PER_RUN;
+        $deadline = microtime(true) + self::DETAIL_FETCH_TIME_BUDGET_SECONDS;
+
+        foreach ($indices as $index) {
+            $event = $events[$index];
+
+            if ('' === $event->url()) {
+                continue;
+            }
+
+            if ($detailFetchesRemaining <= 0 || microtime(true) >= $deadline) {
+                break;
+            }
+
+            --$detailFetchesRemaining;
+            $events[$index] = $this->enrichWithDetailPage($event);
+            $enrichedAt[$event->externalId()] = time();
+        }
+
+        $currentExternalIds = array_map(
+            static fn (Event $event): string => $event->externalId(),
+            $events
+        );
+
+        update_option(
+            self::DETAIL_ENRICHED_AT_OPTION,
+            array_intersect_key($enrichedAt, array_flip($currentExternalIds))
+        );
+
+        return $events;
     }
 
     /**
