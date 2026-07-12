@@ -7,6 +7,7 @@ return [
         'wp-blocks',
         'wp-element',
         'wp-block-editor',
+        'wp-i18n',
     ],
     'version' => (string) filemtime(__DIR__ . '/index.js'),
 ];

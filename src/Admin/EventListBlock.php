@@ -491,7 +491,7 @@ final class EventListBlock
 <!-- wp:eventmesh/provider-embed {"style":{"spacing":{"margin":{"top":"0.5em"}}}} /-->
 
 <!-- wp:details {"style":{"typography":{"fontSize":"0.8rem"},"spacing":{"margin":{"top":"0.35em"}}}} -->
-<details class="wp-block-details" style="margin-top:0.35em;font-size:0.8rem"><summary>Show more</summary>
+<details class="wp-block-details" style="margin-top:0.35em;font-size:0.8rem"><summary>__EVENTMESH_SHOW_MORE__</summary>
 
 <!-- wp:group {"style":{"typography":{"fontSize":"1rem"}},"layout":{"type":"constrained"}} -->
 <div class="wp-block-group" style="font-size:1rem">
@@ -523,12 +523,20 @@ final class EventListBlock
 
 <!-- wp:query-no-results -->
 <!-- wp:paragraph -->
-<p>No events found.</p>
+<p>__EVENTMESH_NO_RESULTS__</p>
 <!-- /wp:paragraph -->
 <!-- /wp:query-no-results -->
 </div>
 <!-- /wp:query -->
 HTML;
+
+        $content = strtr(
+            $content,
+            [
+                '__EVENTMESH_SHOW_MORE__' => esc_html__('Show more', 'eventmesh'),
+                '__EVENTMESH_NO_RESULTS__' => esc_html__('No events found.', 'eventmesh'),
+            ]
+        );
 
         register_block_pattern(
             'eventmesh/event-query-loop-pattern',
