@@ -65,6 +65,51 @@ final class SyncRunnerTest extends TestCase
         );
     }
 
+    public function testRunReclaimsAStaleLockAndProceeds(): void
+    {
+        $transients = ['eventmesh_sync_lock' => time() - (10 * HOUR_IN_SECONDS)];
+
+        Functions\when('get_transient')->alias(
+            static fn (string $name) => $transients[$name] ?? false
+        );
+        Functions\when('set_transient')->alias(
+            function (string $name, $value) use (&$transients): bool {
+                $transients[$name] = $value;
+
+                return true;
+            }
+        );
+        Functions\when('delete_transient')->alias(
+            function (string $name) use (&$transients): bool {
+                unset($transients[$name]);
+
+                return true;
+            }
+        );
+
+        $updatedOptions = [];
+        Functions\when('update_option')->alias(
+            function (string $name, $value) use (&$updatedOptions): bool {
+                $updatedOptions[$name] = $value;
+
+                return true;
+            }
+        );
+
+        $this->runner()->run([]);
+
+        self::assertArrayHasKey(
+            'eventmesh_last_sync_attempt_at',
+            $updatedOptions,
+            'A lock older than its TTL must be reclaimed so a crashed run cannot block cron forever.'
+        );
+        self::assertArrayNotHasKey(
+            'eventmesh_sync_lock',
+            $transients,
+            'The reclaimed lock must be released after the run.'
+        );
+    }
+
     public function testRunAcquiresAndReleasesTheLockAndRecordsTheAttemptTime(): void
     {
         $transients = [];

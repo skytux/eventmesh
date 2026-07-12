@@ -214,18 +214,19 @@ final class Admin
 
         $result = $this->container->get(SyncRunner::class)->run();
 
-        if ($result['processed'] > 0) {
-            $this->container->get(DashboardPage::class)->persistSyncSummary(
-                [
-                    'created' => $result['created'],
-                    'updated' => $result['updated'],
-                    'failed' => $result['failed'],
-                    'skipped' => $result['skipped'],
-                    'archived' => $result['archived'],
-                ],
-                $result['created'] + $result['updated']
-            );
-        }
+        // Persist unconditionally (not only when events were processed), so
+        // the dashboard's "Last sync" timestamp reflects every completed cron
+        // run - matching the manual "Sync now" and the visitor fallback paths.
+        $this->container->get(DashboardPage::class)->persistSyncSummary(
+            [
+                'created' => $result['created'],
+                'updated' => $result['updated'],
+                'failed' => $result['failed'],
+                'skipped' => $result['skipped'],
+                'archived' => $result['archived'],
+            ],
+            $result['created'] + $result['updated']
+        );
     }
 
     public function registerBlock(): void

@@ -62,10 +62,26 @@ final class SyncRunner
      */
     public function run(?array $connectorIds = null): array
     {
-        if (get_transient(self::LOCK_TRANSIENT)) {
+        $existingLock = get_transient(self::LOCK_TRANSIENT);
+
+        if (false !== $existingLock && ! $this->lockIsStale($existingLock)) {
             $this->logger->warning('Skipped sync run: another sync is already in progress.');
 
             return $this->emptySummary();
+        }
+
+        if (false !== $existingLock) {
+            // The transient's own TTL should normally expire the lock, but a
+            // run that died mid-way (PHP timeout, fatal) - or an object-cache
+            // backend that doesn't strictly honor TTLs - can leave it behind,
+            // silently blocking every subsequent cron/fallback run until it
+            // clears. Reclaiming a demonstrably-too-old lock self-heals that.
+            $this->logger->warning(
+                sprintf(
+                    'Reclaiming a stale sync lock acquired at %s - a previous run likely died without releasing it.',
+                    gmdate('c', (int) $existingLock)
+                )
+            );
         }
 
         set_transient(self::LOCK_TRANSIENT, time(), self::LOCK_TTL_SECONDS);
@@ -76,6 +92,17 @@ final class SyncRunner
             delete_transient(self::LOCK_TRANSIENT);
             update_option(self::LAST_ATTEMPT_OPTION, time());
         }
+    }
+
+    /**
+     * A lock is stale once it is older than its own intended lifetime: no
+     * legitimately-running sync should ever hold it that long.
+     *
+     * @param mixed $lock the stored lock value (its acquisition timestamp)
+     */
+    private function lockIsStale($lock): bool
+    {
+        return time() - (int) $lock >= self::LOCK_TTL_SECONDS;
     }
 
     /**
