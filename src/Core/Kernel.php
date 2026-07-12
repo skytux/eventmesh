@@ -40,6 +40,7 @@ final class Kernel
     public function boot(): void
     {
         $this->registerServices();
+        $this->validateServicesWhenDebugging();
 
         $admin = $this->container->get(Admin::class);
         $admin->boot();
@@ -69,6 +70,46 @@ final class Kernel
             'eventmesh/boot',
             $this->container
         );
+    }
+
+    /**
+     * A missed or misordered binding among ~20 manually-wired singletons
+     * would otherwise only fail lazily, on whatever admin page happens to
+     * be the first to touch it, in production. Eagerly resolving every
+     * registered service right after wiring converts that into an
+     * immediate, logged failure at plugins_loaded - but only under
+     * WP_DEBUG, since eagerly constructing every service (including ones
+     * nothing on the current request needs) has no reason to happen on a
+     * production request that will never hit the broken one anyway.
+     */
+    private function validateServicesWhenDebugging(): void
+    {
+        if (! defined('WP_DEBUG') || ! WP_DEBUG) {
+            return;
+        }
+
+        foreach ($this->container->registeredIds() as $id) {
+            try {
+                $this->container->get($id);
+            } catch (\Throwable $exception) {
+                $this->logBootFailure($id, $exception);
+            }
+        }
+    }
+
+    private function logBootFailure(string $id, \Throwable $exception): void
+    {
+        $message = sprintf(
+            'EventMesh: service "%s" failed to resolve during boot: %s',
+            $id,
+            $exception->getMessage()
+        );
+
+        try {
+            $this->container->get(Logger::class)->error($message);
+        } catch (\Throwable) {
+            error_log($message);
+        }
     }
 
     private function registerServices(): void
