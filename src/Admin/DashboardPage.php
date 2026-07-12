@@ -61,23 +61,21 @@ final class DashboardPage
     /**
      * @return array{success: bool, synced: int, message: string}
      */
-    public function syncHolvi(): array
+    public function runSync(): array
     {
-        $connector = $this->connectors->get('holvi');
-
-        if (null === $connector) {
-            $this->markSyncState('error', __('No Holvi connector is registered.', 'eventmesh'));
+        if (0 === $this->connectors->count()) {
+            $this->markSyncState('error', __('No connectors are registered.', 'eventmesh'));
 
             return [
                 'success' => false,
                 'synced' => 0,
-                'message' => __('No Holvi connector is registered.', 'eventmesh'),
+                'message' => __('No connectors are registered.', 'eventmesh'),
             ];
         }
 
         $this->markSyncState('running', __('Sync in progress…', 'eventmesh'));
 
-        $result = $this->syncRunner->run(['holvi']);
+        $result = $this->syncRunner->run();
         $synced = $result['created'] + $result['updated'];
 
         $this->persistSyncSummary(
@@ -92,12 +90,12 @@ final class DashboardPage
         );
 
         if (0 === $result['processed']) {
-            $this->markSyncState('completed', __('No Holvi events were found.', 'eventmesh'));
+            $this->markSyncState('completed', __('No events were found.', 'eventmesh'));
 
             return [
                 'success' => true,
                 'synced' => 0,
-                'message' => __('No Holvi events were found.', 'eventmesh'),
+                'message' => __('No events were found.', 'eventmesh'),
             ];
         }
 
