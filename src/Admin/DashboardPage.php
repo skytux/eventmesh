@@ -187,7 +187,15 @@ final class DashboardPage
     }
 
     /**
-     * @return array{created: int, updated: int, failed: int, skipped: int, archived: int, synced: int, timestamp: int}|null
+     * @return array{
+     *     created: int,
+     *     updated: int,
+     *     failed: int,
+     *     skipped: int,
+     *     archived: int,
+     *     synced: int,
+     *     timestamp: int
+     * }|null
      */
     public function lastSyncSummary(): ?array
     {

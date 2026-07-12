@@ -526,7 +526,8 @@ final class HolviHtmlParser
     }
 
     private const RANGE_DATE_PATTERN =
-        '/\b(?<startDay>\d{1,2})\.(?<startMonth>\d{1,2})\s*-\s*(?<endDay>\d{1,2})\.(?<endMonth>\d{1,2})\.(?<year>\d{4})?/';
+        '/\b(?<startDay>\d{1,2})\.(?<startMonth>\d{1,2})\s*-\s*'
+        . '(?<endDay>\d{1,2})\.(?<endMonth>\d{1,2})\.(?<year>\d{4})?/';
     private const SINGLE_DATE_PATTERN = '/\b(?<day>\d{1,2})\.(?<month>\d{1,2})\.(?<year>\d{4})?/';
 
     /**

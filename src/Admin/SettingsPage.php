@@ -23,7 +23,10 @@ final class SettingsPage
         $this->view->render(
             'settings',
             [
-                'artist_map_json' => wp_json_encode($this->artistMap->all(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) ?: '{}',
+                'artist_map_json' => wp_json_encode(
+                    $this->artistMap->all(),
+                    JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+                ) ?: '{}',
                 'source_settings' => $this->sourceSettings->all(),
                 'background_sync_enabled' => '1' === (string) get_option('eventmesh_enable_background_sync', '1'),
                 'sync_interval' => $this->admin->configuredSyncInterval(),
@@ -110,7 +113,7 @@ final class SettingsPage
                 'type' => 'success',
                 'message' => sprintf(
                     /* translators: 1: number of deleted events, 2: number of deleted performer terms */
-                    __('Factory reset complete: removed %1$d event(s) and %2$d performer term(s). All settings reset.', 'eventmesh'),
+                    __('Factory reset complete: removed %1$d event(s) and %2$d performer term(s). All settings reset.', 'eventmesh'), // phpcs:ignore Generic.Files.LineLength.TooLong
                     $result['deleted_events'],
                     $result['deleted_terms']
                 ),
