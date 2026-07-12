@@ -11,6 +11,9 @@
 				el( ServerSideRender, {
 					block: 'eventmesh/provider-embed',
 					attributes: props.attributes,
+					EmptyResponsePlaceholder: function () {
+						return null;
+					},
 				} )
 			);
 		},
