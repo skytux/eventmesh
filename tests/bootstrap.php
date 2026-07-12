@@ -8,6 +8,15 @@ if (! defined('EVENTMESH_PLUGIN_DIR')) {
     define('EVENTMESH_PLUGIN_DIR', dirname(__DIR__) . '/');
 }
 
+// Every template/include file in this plugin starts with
+// `if (! defined('ABSPATH')) { exit; }` - a standard WordPress guard against
+// direct browser access. Without a real WP bootstrap, that `exit` call
+// would otherwise silently kill the entire PHPUnit process the moment any
+// test includes one of those files.
+if (! defined('ABSPATH')) {
+    define('ABSPATH', dirname(__DIR__) . '/');
+}
+
 if (! defined('EVENTMESH_VERSION')) {
     define('EVENTMESH_VERSION', '0.0.0-test');
 }
