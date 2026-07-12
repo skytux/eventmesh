@@ -51,6 +51,7 @@ final class EventListBlockRenderersTest extends TestCase
     public function testRenderEventFieldStartsAtRendersTheFormattedDate(): void
     {
         Functions\when('get_permalink')->justReturn('https://example.test/events/some-band/');
+        Functions\when('get_the_title')->justReturn('Some Band 12.8.2026');
         Functions\when('get_post_meta')->alias(
             static function (int $postId, string $key) {
                 return match ($key) {
@@ -65,6 +66,26 @@ final class EventListBlockRenderersTest extends TestCase
 
         self::assertStringContainsString('Sat 13 June 2026 18:00', $html);
         self::assertStringStartsWith('<p ', $html);
+        self::assertStringNotContainsString('text-decoration:line-through', $html);
+    }
+
+    public function testRenderEventFieldStartsAtIsStruckThroughWhenTitleContainsCanceled(): void
+    {
+        Functions\when('get_permalink')->justReturn('https://example.test/events/some-band/');
+        Functions\when('get_the_title')->justReturn('Some Band 12.8.2026 CANCELED');
+        Functions\when('get_post_meta')->alias(
+            static function (int $postId, string $key) {
+                return match ($key) {
+                    '_eventmesh_starts_at' => '2026-06-13T18:00:00+00:00',
+                    '_eventmesh_starts_at_year_known' => '1',
+                    default => '',
+                };
+            }
+        );
+
+        $html = $this->block()->renderEventField(['field' => 'starts_at'], '', $this->blockInstance(['postId' => 42]));
+
+        self::assertStringContainsString('text-decoration:line-through', $html);
     }
 
     public function testRenderEventFieldStartsAtReturnsEmptyStringWithoutAStartDate(): void
@@ -90,7 +111,7 @@ final class EventListBlockRenderersTest extends TestCase
         self::assertStringStartsWith('<h4 ', $html);
     }
 
-    public function testRenderEventFieldTitleIsStruckThroughWhenSoldOut(): void
+    public function testRenderEventFieldTitleIsNotStruckThroughWhenMerelySoldOut(): void
     {
         Functions\when('get_the_title')->justReturn('Some Band 12.8.2026');
         Functions\when('get_permalink')->justReturn('https://example.test/events/some-band/');
@@ -100,7 +121,23 @@ final class EventListBlockRenderersTest extends TestCase
 
         $html = $this->block()->renderEventField(['field' => 'title'], '', $this->blockInstance(['postId' => 42]));
 
+        self::assertStringNotContainsString(
+            'text-decoration:line-through',
+            $html,
+            'Sold out no longer implies canceled - striking it through would suggest the event was canceled.'
+        );
+    }
+
+    public function testRenderEventFieldTitleIsStruckThroughWhenTitleContainsCanceled(): void
+    {
+        Functions\when('get_the_title')->justReturn('Some Band 12.8.2026 CANCELED');
+        Functions\when('get_permalink')->justReturn('https://example.test/events/some-band/');
+        Functions\when('get_post_meta')->justReturn('');
+
+        $html = $this->block()->renderEventField(['field' => 'title'], '', $this->blockInstance(['postId' => 42]));
+
         self::assertStringContainsString('text-decoration:line-through', $html);
+        self::assertStringContainsString('CANCELED', $html, 'The keyword must stay visible, not be stripped.');
     }
 
     public function testRenderEventFieldTitleRendersAnUnlinkedHeadingTagWhenConfigured(): void
@@ -120,7 +157,7 @@ final class EventListBlockRenderersTest extends TestCase
         self::assertStringContainsString('Some Band', $html);
     }
 
-    public function testRenderEventFieldTitleIsNotStruckThroughWhenNotSoldOut(): void
+    public function testRenderEventFieldTitleIsNotStruckThroughForAnOrdinaryTitle(): void
     {
         Functions\when('get_the_title')->justReturn('Some Band 12.8.2026');
         Functions\when('get_permalink')->justReturn('https://example.test/events/some-band/');
@@ -249,58 +286,88 @@ final class EventListBlockRenderersTest extends TestCase
         self::assertSame('', $html);
     }
 
-    public function testMarkPastEventRowAddsThePastClassWhenTheEventHasAlreadyHappened(): void
+    public function testMarkEventRowStatusAddsThePastClassWhenTheEventHasAlreadyHappened(): void
     {
         Functions\when('get_post_meta')->justReturn('2000-01-01T00:00:00+00:00');
 
         $parsedBlock = ['blockName' => 'core/columns', 'attrs' => ['className' => 'eventmesh-event-row']];
         $content = '<div class="wp-block-columns eventmesh-event-row">stuff</div>';
 
-        $result = $this->block()->markPastEventRow($content, $parsedBlock, $this->blockInstance(['postId' => 42]));
+        $result = $this->block()->markEventRowStatus($content, $parsedBlock, $this->blockInstance(['postId' => 42]));
 
         self::assertStringContainsString('eventmesh-event-past', $result);
     }
 
-    public function testMarkPastEventRowLeavesFutureEventsAlone(): void
+    public function testMarkEventRowStatusLeavesFutureEventsAlone(): void
     {
         Functions\when('get_post_meta')->justReturn('2999-01-01T00:00:00+00:00');
 
         $parsedBlock = ['blockName' => 'core/columns', 'attrs' => ['className' => 'eventmesh-event-row']];
         $content = '<div class="wp-block-columns eventmesh-event-row">stuff</div>';
 
-        $result = $this->block()->markPastEventRow($content, $parsedBlock, $this->blockInstance(['postId' => 42]));
+        $result = $this->block()->markEventRowStatus($content, $parsedBlock, $this->blockInstance(['postId' => 42]));
 
         self::assertSame($content, $result);
     }
 
-    public function testMarkPastEventRowIgnoresBlocksWithoutTheEventRowClass(): void
+    public function testMarkEventRowStatusIgnoresBlocksWithoutTheEventRowClass(): void
     {
         $parsedBlock = ['blockName' => 'core/columns', 'attrs' => ['className' => 'something-else']];
         $content = '<div class="wp-block-columns something-else">stuff</div>';
 
-        $result = $this->block()->markPastEventRow($content, $parsedBlock, $this->blockInstance(['postId' => 42]));
+        $result = $this->block()->markEventRowStatus($content, $parsedBlock, $this->blockInstance(['postId' => 42]));
 
         self::assertSame($content, $result);
     }
 
-    public function testMarkPastEventRowIgnoresUnrelatedBlockTypes(): void
+    public function testMarkEventRowStatusIgnoresUnrelatedBlockTypes(): void
     {
         $parsedBlock = ['blockName' => 'core/paragraph', 'attrs' => []];
         $content = '<p>stuff</p>';
 
-        $result = $this->block()->markPastEventRow($content, $parsedBlock, $this->blockInstance(['postId' => 42]));
+        $result = $this->block()->markEventRowStatus($content, $parsedBlock, $this->blockInstance(['postId' => 42]));
 
         self::assertSame($content, $result);
     }
 
-    public function testMarkPastEventRowLeavesContentAloneWithoutAPostIdInContext(): void
+    public function testMarkEventRowStatusLeavesContentAloneWithoutAPostIdInContext(): void
     {
         $parsedBlock = ['blockName' => 'core/columns', 'attrs' => ['className' => 'eventmesh-event-row']];
         $content = '<div class="wp-block-columns eventmesh-event-row">stuff</div>';
 
-        $result = $this->block()->markPastEventRow($content, $parsedBlock, $this->blockInstance([]));
+        $result = $this->block()->markEventRowStatus($content, $parsedBlock, $this->blockInstance([]));
 
         self::assertSame($content, $result);
+    }
+
+    public function testMarkEventRowStatusAddsTheSoldOutClassForAnUpcomingSoldOutEvent(): void
+    {
+        Functions\when('get_post_meta')->alias(
+            static fn (int $postId, string $key) => '_eventmesh_sold_out' === $key ? '1' : '2999-01-01T00:00:00+00:00'
+        );
+
+        $parsedBlock = ['blockName' => 'core/columns', 'attrs' => ['className' => 'eventmesh-event-row']];
+        $content = '<div class="wp-block-columns eventmesh-event-row">stuff</div>';
+
+        $result = $this->block()->markEventRowStatus($content, $parsedBlock, $this->blockInstance(['postId' => 42]));
+
+        self::assertStringContainsString('eventmesh-sold-out-row', $result);
+        self::assertStringNotContainsString('eventmesh-event-past', $result);
+    }
+
+    public function testMarkEventRowStatusAddsBothClassesForAPastSoldOutEvent(): void
+    {
+        Functions\when('get_post_meta')->alias(
+            static fn (int $postId, string $key) => '_eventmesh_sold_out' === $key ? '1' : '2000-01-01T00:00:00+00:00'
+        );
+
+        $parsedBlock = ['blockName' => 'core/columns', 'attrs' => ['className' => 'eventmesh-event-row']];
+        $content = '<div class="wp-block-columns eventmesh-event-row">stuff</div>';
+
+        $result = $this->block()->markEventRowStatus($content, $parsedBlock, $this->blockInstance(['postId' => 42]));
+
+        self::assertStringContainsString('eventmesh-sold-out-row', $result);
+        self::assertStringContainsString('eventmesh-event-past', $result);
     }
 
     public function testRenderProviderEmbedRendersTheCachedHtml(): void

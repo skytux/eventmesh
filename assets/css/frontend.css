@@ -3,6 +3,18 @@
     opacity: 0.55;
 }
 
+/*
+ * A distinct, independent dimming from the past-event opacity above - a
+ * sold-out event is still relevant among upcoming ones (unlike a past one),
+ * so it's dimmed less. Both classes can apply to the same event (a sold-out
+ * event that's also past) and simply compound, which is fine.
+ */
+.eventmesh-sold-out-row,
+.eventmesh-events-list__item--sold-out,
+.eventmesh-event-card--sold-out {
+    opacity: 0.7;
+}
+
 .eventmesh-events-divider {
     margin: 1.5em 0 1em;
     padding-top: 1em;

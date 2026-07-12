@@ -15,17 +15,18 @@ if (! defined('ABSPATH')) {
         <?php $image = (string) ($event['image'] ?? ''); ?>
         <?php $title = (string) ($event['title'] ?? ''); ?>
         <?php $soldOut = ! empty($event['sold_out']); ?>
+        <?php $canceled = ! empty($event['is_canceled']); ?>
         <?php if (! $pastDividerShown && ! empty($event['is_past'])) : ?>
             <?php $pastDividerShown = true; ?>
             <div class="eventmesh-events-divider eventmesh-events-divider--grid">
                 <?php esc_html_e('Past Events', 'eventmesh'); ?>
             </div>
         <?php endif; ?>
-        <article class="eventmesh-event-card<?php echo ! empty($event['is_past']) ? ' eventmesh-event-past' : ''; ?>">
+        <article class="eventmesh-event-card<?php echo ! empty($event['is_past']) ? ' eventmesh-event-past' : ''; ?><?php echo $soldOut ? ' eventmesh-event-card--sold-out' : ''; ?>">
             <?php if ('' !== $image) : ?>
                 <img src="<?php echo esc_url($image); ?>" alt="<?php echo esc_attr($title); ?>" />
             <?php endif; ?>
-            <h3<?php echo $soldOut ? ' style="text-decoration:line-through"' : ''; ?>><?php echo esc_html($title); ?></h3>
+            <h3<?php echo $canceled ? ' style="text-decoration:line-through"' : ''; ?>><?php echo esc_html($title); ?></h3>
             <?php if ($soldOut) : ?>
                 <p class="eventmesh-sold-out-label"><?php esc_html_e('Sold out', 'eventmesh'); ?></p>
             <?php endif; ?>
