@@ -26,6 +26,7 @@ use EventMesh\Services\ProviderEnricher;
 use EventMesh\Services\SourceSettings;
 use EventMesh\Services\SyncRunner;
 use EventMesh\Sync\EventSynchronizer;
+use EventMesh\Support\BlockAppearanceTools;
 use EventMesh\Support\Logger;
 
 final class Kernel
@@ -56,6 +57,9 @@ final class Kernel
 
         $cronFallbackTrigger = $this->container->get(CronFallbackTrigger::class);
         $cronFallbackTrigger->boot();
+
+        $blockAppearanceTools = $this->container->get(BlockAppearanceTools::class);
+        $blockAppearanceTools->boot();
 
         $performerTaxonomy = $this->container->get(PerformerTaxonomy::class);
         $performerTaxonomy->boot();
@@ -224,6 +228,11 @@ final class Kernel
                 $container->get(Logger::class),
                 $container->get(SyncRunner::class)
             )
+        );
+
+        $this->container->singleton(
+            BlockAppearanceTools::class,
+            fn () => new BlockAppearanceTools()
         );
 
         $this->container->singleton(
