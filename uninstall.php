@@ -16,4 +16,10 @@ if (! defined('EVENTMESH_PLUGIN_DIR')) {
 require __DIR__ . '/src/Support/Autoloader.php';
 
 EventMesh\Support\Autoloader::register();
-EventMesh\Support\FactoryReset::run();
+
+// Off by default (see the Settings page) - preserving synced data on
+// uninstall is the safer default, so a reinstall (or accidental deactivate
+// + delete) doesn't silently wipe everything the user built up.
+if ('1' === (string) get_option('eventmesh_delete_data_on_uninstall', '0')) {
+    EventMesh\Support\FactoryReset::run();
+}

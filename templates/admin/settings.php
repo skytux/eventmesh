@@ -8,6 +8,7 @@
  * @var bool $background_sync_enabled Whether background sync is enabled.
  * @var string $sync_interval Currently configured background sync interval key.
  * @var array<string, string> $sync_intervals Available interval keys mapped to labels.
+ * @var bool $delete_data_on_uninstall Whether uninstalling the plugin should also delete its data.
  */
 
 declare(strict_types=1);
@@ -91,6 +92,20 @@ if (! defined('ABSPATH')) {
                         ><?php echo esc_textarea($artist_map_json); ?></textarea>
                         <p class="description">
                             <?php esc_html_e('Define a JSON map of artists to provider URLs such as spotify, youtube, mixcloud, bandcamp, and soundcloud.', 'eventmesh'); ?>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <?php esc_html_e('Uninstalling', 'eventmesh'); ?>
+                    </th>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="eventmesh_delete_data_on_uninstall" value="1" <?php checked($delete_data_on_uninstall, true); ?> />
+                            <?php esc_html_e('Delete all EventMesh data when the plugin is deleted', 'eventmesh'); ?>
+                        </label>
+                        <p class="description">
+                            <?php esc_html_e('Off by default: deleting the plugin keeps every synced event, term, and setting so reinstalling picks up where you left off.', 'eventmesh'); ?>
                         </p>
                     </td>
                 </tr>
