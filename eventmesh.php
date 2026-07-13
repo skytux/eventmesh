@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: EventMesh
- * Description: Synchronize external event sources into native WordPress content.
+ * Description: Synchronize external event sources such as Holvi into native WordPress content.
  * Version: 1.0.0
  * Requires at least: 6.8
  * Requires PHP: 8.2
