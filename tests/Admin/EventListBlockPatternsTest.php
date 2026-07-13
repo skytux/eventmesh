@@ -88,14 +88,28 @@ final class EventListBlockPatternsTest extends TestCase
         self::assertStringContainsString('wp:eventmesh/event-field {"field":"venue"}', $content);
     }
 
-    public function testUsesTheDynamicTicketButtonBlockTwiceForRowAndDetails(): void
+    public function testRegistersTwoNamespacedLoopsAndDropsThePastEventsMarker(): void
+    {
+        $content = $this->queryLoopPatternContent();
+
+        self::assertStringContainsString('"namespace":"eventmesh/upcoming-events"', $content);
+        self::assertStringContainsString('"namespace":"eventmesh/past-events"', $content);
+        self::assertSame(2, substr_count($content, '<!-- wp:query '), 'Expected exactly two separate Query Loops.');
+        self::assertStringNotContainsString(
+            'past-events-marker',
+            $content,
+            'The single-loop divider block is replaced by two independent loops.'
+        );
+    }
+
+    public function testTheTicketButtonAppearsOnlyInTheUpcomingLoop(): void
     {
         $content = $this->queryLoopPatternContent();
 
         self::assertSame(
-            2,
+            1,
             substr_count($content, 'wp:eventmesh/ticket-button'),
-            'Expected exactly two ticket buttons: the always-visible row one and the one inside the expanded details.'
+            'Only the upcoming loop shows a ticket button; a past event can no longer sell tickets.'
         );
     }
 
@@ -107,9 +121,9 @@ final class EventListBlockPatternsTest extends TestCase
         self::assertStringContainsString('<!-- wp:post-content /-->', $content);
 
         self::assertSame(
-            1,
+            2,
             substr_count($content, 'wp:post-featured-image'),
-            'The featured image should only appear once (in the always-visible row), not duplicated inside the expanded details.'
+            'One featured image per loop (upcoming and past), each in its own row - never duplicated within a row.'
         );
     }
 
@@ -148,7 +162,10 @@ final class EventListBlockPatternsTest extends TestCase
         $content = $this->queryLoopPatternContent();
 
         self::assertStringContainsString('<summary>Show more</summary>', $content);
-        self::assertStringContainsString('<p>No events found.</p>', $content);
+        self::assertStringContainsString('<p>No upcoming events.</p>', $content);
+        self::assertStringContainsString('<p>No past events.</p>', $content);
+        self::assertStringContainsString('>Upcoming events</h2>', $content);
+        self::assertStringContainsString('>Past events</h2>', $content);
         self::assertStringNotContainsString('__EVENTMESH_', $content, 'A translation placeholder was left unreplaced.');
     }
 }

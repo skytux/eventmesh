@@ -196,4 +196,37 @@ final class EventQueryTest extends TestCase
         self::assertStringContainsString('_eventmesh_starts_at', $result['join']);
         self::assertNotSame($clauses['orderby'], $result['orderby']);
     }
+
+    public function testApplyTimeToQueryVarsRestrictsToUpcomingAscending(): void
+    {
+        $result = (new EventQuery())->applyTimeToQueryVars(
+            ['post_type' => 'eventmesh_event', 'eventmesh_upcoming_first' => true],
+            'upcoming'
+        );
+
+        self::assertArrayHasKey('meta_query', $result);
+        self::assertSame('_eventmesh_starts_at', $result['meta_key']);
+        self::assertSame('meta_value', $result['orderby']);
+        self::assertSame('ASC', $result['order']);
+        self::assertArrayNotHasKey(
+            'eventmesh_upcoming_first',
+            $result,
+            'The time-scoped ordering must win over the upcoming-first flag.'
+        );
+    }
+
+    public function testApplyTimeToQueryVarsRestrictsToPastDescending(): void
+    {
+        $result = (new EventQuery())->applyTimeToQueryVars(['post_type' => 'eventmesh_event'], 'past');
+
+        self::assertArrayHasKey('meta_query', $result);
+        self::assertSame('DESC', $result['order'], 'Past events sort most-recent-first.');
+    }
+
+    public function testApplyTimeToQueryVarsLeavesUnknownTimeWindowsUntouched(): void
+    {
+        $query = ['post_type' => 'eventmesh_event'];
+
+        self::assertSame($query, (new EventQuery())->applyTimeToQueryVars($query, 'all'));
+    }
 }

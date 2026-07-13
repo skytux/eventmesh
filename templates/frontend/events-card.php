@@ -22,7 +22,7 @@ if (! defined('ABSPATH')) {
                 <?php esc_html_e('Past Events', 'eventmesh'); ?>
             </div>
         <?php endif; ?>
-        <article class="eventmesh-event-card<?php echo ! empty($event['is_past']) ? ' eventmesh-event-past' : ''; ?><?php echo $soldOut ? ' eventmesh-event-card--sold-out' : ''; ?>">
+        <article class="eventmesh-event-card">
             <?php if ('' !== $image) : ?>
                 <img src="<?php echo esc_url($image); ?>" alt="<?php echo esc_attr($title); ?>" />
             <?php endif; ?>

@@ -22,7 +22,7 @@ if (! defined('ABSPATH')) {
                     <?php $pastDividerShown = true; ?>
                     <li class="eventmesh-events-divider"><?php esc_html_e('Past Events', 'eventmesh'); ?></li>
                 <?php endif; ?>
-                <li class="eventmesh-events-list__item<?php echo ! empty($event['is_past']) ? ' eventmesh-events-list__item--past' : ''; ?><?php echo $soldOut ? ' eventmesh-events-list__item--sold-out' : ''; ?>">
+                <li class="eventmesh-events-list__item">
                     <?php $image = (string) ($event['image'] ?? ''); ?>
                     <?php if ('' !== $image) : ?>
                         <a href="<?php echo esc_url((string) ($event['url'] ?? '#')); ?>">
