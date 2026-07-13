@@ -27,13 +27,7 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-$eventmesh_datetime = static function (int $timestamp): string {
-    if (0 === $timestamp) {
-        return __('Never', 'eventmesh');
-    }
-
-    return date_i18n(get_option('date_format') . ' ' . get_option('time_format'), $timestamp);
-};
+$eventmesh_datetime = static fn (int $timestamp): string => \EventMesh\Support\DateTimeFormat::format($timestamp);
 ?>
 
 <div class="wrap">
