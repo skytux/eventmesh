@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EventMesh\Content;
 
 use DateTimeImmutable;
+use EventMesh\Support\EventMeta;
 use EventMesh\Support\EventStatus;
 use WP_Query;
 
@@ -67,18 +68,10 @@ final class EventQuery
 
         foreach ($query->posts as $post) {
             $postId = (int) $post->ID;
-            $meta = get_post_meta($postId);
-            $providers = [];
 
-            foreach ($meta as $key => $values) {
-                if (! str_starts_with($key, '_eventmesh_provider_')) {
-                    continue;
-                }
-
-                $providers[substr($key, strlen('_eventmesh_provider_'))] = (string) ($values[0] ?? '');
-            }
-
-            $startsAt = (string) get_post_meta($postId, '_eventmesh_starts_at', true);
+            // Every overridable field is read through EventMeta so a manual
+            // edit-screen value wins over the scraped one on the front end.
+            $startsAt = EventMeta::resolve($postId, 'starts_at');
 
             $events[] = [
                 'id' => $postId,
@@ -89,14 +82,15 @@ final class EventQuery
                 'image' => get_the_post_thumbnail_url($post, 'large'),
                 'image_id' => (int) get_post_thumbnail_id($post),
                 'starts_at' => $startsAt,
-                'ends_at' => get_post_meta($postId, '_eventmesh_ends_at', true),
-                'venue_name' => get_post_meta($postId, '_eventmesh_venue_name', true),
+                'ends_at' => EventMeta::resolve($postId, 'ends_at'),
+                'venue_name' => EventMeta::resolve($postId, 'venue_name'),
+                'price' => EventMeta::resolve($postId, 'price'),
                 'source_url' => get_post_meta($postId, '_eventmesh_url', true),
-                'sold_out' => '1' === (string) get_post_meta($postId, '_eventmesh_sold_out', true),
+                'sold_out' => EventMeta::isSoldOut($postId),
                 'embed_html' => get_post_meta($postId, '_eventmesh_embed_html', true),
                 'is_past' => '' !== $startsAt && $startsAt < $now,
                 'is_canceled' => EventStatus::isCanceled($post->post_title),
-                'providers' => $providers,
+                'providers' => EventMeta::resolvedProviders($postId),
                 'post' => $post,
             ];
         }
