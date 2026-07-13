@@ -4,6 +4,7 @@
   "name": "eventmesh/ticket-button",
   "title": "EventMesh ticket button",
   "category": "widgets",
+  "textdomain": "eventmesh",
   "icon": "tickets-alt",
   "description": "A button linking to the current event's ticket page. Rendered directly in PHP rather than via Block Bindings, so the link is always correct regardless of binding support.",
   "keywords": ["tickets", "button", "eventmesh"],

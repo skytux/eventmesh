@@ -4,6 +4,7 @@
   "name": "eventmesh/event-list",
   "title": "EventMesh events list",
   "category": "widgets",
+  "textdomain": "eventmesh",
   "icon": "calendar-alt",
   "description": "Display a list of events imported by EventMesh.",
   "keywords": ["events", "calendar", "eventmesh"],

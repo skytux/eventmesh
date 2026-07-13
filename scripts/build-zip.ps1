@@ -33,7 +33,7 @@ if (Test-Path $stagingRoot) {
 }
 New-Item -ItemType Directory -Force -Path $stagingDir | Out-Null
 
-$runtimeItems = @('eventmesh.php', 'uninstall.php', 'src', 'templates', 'config', 'assets')
+$runtimeItems = @('eventmesh.php', 'uninstall.php', 'readme.txt', 'LICENSE', 'src', 'templates', 'config', 'assets')
 
 foreach ($item in $runtimeItems) {
     $source = Join-Path $repoRoot $item
