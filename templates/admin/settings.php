@@ -4,6 +4,7 @@
  *
  * @var string $holvi_source_urls Holvi source URLs configured for syncing.
  * @var string $artist_map_json   Artist/provider mapping JSON.
+ * @var array<int, array{id: string, label: string}> $connector_rows Registered connector rows.
  * @var array<string, bool> $source_settings Source enablement settings.
  * @var bool $background_sync_enabled Whether background sync is enabled.
  * @var string $sync_interval Currently configured background sync interval key.
@@ -38,10 +39,22 @@ if (! defined('ABSPATH')) {
                             <legend class="screen-reader-text">
                                 <?php esc_html_e('Enabled sources', 'eventmesh'); ?>
                             </legend>
-                            <label>
-                                <input type="checkbox" name="eventmesh_source_enabled[holvi]" value="1" <?php checked($source_settings['holvi'] ?? true, true); ?> />
-                                <?php esc_html_e('Holvi', 'eventmesh'); ?>
-                            </label>
+                            <?php if ([] === $connector_rows) : ?>
+                                <p class="description">
+                                    <?php esc_html_e('No connectors are registered yet.', 'eventmesh'); ?>
+                                </p>
+                            <?php endif; ?>
+                            <?php foreach ($connector_rows as $connector_row) : ?>
+                                <label style="display: block; margin-bottom: 4px;">
+                                    <?php // The hidden 0 submits when the checkbox is unchecked, so unticking actually disables the source. ?>
+                                    <input type="hidden" name="eventmesh_source_enabled[<?php echo esc_attr($connector_row['id']); ?>]" value="0" />
+                                    <input type="checkbox" name="eventmesh_source_enabled[<?php echo esc_attr($connector_row['id']); ?>]" value="1" <?php checked($source_settings[$connector_row['id']] ?? true, true); ?> />
+                                    <?php echo esc_html($connector_row['label']); ?>
+                                </label>
+                            <?php endforeach; ?>
+                            <p class="description">
+                                <?php esc_html_e('Disabling a source archives its events (moves them to Draft) on the next sync; re-enabling it republishes them.', 'eventmesh'); ?>
+                            </p>
                         </fieldset>
                     </td>
                 </tr>
