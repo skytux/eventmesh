@@ -279,7 +279,8 @@ final class Kernel
                 $container->get(View::class),
                 $container->get(ArtistMap::class),
                 $container->get(SourceSettings::class),
-                $container->get(Admin::class)
+                $container->get(Admin::class),
+                $container->get(ConnectorManager::class)
             )
         );
 

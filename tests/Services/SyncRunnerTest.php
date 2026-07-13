@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EventMesh\Tests\Services;
 
 use Brain\Monkey\Functions;
+use EventMesh\Contracts\ConnectorInterface;
 use EventMesh\Core\ConnectorRegistry;
 use EventMesh\Services\ArtistMap;
 use EventMesh\Services\ConnectorManager;
@@ -26,12 +27,12 @@ final class SyncRunnerTest extends TestCase
         Functions\when('get_option')->justReturn([]);
     }
 
-    private function runner(): SyncRunner
+    private function runner(?ConnectorManager $connectors = null): SyncRunner
     {
         $logger = new Logger();
 
         return new SyncRunner(
-            new ConnectorManager(new ConnectorRegistry()),
+            $connectors ?? new ConnectorManager(new ConnectorRegistry()),
             new EventSynchronizer(
                 $logger,
                 new EventMediaEnricher($logger),
@@ -41,6 +42,74 @@ final class SyncRunnerTest extends TestCase
             $logger,
             new SourceSettings()
         );
+    }
+
+    public function testRunArchivesEventsOfADisabledSourceWithoutFetchingIt(): void
+    {
+        // Lock free, plus the usual transient/option plumbing.
+        Functions\when('get_transient')->justReturn(false);
+        Functions\when('set_transient')->justReturn(true);
+        Functions\when('delete_transient')->justReturn(true);
+        Functions\when('update_option')->justReturn(true);
+        Functions\when('is_wp_error')->justReturn(false);
+
+        // The source is registered but disabled in the settings.
+        Functions\when('get_option')->alias(
+            static fn (string $name, $default = false) => 'eventmesh_source_settings' === $name
+                ? ['disabled-src' => false]
+                : $default
+        );
+
+        $connectors = new ConnectorManager(new ConnectorRegistry());
+        $connectors->register(
+            new class implements ConnectorInterface {
+                public function id(): string
+                {
+                    return 'disabled-src';
+                }
+
+                public function label(): string
+                {
+                    return 'Disabled Source';
+                }
+
+                public function fetch(): array
+                {
+                    TestCase::fail('A disabled source must never be fetched.');
+                }
+
+                public function fetchErrors(): int
+                {
+                    return 0;
+                }
+            }
+        );
+
+        // pruneStale()'s WP_Query returns two published posts owned by the
+        // source; with an empty seen-list both must be drafted.
+        $this->queueQueryResults([11, 12]);
+        Functions\when('get_post_meta')->alias(
+            static fn (int $postId, string $key = '', bool $single = false) => 'ext-' . $postId
+        );
+
+        $drafted = [];
+        Functions\when('wp_update_post')->alias(
+            static function (array $postData) use (&$drafted): int {
+                if (($postData['post_status'] ?? '') === 'draft') {
+                    $drafted[] = (int) $postData['ID'];
+                }
+
+                return (int) $postData['ID'];
+            }
+        );
+
+        $summary = $this->runner($connectors)->run();
+
+        self::assertSame([11, 12], $drafted, 'Every published event of the disabled source must be drafted.');
+        self::assertSame(2, $summary['archived']);
+        self::assertSame(0, $summary['processed']);
+        self::assertSame('disabled-src', $summary['connectors'][0]['id']);
+        self::assertSame(2, $summary['connectors'][0]['archived']);
     }
 
     public function testRunSkipsEntirelyWhenALockIsAlreadyHeld(): void

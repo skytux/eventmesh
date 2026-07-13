@@ -141,13 +141,43 @@ final class SyncRunner
         $summary = $this->emptySummary();
 
         foreach ($ids as $connectorId) {
-            if (! $this->sourceSettings->isEnabled($connectorId)) {
-                continue;
-            }
-
             $connector = $this->connectors->get($connectorId);
 
             if (null === $connector) {
+                continue;
+            }
+
+            if (! $this->sourceSettings->isEnabled($connectorId)) {
+                // A disabled source shouldn't keep publishing content it can
+                // no longer vouch for: archive (draft) everything it owns
+                // instead of skipping silently. pruneStale() with an empty
+                // seen-list drafts every published post for the source, and
+                // re-enabling + syncing republishes them (sync() finds posts
+                // regardless of status and always writes publish).
+                $archived = $this->synchronizer->pruneStale($connectorId, []);
+
+                if ($archived > 0) {
+                    $this->logger->info(
+                        sprintf(
+                            'Archived %d event(s) for disabled source "%s".',
+                            $archived,
+                            $connector->label()
+                        )
+                    );
+                }
+
+                $summary['archived'] += $archived;
+                $summary['connectors'][] = [
+                    'id' => $connectorId,
+                    'label' => $connector->label(),
+                    'events' => 0,
+                    'created' => 0,
+                    'updated' => 0,
+                    'failed' => 0,
+                    'skipped' => 0,
+                    'archived' => $archived,
+                ];
+
                 continue;
             }
 

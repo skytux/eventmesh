@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EventMesh\Admin;
 
 use EventMesh\Services\ArtistMap;
+use EventMesh\Services\ConnectorManager;
 use EventMesh\Services\SourceSettings;
 use EventMesh\Support\FactoryReset;
 
@@ -14,7 +15,8 @@ final class SettingsPage
         private readonly View $view,
         private readonly ArtistMap $artistMap,
         private readonly SourceSettings $sourceSettings,
-        private readonly Admin $admin
+        private readonly Admin $admin,
+        private readonly ConnectorManager $connectors
     ) {
     }
 
@@ -27,6 +29,7 @@ final class SettingsPage
                     $this->artistMap->all(),
                     JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
                 ) ?: '{}',
+                'connector_rows' => $this->connectors->sourceRows(),
                 'source_settings' => $this->sourceSettings->all(),
                 'background_sync_enabled' => '1' === (string) get_option('eventmesh_enable_background_sync', '1'),
                 'sync_interval' => $this->admin->configuredSyncInterval(),
@@ -88,7 +91,13 @@ final class SettingsPage
         update_option('eventmesh_enable_test_connector', $enableTestConnector ? '1' : '0');
 
         foreach ($sourceSettings as $sourceId => $enabled) {
-            $this->sourceSettings->setEnabled((string) $sourceId, 1 === $enabled);
+            $sourceId = sanitize_key((string) $sourceId);
+
+            if ('' === $sourceId) {
+                continue;
+            }
+
+            $this->sourceSettings->setEnabled($sourceId, 1 === $enabled);
         }
 
         wp_safe_redirect(
