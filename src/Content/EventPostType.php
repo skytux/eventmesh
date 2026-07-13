@@ -143,64 +143,89 @@ final class EventPostType
         echo '<p><strong>' . esc_html__('Remote URL', 'eventmesh') . ':</strong> '
             . esc_url((string) $sourceUrl) . '</p>';
 
-        $this->renderSyncedValues($post);
-
         wp_nonce_field('eventmesh_save_providers_' . $post->ID, 'eventmesh_providers_nonce');
 
-        echo '<p><strong>' . esc_html__('Providers', 'eventmesh') . '</strong></p>';
-        echo '<p class="description">' . esc_html__(
-            'Auto-filled from Holvi when it links to one of these; fill in manually otherwise.',
-            'eventmesh'
-        ) . '</p>';
+        // phpcs:ignore Generic.Files.LineLength.TooLong -- single gettext literal; splitting it breaks extraction.
+        echo '<p class="description">' . esc_html__('Each field shows the value found on the last sync; type a value below it to override what appears on the front end. Overrides are kept and never replaced by a later sync. Leave blank to use the found value.', 'eventmesh') . '</p>';
+
+        $this->renderOverrideRow($post, 'price', __('Price', 'eventmesh'), 'text');
+        $this->renderOverrideRow($post, 'venue_name', __('Venue', 'eventmesh'), 'text');
+        $this->renderOverrideRow($post, 'starts_at', __('Starts at', 'eventmesh'), 'datetime-local');
+        $this->renderOverrideRow($post, 'ends_at', __('Ends at', 'eventmesh'), 'datetime-local');
+        $this->renderSoldOutOverride($post);
+
+        echo '<p><strong>' . esc_html__('Provider links', 'eventmesh') . '</strong></p>';
 
         foreach (KnownProviders::labels() as $key => $label) {
-            $value = get_post_meta($post->ID, '_eventmesh_provider_' . $key, true);
-
-            printf(
-                '<p><label>%s<br /><input type="url" style="width:100%%" ' .
-                'name="eventmesh_provider_%s" value="%s" /></label></p>',
-                esc_html($label),
-                esc_attr($key),
-                esc_attr((string) $value)
-            );
+            $this->renderOverrideRow($post, 'provider_' . $key, $label, 'url');
         }
     }
 
     /**
-     * Read-only readout of the values the last sync computed and stored for
-     * this event - what the front-end blocks actually render. Chiefly a
-     * diagnostic: if e.g. the ticket button still says "Tickets", this shows
-     * at a glance whether a price was extracted from the source at all.
+     * One labeled field: the scraped ("found") value read-only, plus an
+     * editable input bound to the matching _eventmesh_manual_{baseKey} meta.
      */
-    private function renderSyncedValues(\WP_Post $post): void
+    private function renderOverrideRow(\WP_Post $post, string $baseKey, string $label, string $type): void
     {
-        $soldOut = '1' === (string) get_post_meta($post->ID, '_eventmesh_sold_out', true);
+        $found = trim((string) get_post_meta($post->ID, '_eventmesh_' . $baseKey, true));
+        $manual = (string) get_post_meta($post->ID, '_eventmesh_manual_' . $baseKey, true);
 
-        $values = [
-            __('Price', 'eventmesh') => (string) get_post_meta($post->ID, '_eventmesh_price', true),
-            __('Starts at', 'eventmesh') => (string) get_post_meta($post->ID, '_eventmesh_starts_at', true),
-            __('Ends at', 'eventmesh') => (string) get_post_meta($post->ID, '_eventmesh_ends_at', true),
-            __('Venue', 'eventmesh') => (string) get_post_meta($post->ID, '_eventmesh_venue_name', true),
-            __('Sold out', 'eventmesh') => $soldOut ? __('Yes', 'eventmesh') : __('No', 'eventmesh'),
+        if ('datetime-local' === $type && '' !== $manual) {
+            $manual = $this->toDateTimeLocal($manual);
+        }
+
+        echo '<p style="margin-bottom:1em"><label><strong>' . esc_html($label) . '</strong><br />';
+        echo '<span class="description">' . esc_html__('Found:', 'eventmesh') . ' '
+            . ('' !== $found ? esc_html($found) : '&mdash;') . '</span><br />';
+
+        printf(
+            '<input type="%s" style="width:100%%" name="eventmesh_manual_%s" value="%s" /></label></p>',
+            esc_attr($type),
+            esc_attr($baseKey),
+            esc_attr($manual)
+        );
+    }
+
+    /**
+     * Sold-out is tri-state: follow the source (default), or force it on/off.
+     */
+    private function renderSoldOutOverride(\WP_Post $post): void
+    {
+        $found = '1' === (string) get_post_meta($post->ID, '_eventmesh_sold_out', true)
+            ? __('Sold out', 'eventmesh')
+            : __('Available', 'eventmesh');
+        $manual = (string) get_post_meta($post->ID, '_eventmesh_manual_sold_out', true);
+
+        $options = [
+            '' => __('Follow the source', 'eventmesh'),
+            '1' => __('Force sold out', 'eventmesh'),
+            '0' => __('Force available', 'eventmesh'),
         ];
 
-        echo '<p><strong>' . esc_html__('Synced values', 'eventmesh') . '</strong></p>';
-        echo '<p class="description">' . esc_html__(
-            'Read-only values from the last sync, as rendered on the front end. A dash means the source provided none.',
-            'eventmesh'
-        ) . '</p>';
+        echo '<p style="margin-bottom:1em"><label><strong>' . esc_html__('Sold out', 'eventmesh') . '</strong><br />';
+        echo '<span class="description">' . esc_html__('Found:', 'eventmesh') . ' '
+            . esc_html($found) . '</span><br />';
+        echo '<select name="eventmesh_manual_sold_out">';
 
-        echo '<ul style="margin:0 0 1em 1em;list-style:disc">';
-
-        foreach ($values as $label => $value) {
+        foreach ($options as $value => $optionLabel) {
             printf(
-                '<li><strong>%s:</strong> %s</li>',
-                esc_html((string) $label),
-                '' !== $value ? esc_html($value) : '&mdash;'
+                '<option value="%s"%s>%s</option>',
+                esc_attr($value),
+                selected($manual, $value, false),
+                esc_html($optionLabel)
             );
         }
 
-        echo '</ul>';
+        echo '</select></label></p>';
+    }
+
+    private function toDateTimeLocal(string $stored): string
+    {
+        try {
+            return (new \DateTimeImmutable($stored))->format('Y-m-d\TH:i');
+        } catch (\Exception) {
+            return '';
+        }
     }
 
     public function saveMetaBox(int $postId, \WP_Post $post): void
@@ -217,10 +242,15 @@ final class EventPostType
             return;
         }
 
-        $this->saveProviderFields($postId);
+        $this->saveOverrides($postId);
     }
 
-    private function saveProviderFields(int $postId): void
+    /**
+     * Persists the manual overrides into _eventmesh_manual_* meta (never the
+     * scraped _eventmesh_* meta, which the sync owns), then re-resolves the
+     * embed since a manual provider link can change which player is shown.
+     */
+    private function saveOverrides(int $postId): void
     {
         $nonce = isset($_POST['eventmesh_providers_nonce'])
             ? sanitize_text_field(wp_unslash((string) $_POST['eventmesh_providers_nonce']))
@@ -230,19 +260,78 @@ final class EventPostType
             return;
         }
 
+        $this->saveTextOverride($postId, 'price', false);
+        $this->saveTextOverride($postId, 'venue_name', false);
+        $this->saveDateOverride($postId, 'starts_at');
+        $this->saveDateOverride($postId, 'ends_at');
+        $this->saveSoldOutOverride($postId);
+
         foreach (KnownProviders::labels() as $key => $label) {
-            $field = 'eventmesh_provider_' . $key;
-
-            if (! isset($_POST[$field])) {
-                continue;
-            }
-
-            $value = esc_url_raw(sanitize_text_field(wp_unslash((string) $_POST[$field])));
-            update_post_meta($postId, '_eventmesh_provider_' . $key, $value);
+            $this->saveTextOverride($postId, 'provider_' . $key, true);
         }
 
         $this->providerEmbedEnricher?->enrich($postId);
     }
+
+    // The nonce is verified in saveOverrides() before any of these helpers
+    // run; phpcs can't see across method boundaries, hence the scoped disable.
+    // phpcs:disable WordPress.Security.NonceVerification.Missing
+    private function saveTextOverride(int $postId, string $baseKey, bool $isUrl): void
+    {
+        $field = 'eventmesh_manual_' . $baseKey;
+
+        if (! isset($_POST[$field])) {
+            return;
+        }
+
+        $value = sanitize_text_field(wp_unslash((string) $_POST[$field]));
+
+        if ($isUrl) {
+            $value = esc_url_raw($value);
+        }
+
+        update_post_meta($postId, '_eventmesh_manual_' . $baseKey, $value);
+    }
+
+    private function saveDateOverride(int $postId, string $baseKey): void
+    {
+        $field = 'eventmesh_manual_' . $baseKey;
+
+        if (! isset($_POST[$field])) {
+            return;
+        }
+
+        $raw = sanitize_text_field(wp_unslash((string) $_POST[$field]));
+        $value = '';
+
+        if ('' !== $raw) {
+            try {
+                // Normalize the datetime-local value to the same DATE_ATOM the
+                // scraped dates use, so comparisons/formatting behave alike.
+                $value = (new \DateTimeImmutable($raw))->format(DATE_ATOM);
+            } catch (\Exception) {
+                $value = '';
+            }
+        }
+
+        update_post_meta($postId, '_eventmesh_manual_' . $baseKey, $value);
+    }
+
+    private function saveSoldOutOverride(int $postId): void
+    {
+        $field = 'eventmesh_manual_sold_out';
+
+        if (! isset($_POST[$field])) {
+            return;
+        }
+
+        $raw = sanitize_text_field(wp_unslash((string) $_POST[$field]));
+        // '' = follow the source; only '1'/'0' are valid explicit overrides.
+        $value = in_array($raw, ['1', '0'], true) ? $raw : '';
+
+        update_post_meta($postId, '_eventmesh_manual_sold_out', $value);
+    }
+    // phpcs:enable WordPress.Security.NonceVerification.Missing
 
     private function registerMeta(): void
     {
@@ -259,7 +348,16 @@ final class EventPostType
             '_eventmesh_price',
         ];
 
-        foreach ($fields as $field) {
+        // Editable manual overrides, written only from the event's own edit
+        // screen (never the sync), that win over the scraped value above.
+        $manualFields = ['_eventmesh_manual_price', '_eventmesh_manual_venue_name',
+            '_eventmesh_manual_starts_at', '_eventmesh_manual_ends_at', '_eventmesh_manual_sold_out'];
+
+        foreach (KnownProviders::labels() as $key => $label) {
+            $manualFields[] = '_eventmesh_manual_provider_' . $key;
+        }
+
+        foreach (array_merge($fields, $manualFields) as $field) {
             register_post_meta(
                 self::NAME,
                 $field,
