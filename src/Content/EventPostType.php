@@ -143,6 +143,8 @@ final class EventPostType
         echo '<p><strong>' . esc_html__('Remote URL', 'eventmesh') . ':</strong> '
             . esc_url((string) $sourceUrl) . '</p>';
 
+        $this->renderSyncedValues($post);
+
         wp_nonce_field('eventmesh_save_providers_' . $post->ID, 'eventmesh_providers_nonce');
 
         echo '<p><strong>' . esc_html__('Providers', 'eventmesh') . '</strong></p>';
@@ -162,6 +164,43 @@ final class EventPostType
                 esc_attr((string) $value)
             );
         }
+    }
+
+    /**
+     * Read-only readout of the values the last sync computed and stored for
+     * this event - what the front-end blocks actually render. Chiefly a
+     * diagnostic: if e.g. the ticket button still says "Tickets", this shows
+     * at a glance whether a price was extracted from the source at all.
+     */
+    private function renderSyncedValues(\WP_Post $post): void
+    {
+        $soldOut = '1' === (string) get_post_meta($post->ID, '_eventmesh_sold_out', true);
+
+        $values = [
+            __('Price', 'eventmesh') => (string) get_post_meta($post->ID, '_eventmesh_price', true),
+            __('Starts at', 'eventmesh') => (string) get_post_meta($post->ID, '_eventmesh_starts_at', true),
+            __('Ends at', 'eventmesh') => (string) get_post_meta($post->ID, '_eventmesh_ends_at', true),
+            __('Venue', 'eventmesh') => (string) get_post_meta($post->ID, '_eventmesh_venue_name', true),
+            __('Sold out', 'eventmesh') => $soldOut ? __('Yes', 'eventmesh') : __('No', 'eventmesh'),
+        ];
+
+        echo '<p><strong>' . esc_html__('Synced values', 'eventmesh') . '</strong></p>';
+        echo '<p class="description">' . esc_html__(
+            'Read-only values from the last sync, as rendered on the front end. A dash means the source provided none.',
+            'eventmesh'
+        ) . '</p>';
+
+        echo '<ul style="margin:0 0 1em 1em;list-style:disc">';
+
+        foreach ($values as $label => $value) {
+            printf(
+                '<li><strong>%s:</strong> %s</li>',
+                esc_html((string) $label),
+                '' !== $value ? esc_html($value) : '&mdash;'
+            );
+        }
+
+        echo '</ul>';
     }
 
     public function saveMetaBox(int $postId, \WP_Post $post): void
