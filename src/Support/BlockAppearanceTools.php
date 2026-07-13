@@ -24,6 +24,14 @@ namespace EventMesh\Support;
  * first filter's effect from ever reaching the editor (the reason bold/
  * italic/border controls kept not showing up despite complete block.json
  * supports).
+ *
+ * The block_editor_settings_all filter runs at PHP_INT_MAX so it wins even
+ * when WordPress (as of 7.0) repopulates __experimentalFeatures from
+ * wp_get_global_settings() at a late priority - a default-priority filter's
+ * flags were being overwritten, which is what made Appearance/Decoration/
+ * Letter-spacing vanish from the Typography options menu after upgrading.
+ * The merge is recursive so an existing typography/border/color/spacing tree
+ * is extended, not replaced, and our leaf flags are never clobbered.
  */
 final class BlockAppearanceTools
 {
@@ -41,10 +49,32 @@ final class BlockAppearanceTools
         'textTransform' => true,
     ];
 
+    /**
+     * The leaf flags to force into __experimentalFeatures, as the nested
+     * shape WordPress resolves theme.json settings into.
+     */
+    private const EDITOR_FEATURE_FLAGS = [
+        'appearanceTools' => true,
+        'typography' => self::TYPOGRAPHY_FLAGS,
+        'border' => [
+            'color' => true,
+            'radius' => true,
+            'style' => true,
+            'width' => true,
+        ],
+        'color' => [
+            'link' => true,
+        ],
+        'spacing' => [
+            'padding' => true,
+            'margin' => true,
+        ],
+    ];
+
     public function boot(): void
     {
         add_filter('wp_theme_json_data_theme', [$this, 'forceEnableAppearanceControls']);
-        add_filter('block_editor_settings_all', [$this, 'forceEditorControls']);
+        add_filter('block_editor_settings_all', [$this, 'forceEditorControls'], PHP_INT_MAX);
     }
 
     public function forceEnableAppearanceControls(\WP_Theme_JSON_Data $themeJson): \WP_Theme_JSON_Data
@@ -64,9 +94,11 @@ final class BlockAppearanceTools
     }
 
     /**
-     * Merges just our leaf flags into the editor's resolved settings tree,
-     * never replacing __experimentalFeatures wholesale - so a theme's own
-     * palette, font sizes, spacing scale, etc. are all left untouched.
+     * Recursively merges our leaf flags into the editor's resolved settings
+     * tree, never replacing __experimentalFeatures wholesale - so a theme's
+     * own palette, font sizes, spacing scale, etc. are all left untouched,
+     * while our forced flags always win (they're applied last, at the deepest
+     * level).
      *
      * @param array<string, mixed> $settings
      *
@@ -78,43 +110,33 @@ final class BlockAppearanceTools
             ? $settings['__experimentalFeatures']
             : [];
 
-        $typography = isset($features['typography']) && is_array($features['typography'])
-            ? $features['typography']
-            : [];
-        $features['typography'] = array_merge($typography, self::TYPOGRAPHY_FLAGS);
-
-        $border = isset($features['border']) && is_array($features['border'])
-            ? $features['border']
-            : [];
-        $features['border'] = array_merge(
-            $border,
-            [
-                'color' => true,
-                'radius' => true,
-                'style' => true,
-                'width' => true,
-            ]
-        );
-
-        $color = isset($features['color']) && is_array($features['color'])
-            ? $features['color']
-            : [];
-        $color['link'] = true;
-        $features['color'] = $color;
-
-        $spacing = isset($features['spacing']) && is_array($features['spacing'])
-            ? $features['spacing']
-            : [];
-        $features['spacing'] = array_merge(
-            $spacing,
-            [
-                'padding' => true,
-                'margin' => true,
-            ]
-        );
-
-        $settings['__experimentalFeatures'] = $features;
+        $settings['__experimentalFeatures'] = $this->deepMerge($features, self::EDITOR_FEATURE_FLAGS);
 
         return $settings;
+    }
+
+    /**
+     * Like array_merge_recursive, but scalar overrides replace rather than
+     * accumulate into arrays (so `fontWeight => true` stays `true`, never
+     * becomes `[false, true]`).
+     *
+     * @param array<string, mixed> $base
+     * @param array<string, mixed> $overrides
+     *
+     * @return array<string, mixed>
+     */
+    private function deepMerge(array $base, array $overrides): array
+    {
+        foreach ($overrides as $key => $value) {
+            if (is_array($value) && isset($base[$key]) && is_array($base[$key])) {
+                $base[$key] = $this->deepMerge($base[$key], $value);
+
+                continue;
+            }
+
+            $base[$key] = $value;
+        }
+
+        return $base;
     }
 }

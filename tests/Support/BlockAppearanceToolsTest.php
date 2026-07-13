@@ -80,4 +80,25 @@ final class BlockAppearanceToolsTest extends TestCase
         self::assertSame(['big'], $features['typography']['fontSizes']);
         self::assertTrue($features['typography']['fontWeight']);
     }
+
+    public function testForceEditorControlsForcesFlagsOnEvenWhenAlreadyDisabled(): void
+    {
+        // The WP 7.0 case: WordPress has already resolved the settings tree
+        // with these turned off; our flags must win, not merge into an array.
+        $settings = (new BlockAppearanceTools())->forceEditorControls(
+            [
+                '__experimentalFeatures' => [
+                    'typography' => ['fontWeight' => false, 'fontStyle' => false, 'textDecoration' => false],
+                    'border' => ['color' => false],
+                ],
+            ]
+        );
+
+        $features = $settings['__experimentalFeatures'];
+
+        self::assertTrue($features['typography']['fontWeight']);
+        self::assertTrue($features['typography']['fontStyle']);
+        self::assertTrue($features['typography']['textDecoration']);
+        self::assertTrue($features['border']['color']);
+    }
 }
