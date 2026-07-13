@@ -17,6 +17,7 @@ final class EventListBlockRenderersTest extends TestCase
         parent::setUp();
 
         Functions\when('__')->returnArg(1);
+        Functions\when('esc_html__')->returnArg(1);
         Functions\when('esc_url')->alias(static fn ($value) => $value);
         Functions\when('esc_html')->alias(static fn ($value) => $value);
         Functions\when('get_block_wrapper_attributes')->alias(
@@ -224,9 +225,20 @@ final class EventListBlockRenderersTest extends TestCase
         self::assertSame('', $html);
     }
 
+    /**
+     * Ticket-button meta with only a URL set: not past, not sold out, no
+     * price - the plain "buyable now" case most of these tests want.
+     */
+    private function ticketUrlOnlyMeta(string $url = 'https://holvi.com/shop/MiaRenwall/product/abc123/'): void
+    {
+        Functions\when('get_post_meta')->alias(
+            static fn (int $postId, string $key) => '_eventmesh_url' === $key ? $url : ''
+        );
+    }
+
     public function testRenderTicketButtonUsesTheRealUrlFromPostMeta(): void
     {
-        Functions\when('get_post_meta')->justReturn('https://holvi.com/shop/MiaRenwall/product/abc123/');
+        $this->ticketUrlOnlyMeta();
 
         $html = $this->block()->renderTicketButton([], '', $this->blockInstance(['postId' => 42]));
 
@@ -237,18 +249,53 @@ final class EventListBlockRenderersTest extends TestCase
         self::assertStringStartsWith('<a ', $html);
     }
 
-    public function testRenderTicketButtonUsesACustomTextAttributeWhenSet(): void
+    public function testRenderTicketButtonUsesTheEventPriceAsTheLabelWhenAvailable(): void
     {
-        Functions\when('get_post_meta')->justReturn('https://holvi.com/shop/MiaRenwall/product/abc123/');
+        Functions\when('get_post_meta')->alias(
+            static function (int $postId, string $key) {
+                return match ($key) {
+                    '_eventmesh_url' => 'https://holvi.com/shop/MiaRenwall/product/abc123/',
+                    '_eventmesh_price' => '€15',
+                    default => '',
+                };
+            }
+        );
+
+        $html = $this->block()->renderTicketButton([], '', $this->blockInstance(['postId' => 42]));
+
+        self::assertStringContainsString('€15', $html);
+        self::assertStringNotContainsString('Tickets', $html, 'The real price replaces the generic "Tickets" label.');
+    }
+
+    public function testRenderTicketButtonUsesACustomTextAttributeWhenSetAndNoPrice(): void
+    {
+        $this->ticketUrlOnlyMeta();
 
         $html = $this->block()->renderTicketButton(['text' => 'Buy now'], '', $this->blockInstance(['postId' => 42]));
 
         self::assertStringContainsString('Buy now', $html);
     }
 
+    public function testRenderTicketButtonIsHiddenForPastEvents(): void
+    {
+        Functions\when('get_post_meta')->alias(
+            static function (int $postId, string $key) {
+                return match ($key) {
+                    '_eventmesh_url' => 'https://holvi.com/shop/MiaRenwall/product/abc123/',
+                    '_eventmesh_starts_at' => '2000-01-01T00:00:00+00:00',
+                    default => '',
+                };
+            }
+        );
+
+        $html = $this->block()->renderTicketButton([], '', $this->blockInstance(['postId' => 42]));
+
+        self::assertSame('', $html, 'A past event can no longer sell tickets, so the button is dropped entirely.');
+    }
+
     public function testRenderTicketButtonEnqueuesTheCoreButtonStylesheetByHandle(): void
     {
-        Functions\when('get_post_meta')->justReturn('https://holvi.com/shop/MiaRenwall/product/abc123/');
+        $this->ticketUrlOnlyMeta();
 
         $registeredCheck = null;
         $enqueued = null;
@@ -279,7 +326,7 @@ final class EventListBlockRenderersTest extends TestCase
 
     public function testRenderTicketButtonDoesNotEnqueueWhenTheCoreButtonStyleIsNotRegistered(): void
     {
-        Functions\when('get_post_meta')->justReturn('https://holvi.com/shop/MiaRenwall/product/abc123/');
+        $this->ticketUrlOnlyMeta();
         Functions\when('wp_style_is')->justReturn(false);
 
         $enqueueCalled = false;
@@ -297,13 +344,14 @@ final class EventListBlockRenderersTest extends TestCase
         self::assertStringStartsWith('<a ', $html, 'The button itself must still render regardless.');
     }
 
-    public function testRenderTicketButtonShowsSoldOutLabelAndSecondaryStyleWhenSoldOut(): void
+    public function testRenderTicketButtonShowsSoldOutAsANonLinkWithTheSecondaryStyle(): void
     {
         Functions\when('get_post_meta')->alias(
             static function (int $postId, string $key) {
                 return match ($key) {
                     '_eventmesh_url' => 'https://holvi.com/shop/MiaRenwall/product/abc123/',
                     '_eventmesh_sold_out' => '1',
+                    '_eventmesh_price' => '€15',
                     default => '',
                 };
             }
@@ -312,18 +360,16 @@ final class EventListBlockRenderersTest extends TestCase
         $html = $this->block()->renderTicketButton(['text' => 'Buy now'], '', $this->blockInstance(['postId' => 42]));
 
         self::assertStringContainsString('Sold out', $html);
-        self::assertStringNotContainsString('Buy now', $html, 'Sold-out status overrides any custom button label.');
+        self::assertStringNotContainsString('Buy now', $html, 'Sold-out status overrides any custom label.');
+        self::assertStringNotContainsString('€15', $html, 'Sold-out status overrides the price too.');
         self::assertStringContainsString('eventmesh-ticket-button--secondary', $html);
         self::assertStringContainsString(
             'wp-block-button__link wp-element-button',
             $html,
-            'The sold-out button must share the same base classes as the regular one so they are the same size and shape.'
+            'The sold-out marker must share the base button classes so it is the same size and shape.'
         );
-        self::assertStringContainsString(
-            'href="https://holvi.com/shop/MiaRenwall/product/abc123/"',
-            $html,
-            'Sold-out events still link through to the store.'
-        );
+        self::assertStringStartsWith('<span ', $html, 'Sold out is a status, not a call to action - it must not be a link.');
+        self::assertStringNotContainsString('href=', $html, 'A sold-out event offers nothing to click through to.');
     }
 
     public function testRenderTicketButtonReturnsEmptyStringWithoutAUrl(): void

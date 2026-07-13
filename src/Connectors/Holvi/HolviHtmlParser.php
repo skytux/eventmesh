@@ -150,8 +150,44 @@ final class HolviHtmlParser
             venueName: $this->resolveVenue($this->placeValue($item['location'] ?? ''), $description),
             startsAtYearKnown: $resolved['yearKnown'],
             soldOut: $this->isSoldOutFromJsonLd($item),
-            providers: $this->providersFromSameAs($item['sameAs'] ?? [])
+            providers: $this->providersFromSameAs($item['sameAs'] ?? []),
+            price: $this->priceFromJsonLd($item)
         );
+    }
+
+    /**
+     * Builds a display price from schema.org offers (price + priceCurrency),
+     * sitting right next to the offers.availability this parser already reads
+     * for sold-out. Common currencies get their symbol; anything else keeps
+     * its ISO code. A whole-number price drops its ".00"/",00" cents.
+     *
+     * @param array<string, mixed> $item
+     */
+    private function priceFromJsonLd(array $item): string
+    {
+        $offers = $item['offers'] ?? [];
+        $offers = array_is_list($offers) ? ($offers[0] ?? []) : $offers;
+
+        if (! is_array($offers)) {
+            return '';
+        }
+
+        $amount = $this->stringValue($offers['price'] ?? $offers['lowPrice'] ?? '');
+
+        if ('' === $amount) {
+            return '';
+        }
+
+        $amount = trim((string) preg_replace('/([.,])00$/', '', $amount));
+        $currency = strtoupper($this->stringValue($offers['priceCurrency'] ?? ''));
+
+        $symbols = ['EUR' => '€', 'USD' => '$', 'GBP' => '£'];
+
+        if (isset($symbols[$currency])) {
+            return $symbols[$currency] . $amount;
+        }
+
+        return '' !== $currency ? $amount . ' ' . $currency : $amount;
     }
 
     /**
@@ -312,7 +348,23 @@ final class HolviHtmlParser
             venueName: $this->resolveVenue($structuredVenue, $description),
             startsAtYearKnown: $resolved['yearKnown'],
             soldOut: $this->isSoldOut($xpath, $element),
-            providers: $this->extractProviders($xpath, $element, $sourceUrl)
+            providers: $this->extractProviders($xpath, $element, $sourceUrl),
+            price: $this->priceFromMarkup($xpath, $element)
+        );
+    }
+
+    /**
+     * Holvi renders each listing's already-localised price inside a
+     * "product-price" element (e.g. "15,00 €"); take it verbatim rather than
+     * re-formatting, since the source has already applied the shop's currency
+     * and locale conventions.
+     */
+    private function priceFromMarkup(DOMXPath $xpath, DOMNode $context): string
+    {
+        return $this->firstText(
+            $xpath,
+            $context,
+            './/*[contains(concat(" ", normalize-space(@class), " "), " product-price ")]'
         );
     }
 
@@ -448,7 +500,8 @@ final class HolviHtmlParser
             // otherwise get misattributed as this specific artist's profile.
             providers: $descriptionNode instanceof DOMElement
                 ? $this->extractProviders($xpath, $descriptionNode, $pageUrl)
-                : []
+                : [],
+            price: $this->priceFromMarkup($xpath, $document)
         );
     }
 

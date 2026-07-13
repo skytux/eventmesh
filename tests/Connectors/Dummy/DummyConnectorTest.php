@@ -114,6 +114,15 @@ final class DummyConnectorTest extends TestCase
         self::assertNotEmpty($canceledPast, 'A canceled past event is needed to show strike-through in the past section.');
     }
 
+    public function testFetchIncludesEventsWithPrices(): void
+    {
+        $events = (new DummyConnector())->fetch();
+
+        $priced = array_filter($events, static fn ($event) => '' !== $event->price());
+
+        self::assertNotEmpty($priced, 'The demo dataset should show prices on the ticket buttons.');
+    }
+
     public function testFetchIncludesAnEventThatIsBothCanceledAndSoldOut(): void
     {
         $events = (new DummyConnector())->fetch();

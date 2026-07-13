@@ -260,6 +260,47 @@ final class HolviHtmlParserTest extends TestCase
         self::assertStringContainsString('Tuesday May 26th', $event->description());
     }
 
+    public function testParseDetailPageExtractsThePriceFromMarkup(): void
+    {
+        $event = $this->parser()->parseDetailPage(
+            $this->fixture('detail-page.html'),
+            'https://shop.holvi.com/shop/MiaRenwall/product/f72ca8c0f481c0ced1d1be5f0c96493b/'
+        );
+
+        self::assertNotNull($event);
+        self::assertStringContainsString('39.00', $event->price());
+        self::assertStringContainsString('EUR', $event->price());
+    }
+
+    public function testExtractsPriceFromJsonLdOffers(): void
+    {
+        $html = '<html><head><script type="application/ld+json">' . (string) json_encode(
+            [
+                '@type' => 'Event',
+                'name' => 'Priced Gig',
+                'startDate' => '2026-08-01T20:00:00+03:00',
+                'offers' => [
+                    '@type' => 'Offer',
+                    'price' => '15.00',
+                    'priceCurrency' => 'EUR',
+                    'availability' => 'https://schema.org/InStock',
+                ],
+            ]
+        ) . '</script></head><body></body></html>';
+
+        $events = $this->parser()->parse($html, self::SOURCE_URL);
+
+        self::assertCount(1, $events);
+        self::assertSame('€15', $events[0]->price(), 'EUR gets its symbol and a whole-number price drops its .00.');
+    }
+
+    public function testJsonLdEventWithoutOffersHasNoPrice(): void
+    {
+        $events = $this->parser()->parse($this->fixture('jsonld-single.html'), self::SOURCE_URL);
+
+        self::assertSame('', $events[0]->price());
+    }
+
     public function testParseDetailPageExtractsImageFromTheAngularImageCarouselAttribute(): void
     {
         $event = $this->parser()->parseDetailPage(

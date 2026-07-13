@@ -248,6 +248,36 @@ final class EventSynchronizerTest extends TestCase
         self::assertSame('The Basement Club', $metaWrites['_eventmesh_venue_name'] ?? null);
     }
 
+    public function testSyncWritesPriceMetaWhenPresentButNotWhenEmpty(): void
+    {
+        $this->queueQueryResults([]);
+        Functions\when('wp_insert_post')->justReturn(91);
+
+        $metaWrites = [];
+        Functions\when('update_post_meta')->alias(
+            static function (int $postId, string $key, mixed $value) use (&$metaWrites) {
+                $metaWrites[$key] = $value;
+
+                return true;
+            }
+        );
+
+        $this->synchronizer()->sync(
+            new Event(sourceId: 'holvi', externalId: 'ext-priced', title: 'Priced Event', price: '€15')
+        );
+
+        self::assertSame('€15', $metaWrites['_eventmesh_price'] ?? null);
+
+        // A later fetch (e.g. a detail page) that finds no price must not blank
+        // a price a previous fetch already recorded.
+        $metaWrites = [];
+        $this->synchronizer()->sync(
+            new Event(sourceId: 'holvi', externalId: 'ext-priced', title: 'Priced Event', price: '')
+        );
+
+        self::assertArrayNotHasKey('_eventmesh_price', $metaWrites);
+    }
+
     public function testSyncWritesSoldOutMeta(): void
     {
         $this->queueQueryResults([]);

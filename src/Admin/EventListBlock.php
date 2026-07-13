@@ -376,6 +376,12 @@ final class EventListBlock
             return '';
         }
 
+        // A past event's tickets can no longer be bought, so the button is
+        // meaningless - drop it entirely rather than link to a dead sale.
+        if ($this->isPastEvent($postId)) {
+            return '';
+        }
+
         $this->enqueueCoreButtonStyle();
 
         $url = (string) get_post_meta($postId, '_eventmesh_url', true);
@@ -384,25 +390,24 @@ final class EventListBlock
             return '';
         }
 
-        $soldOut = '1' === (string) get_post_meta($postId, '_eventmesh_sold_out', true);
-
         // The secondary class is layered on top of the same base button
-        // classes in both cases (rather than swapped for a differently
-        // sized class), so the sold-out button is always the exact same
-        // size and shape as a regular one - only its color changes.
+        // classes (rather than swapped for a differently sized class), so the
+        // sold-out marker is always the exact same size and shape as a
+        // regular button - only its color changes.
         $class = 'wp-block-button__link wp-element-button';
 
-        if ($soldOut) {
-            // Sold out overrides any custom label - it's a status, not a
-            // call to action - but still links through to the store since
-            // the event may resume selling tickets later.
-            $text = __('Sold out', 'eventmesh');
-            $class .= ' eventmesh-ticket-button--secondary';
-        } else {
-            $text = isset($attributes['text']) && is_string($attributes['text']) && '' !== trim($attributes['text'])
-                ? $attributes['text']
-                : __('Tickets', 'eventmesh');
+        if ($this->isSoldOut($postId)) {
+            // Sold out is a status, not a call to action: render it as a
+            // non-link so nothing invites a click, and let it override any
+            // custom label or price.
+            $wrapperAttributes = get_block_wrapper_attributes(
+                ['class' => $class . ' eventmesh-ticket-button--secondary']
+            );
+
+            return sprintf('<span %s>%s</span>', $wrapperAttributes, esc_html__('Sold out', 'eventmesh'));
         }
+
+        $text = $this->ticketButtonLabel($postId, $attributes);
 
         $wrapperAttributes = get_block_wrapper_attributes(
             [
@@ -414,6 +419,27 @@ final class EventListBlock
         );
 
         return sprintf('<a %s>%s</a>', $wrapperAttributes, esc_html($text));
+    }
+
+    /**
+     * The button shows the event's actual price when the source provided one,
+     * falling back to the block's own custom label, then to "Tickets".
+     *
+     * @param array<string, mixed> $attributes
+     */
+    private function ticketButtonLabel(int $postId, array $attributes): string
+    {
+        $price = trim((string) get_post_meta($postId, '_eventmesh_price', true));
+
+        if ('' !== $price) {
+            return $price;
+        }
+
+        if (isset($attributes['text']) && is_string($attributes['text']) && '' !== trim($attributes['text'])) {
+            return $attributes['text'];
+        }
+
+        return __('Tickets', 'eventmesh');
     }
 
     /**
