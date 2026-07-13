@@ -23,7 +23,8 @@ final class Event
         private readonly string $venueName = '',
         private readonly bool $startsAtYearKnown = true,
         private readonly bool $soldOut = false,
-        private readonly array $providers = []
+        private readonly array $providers = [],
+        private readonly string $price = ''
     ) {
     }
 
@@ -89,6 +90,18 @@ final class Event
     }
 
     /**
+     * Display-ready price string as shown at the source (e.g. "€15",
+     * "15,00 €", "Free"), or '' when the source listed no price. Kept as
+     * presentation text rather than a numeric amount + currency: connectors
+     * see prices already localised/formatted, and the ticket button only
+     * ever renders it verbatim.
+     */
+    public function price(): string
+    {
+        return $this->price;
+    }
+
+    /**
      * Provider links (Spotify, Mixcloud, ...) parsed directly off this
      * event's own Holvi page - keyed by provider name, as used in
      * _eventmesh_provider_{name} post meta.
@@ -113,7 +126,8 @@ final class Event
      *     image_url: string,
      *     venue_name: string,
      *     sold_out: string,
-     *     providers: array<string, string>
+     *     providers: array<string, string>,
+     *     price: string
      * }
      */
     public function toArray(): array
@@ -131,6 +145,7 @@ final class Event
             'venue_name' => $this->venueName,
             'sold_out' => $this->soldOut ? '1' : '',
             'providers' => $this->providers,
+            'price' => $this->price,
         ];
     }
 }

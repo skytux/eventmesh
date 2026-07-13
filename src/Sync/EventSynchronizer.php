@@ -292,5 +292,12 @@ final class EventSynchronizer
         if ('' !== trim($event->venueName())) {
             update_post_meta($postId, '_eventmesh_venue_name', sanitize_text_field($event->venueName()));
         }
+
+        // Same guard as venue: the listing page usually carries the price but
+        // an event's own detail page may not, so a fetch that finds none must
+        // not wipe a price a previous fetch (or a person) already set.
+        if ('' !== trim($event->price())) {
+            update_post_meta($postId, '_eventmesh_price', sanitize_text_field($event->price()));
+        }
     }
 }

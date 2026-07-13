@@ -40,15 +40,16 @@ final class DummyConnector implements ConnectorInterface
                 sourceId: $this->id(),
                 externalId: 'dummy-upcoming-1',
                 title: 'Dummy Upcoming Show',
-                startsAt: $now->modify('+7 days'),
-                endsAt: null,
+                startsAt: $now->modify('+7 days')->setTime(19, 30),
+                endsAt: $now->modify('+7 days')->setTime(23, 0),
                 url: 'https://example.test/dummy-upcoming-1',
-                description: 'A sample upcoming event with a known year and a venue.',
+                description: 'A sample upcoming event with a known year, a venue, and an evening time range.',
                 imageUrl: '',
                 venueName: 'Dummy Venue Hall',
                 startsAtYearKnown: true,
                 soldOut: false,
-                providers: ['spotify' => 'https://open.spotify.com/track/dummy']
+                providers: ['spotify' => 'https://open.spotify.com/track/dummy'],
+                price: '€15'
             ),
             new Event(
                 sourceId: $this->id(),
@@ -62,21 +63,23 @@ final class DummyConnector implements ConnectorInterface
                 venueName: 'Riverside Club',
                 startsAtYearKnown: true,
                 soldOut: false,
-                providers: []
+                providers: [],
+                price: 'Free'
             ),
             new Event(
                 sourceId: $this->id(),
                 externalId: 'dummy-upcoming-3',
                 title: 'Dummy Season Finale',
-                startsAt: $now->modify('+28 days'),
-                endsAt: null,
+                startsAt: $now->modify('+28 days')->setTime(12, 0),
+                endsAt: $now->modify('+29 days')->setTime(22, 0),
                 url: 'https://example.test/dummy-upcoming-3',
-                description: 'A later upcoming event, furthest out in the future.',
+                description: 'A later, multi-day upcoming event, to show date and time ranges.',
                 imageUrl: '',
                 venueName: 'Grand Theatre',
                 startsAtYearKnown: true,
                 soldOut: false,
-                providers: []
+                providers: [],
+                price: '€25'
             ),
             new Event(
                 sourceId: $this->id(),
@@ -90,7 +93,8 @@ final class DummyConnector implements ConnectorInterface
                 venueName: '',
                 startsAtYearKnown: false,
                 soldOut: false,
-                providers: []
+                providers: [],
+                price: ''
             ),
 
             // --- Sold out (upcoming) ---
@@ -106,7 +110,8 @@ final class DummyConnector implements ConnectorInterface
                 venueName: 'Dummy Venue Hall',
                 startsAtYearKnown: true,
                 soldOut: true,
-                providers: []
+                providers: [],
+                price: '€20'
             ),
             new Event(
                 sourceId: $this->id(),
@@ -115,12 +120,13 @@ final class DummyConnector implements ConnectorInterface
                 startsAt: $now->modify('+5 days'),
                 endsAt: null,
                 url: 'https://example.test/dummy-sold-out-2',
-                description: 'A second sold-out upcoming event, to show dimming among upcoming events.',
+                description: 'A second sold-out upcoming event.',
                 imageUrl: '',
                 venueName: 'Riverside Club',
                 startsAtYearKnown: true,
                 soldOut: true,
-                providers: []
+                providers: [],
+                price: '€12'
             ),
 
             // --- Canceled ---
@@ -136,7 +142,8 @@ final class DummyConnector implements ConnectorInterface
                 venueName: 'Dummy Venue Hall',
                 startsAtYearKnown: true,
                 soldOut: false,
-                providers: []
+                providers: [],
+                price: '€18'
             ),
             new Event(
                 sourceId: $this->id(),
@@ -150,7 +157,8 @@ final class DummyConnector implements ConnectorInterface
                 venueName: 'Grand Theatre',
                 startsAtYearKnown: true,
                 soldOut: false,
-                providers: []
+                providers: [],
+                price: '€18'
             ),
             new Event(
                 sourceId: $this->id(),
@@ -164,7 +172,8 @@ final class DummyConnector implements ConnectorInterface
                 venueName: 'Open Air Grounds',
                 startsAtYearKnown: true,
                 soldOut: true,
-                providers: []
+                providers: [],
+                price: '€40'
             ),
 
             // --- Past ---
@@ -180,7 +189,8 @@ final class DummyConnector implements ConnectorInterface
                 venueName: 'Dummy Venue Hall',
                 startsAtYearKnown: true,
                 soldOut: false,
-                providers: []
+                providers: [],
+                price: '€15'
             ),
             new Event(
                 sourceId: $this->id(),
@@ -194,7 +204,8 @@ final class DummyConnector implements ConnectorInterface
                 venueName: 'Riverside Club',
                 startsAtYearKnown: true,
                 soldOut: false,
-                providers: []
+                providers: [],
+                price: '€10'
             ),
 
             // --- Past + sold out ---
@@ -210,7 +221,8 @@ final class DummyConnector implements ConnectorInterface
                 venueName: 'Dummy Venue Hall',
                 startsAtYearKnown: true,
                 soldOut: true,
-                providers: []
+                providers: [],
+                price: '€15'
             ),
         ];
     }

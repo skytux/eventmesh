@@ -217,6 +217,7 @@ final class EventPostType
             '_eventmesh_image_url',
             '_eventmesh_venue_name',
             '_eventmesh_sold_out',
+            '_eventmesh_price',
         ];
 
         foreach ($fields as $field) {
