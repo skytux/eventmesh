@@ -222,8 +222,57 @@ final class EventListBlock
         return match ($field) {
             'title' => $this->renderTitleField($postId, $attributes),
             'venue' => $this->renderVenueField($postId, $attributes),
+            'price' => $this->renderPriceField($postId, $attributes),
+            'date_range',
+            'start_date',
+            'end_date',
+            'start_time',
+            'end_time',
+            'time_range' => $this->renderDateComponentField($postId, $attributes, $field),
             default => $this->renderStartsAtField($postId, $attributes),
         };
+    }
+
+    /**
+     * @param array<string, mixed> $attributes
+     */
+    private function renderPriceField(int $postId, array $attributes): string
+    {
+        $price = trim((string) get_post_meta($postId, '_eventmesh_price', true));
+
+        if ('' === $price) {
+            return '';
+        }
+
+        return $this->renderTextField($postId, $attributes, $price, 'p');
+    }
+
+    /**
+     * One of the granular date/time pieces (a single date or time, or a
+     * date/time range), struck through when the event is canceled - the same
+     * treatment the full starts_at field and the title already get.
+     *
+     * @param array<string, mixed> $attributes
+     */
+    private function renderDateComponentField(int $postId, array $attributes, string $which): string
+    {
+        $text = match ($which) {
+            'date_range' => $this->dateRangeText($postId),
+            'start_date' => $this->startDateText($postId),
+            'end_date' => $this->endDateText($postId),
+            'start_time' => $this->startTimeText($postId),
+            'end_time' => $this->endTimeText($postId),
+            'time_range' => $this->timeRangeText($postId),
+            default => null,
+        };
+
+        if (null === $text || '' === $text) {
+            return '';
+        }
+
+        $strikethrough = EventStatus::isCanceled(get_the_title($postId)) ? ' style="text-decoration:line-through"' : '';
+
+        return $this->renderTextField($postId, $attributes, $text, 'p', $strikethrough);
     }
 
     /**
@@ -240,7 +289,7 @@ final class EventListBlock
         $title = $this->holviHtmlParser->stripDateForDisplay($title);
         $strikethrough = EventStatus::isCanceled($title) ? ' style="text-decoration:line-through"' : '';
 
-        return $this->renderTextField($postId, $attributes, $title, 'h4', $strikethrough);
+        return $this->renderTextField($postId, $attributes, $title, 'p', $strikethrough);
     }
 
     /**
@@ -274,13 +323,13 @@ final class EventListBlock
     }
 
     /**
-     * Shared by all three event-field variants: wraps $text in the
-     * attributes-chosen tag (falling back to $defaultTag), optionally
-     * linking it to the event's own permalink - "linked" defaults to true
-     * (matching block.json) so existing title fields keep working exactly
-     * as before, but is overridden to false on the single-event template's
-     * own fields, since a field linking back to the very page it's already
-     * on is meaningless there.
+     * Shared by every event-field variant: wraps $text in the
+     * attributes-chosen tag (falling back to $defaultTag, a paragraph for all
+     * fields), optionally linking it to the event's own permalink. "linked"
+     * defaults to false (matching block.json) - nothing links unless the
+     * editor turns it on for that field - and is likewise false on the
+     * single-event template's own fields, since a field linking back to the
+     * very page it's already on is meaningless there.
      *
      * @param array<string, mixed> $attributes
      */
@@ -294,7 +343,7 @@ final class EventListBlock
         $tag = isset($attributes['tag']) && is_string($attributes['tag']) && '' !== $attributes['tag']
             ? $attributes['tag']
             : $defaultTag;
-        $linked = ! isset($attributes['linked']) || (bool) $attributes['linked'];
+        $linked = isset($attributes['linked']) && (bool) $attributes['linked'];
 
         $inner = match (true) {
             $linked => sprintf(
@@ -311,54 +360,138 @@ final class EventListBlock
     }
 
     /**
-     * Builds "Sat 11 June 2026" (or without the year, when the source
-     * didn't specify one), extended with an end date when it falls on a
-     * different day ("Sat 27 June 2026 - Sun 28 June 2026") and a time range
-     * when a time-of-day is actually known ("18:00" / "18:00 - 21:00").
+     * The full "starts_at" field: a date (or date range) plus a time range
+     * when a time-of-day is known, e.g. "Sat 27 June 2026 - Sun 28 June 2026
+     * 18:00 - 21:00". Composed from the same granular pieces the individual
+     * date/time fields expose, so they can never drift apart.
      */
     private function formattedStartDate(int $postId): ?string
     {
-        $startsAtRaw = (string) get_post_meta($postId, '_eventmesh_starts_at', true);
+        $dateRange = $this->dateRangeText($postId);
 
-        if ('' === $startsAtRaw) {
+        if (null === $dateRange) {
+            return null;
+        }
+
+        $timeRange = $this->timeRangeText($postId);
+
+        return null !== $timeRange ? $dateRange . ' ' . $timeRange : $dateRange;
+    }
+
+    /**
+     * Reads the event's start/end DateTimes and whether the year is known,
+     * from post meta. Either date may be null.
+     *
+     * @return array{0: ?\DateTimeImmutable, 1: ?\DateTimeImmutable, 2: bool}
+     */
+    private function eventDates(int $postId): array
+    {
+        $start = $this->parseMetaDate((string) get_post_meta($postId, '_eventmesh_starts_at', true));
+        $end = $this->parseMetaDate((string) get_post_meta($postId, '_eventmesh_ends_at', true));
+        $yearKnown = '1' === (string) get_post_meta($postId, '_eventmesh_starts_at_year_known', true);
+
+        return [$start, $end, $yearKnown];
+    }
+
+    private function parseMetaDate(string $raw): ?\DateTimeImmutable
+    {
+        if ('' === $raw) {
             return null;
         }
 
         try {
-            $start = new \DateTimeImmutable($startsAtRaw);
+            return new \DateTimeImmutable($raw);
         } catch (\Exception) {
             return null;
         }
+    }
 
-        $end = null;
-        $endsAtRaw = (string) get_post_meta($postId, '_eventmesh_ends_at', true);
+    /**
+     * "Sat 11 June 2026" (year dropped when the source never stated one).
+     */
+    private function startDateText(int $postId): ?string
+    {
+        [$start, , $yearKnown] = $this->eventDates($postId);
 
-        if ('' !== $endsAtRaw) {
-            try {
-                $end = new \DateTimeImmutable($endsAtRaw);
-            } catch (\Exception) {
-                $end = null;
-            }
+        if (null === $start) {
+            return null;
         }
 
-        $yearKnown = '1' === (string) get_post_meta($postId, '_eventmesh_starts_at_year_known', true);
-        $dateFormat = $yearKnown ? 'D j F Y' : 'D j F';
+        return date_i18n($yearKnown ? 'D j F Y' : 'D j F', $start->getTimestamp());
+    }
 
-        $result = date_i18n($dateFormat, $start->getTimestamp());
+    private function endDateText(int $postId): ?string
+    {
+        [, $end, $yearKnown] = $this->eventDates($postId);
+
+        if (null === $end) {
+            return null;
+        }
+
+        return date_i18n($yearKnown ? 'D j F Y' : 'D j F', $end->getTimestamp());
+    }
+
+    /**
+     * The start date, extended with the end date only when it falls on a
+     * different day ("Sat 27 June 2026 - Sun 28 June 2026").
+     */
+    private function dateRangeText(int $postId): ?string
+    {
+        [$start, $end, ] = $this->eventDates($postId);
+
+        if (null === $start) {
+            return null;
+        }
+
+        $text = (string) $this->startDateText($postId);
 
         if (null !== $end && $end->format('Y-m-d') !== $start->format('Y-m-d')) {
-            $result .= ' - ' . date_i18n($dateFormat, $end->getTimestamp());
+            $text .= ' - ' . $this->endDateText($postId);
         }
 
-        if ('00:00' !== $start->format('H:i')) {
-            $result .= ' ' . date_i18n('H:i', $start->getTimestamp());
+        return $text;
+    }
 
-            if (null !== $end && '00:00' !== $end->format('H:i')) {
-                $result .= ' - ' . date_i18n('H:i', $end->getTimestamp());
-            }
+    /**
+     * A date-only value always carries a midnight time component, so a start
+     * of exactly 00:00 is treated as "no time known" and yields null.
+     */
+    private function startTimeText(int $postId): ?string
+    {
+        [$start, , ] = $this->eventDates($postId);
+
+        if (null === $start || '00:00' === $start->format('H:i')) {
+            return null;
         }
 
-        return $result;
+        return date_i18n('H:i', $start->getTimestamp());
+    }
+
+    private function endTimeText(int $postId): ?string
+    {
+        [, $end, ] = $this->eventDates($postId);
+
+        if (null === $end || '00:00' === $end->format('H:i')) {
+            return null;
+        }
+
+        return date_i18n('H:i', $end->getTimestamp());
+    }
+
+    /**
+     * "18:00" or "18:00 - 21:00"; null when the event has no known start time.
+     */
+    private function timeRangeText(int $postId): ?string
+    {
+        $startTime = $this->startTimeText($postId);
+
+        if (null === $startTime) {
+            return null;
+        }
+
+        $endTime = $this->endTimeText($postId);
+
+        return null !== $endTime ? $startTime . ' - ' . $endTime : $startTime;
     }
 
     /**

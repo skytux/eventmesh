@@ -26,9 +26,16 @@
 							label: __( 'Field', 'eventmesh' ),
 							value: attributes.field,
 							options: [
-								{ label: __( 'Start date', 'eventmesh' ), value: 'starts_at' },
+								{ label: __( 'Date & time (full)', 'eventmesh' ), value: 'starts_at' },
 								{ label: __( 'Title (date removed)', 'eventmesh' ), value: 'title' },
 								{ label: __( 'Venue', 'eventmesh' ), value: 'venue' },
+								{ label: __( 'Price', 'eventmesh' ), value: 'price' },
+								{ label: __( 'Date range', 'eventmesh' ), value: 'date_range' },
+								{ label: __( 'Start date', 'eventmesh' ), value: 'start_date' },
+								{ label: __( 'End date', 'eventmesh' ), value: 'end_date' },
+								{ label: __( 'Start time', 'eventmesh' ), value: 'start_time' },
+								{ label: __( 'End time', 'eventmesh' ), value: 'end_time' },
+								{ label: __( 'Time range', 'eventmesh' ), value: 'time_range' },
 							],
 							onChange: function ( value ) {
 								setAttributes( { field: value } );
