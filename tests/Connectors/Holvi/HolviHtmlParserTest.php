@@ -301,6 +301,63 @@ final class HolviHtmlParserTest extends TestCase
         self::assertSame('', $events[0]->price());
     }
 
+    public function testParsesHolviProductJsonLdWithPrice(): void
+    {
+        // Holvi's real shape: a schema.org Product (not Event) whose name
+        // carries the date and whose offers block carries the price.
+        $html = '<html><head><script type="application/ld+json">' . (string) json_encode(
+            [
+                '@context' => 'http://schema.org',
+                '@type' => 'Product',
+                'name' => 'Authentic Dating 25.8.2026',
+                'description' => 'A dating workshop.',
+                'url' => 'https://holvi.com/shop/MiaRenwall/product/abc/',
+                'offers' => [
+                    '@type' => 'Offer',
+                    'availability' => 'http://schema.org/InStock',
+                    'price' => '39.00',
+                    'priceCurrency' => 'EUR',
+                ],
+            ]
+        ) . '</script></head><body></body></html>';
+
+        $events = $this->parser()->parse($html, self::SOURCE_URL);
+
+        self::assertCount(1, $events);
+        self::assertSame('Authentic Dating 25.8.2026', $events[0]->title());
+        self::assertSame('€39', $events[0]->price());
+        self::assertFalse($events[0]->soldOut());
+    }
+
+    public function testSkipsAProductJsonLdWithNoDateInItsName(): void
+    {
+        // A gift card / merch Product on the same shop page: no date, so it is
+        // not a real event and must be skipped despite carrying a price.
+        $html = '<html><head><script type="application/ld+json">' . (string) json_encode(
+            [
+                '@type' => 'Product',
+                'name' => 'Gift Card',
+                'offers' => ['@type' => 'Offer', 'price' => '50.00', 'priceCurrency' => 'EUR'],
+            ]
+        ) . '</script></head><body></body></html>';
+
+        self::assertSame([], $this->parser()->parse($html, self::SOURCE_URL));
+    }
+
+    public function testExtractsProviderLinksWrittenAsBareTextInTheDescription(): void
+    {
+        $html = '<html><body>'
+            . '<h1 itemprop="name">Some Gig 12.8.2026</h1>'
+            . '<div itemprop="description">Pre-show playlist: '
+            . 'https://open.spotify.com/artist/xyz — see you there!</div>'
+            . '</body></html>';
+
+        $event = $this->parser()->parseDetailPage($html, 'https://shop.holvi.com/product/some-gig/');
+
+        self::assertNotNull($event);
+        self::assertSame('https://open.spotify.com/artist/xyz', $event->providers()['spotify'] ?? null);
+    }
+
     public function testParseDetailPageExtractsImageFromTheAngularImageCarouselAttribute(): void
     {
         $event = $this->parser()->parseDetailPage(

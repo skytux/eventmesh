@@ -72,7 +72,15 @@ final class HolviHtmlParser
 
                 $event = $this->eventFromJsonLd($item, $sourceUrl);
 
-                if ($event instanceof Event) {
+                if (! $event instanceof Event) {
+                    continue;
+                }
+
+                // An explicit schema.org Event is trusted as-is. A Product
+                // (how Holvi tags its listings, but also its gift cards/merch)
+                // is only kept when it looks like a real event - the same date
+                // gate the markup fallback applies.
+                if ($this->jsonLdTypeContains($item, 'Event') || $this->looksLikeARealEvent($event)) {
                     $events[] = $event;
                 }
             }
@@ -100,17 +108,29 @@ final class HolviHtmlParser
     }
 
     /**
+     * Holvi describes each listing as a schema.org Product (with the date in
+     * its name and an offers block), not an Event, so both types are accepted;
+     * parseJsonLdEvents() then applies the real-event date filter to Products.
+     *
      * @param array<string, mixed> $item
      */
     private function isJsonLdEvent(array $item): bool
     {
+        return $this->jsonLdTypeContains($item, 'Event') || $this->jsonLdTypeContains($item, 'Product');
+    }
+
+    /**
+     * @param array<string, mixed> $item
+     */
+    private function jsonLdTypeContains(array $item, string $wanted): bool
+    {
         $type = $item['@type'] ?? '';
 
         if (is_array($type)) {
-            return in_array('Event', $type, true);
+            return in_array($wanted, $type, true);
         }
 
-        return 'Event' === $type;
+        return $wanted === $type;
     }
 
     /**
@@ -348,7 +368,10 @@ final class HolviHtmlParser
             venueName: $this->resolveVenue($structuredVenue, $description),
             startsAtYearKnown: $resolved['yearKnown'],
             soldOut: $this->isSoldOut($xpath, $element),
-            providers: $this->extractProviders($xpath, $element, $sourceUrl),
+            providers: array_merge(
+                $this->extractProvidersFromText($description),
+                $this->extractProviders($xpath, $element, $sourceUrl)
+            ),
             price: $this->priceFromMarkup($xpath, $element)
         );
     }
@@ -364,8 +387,41 @@ final class HolviHtmlParser
         return $this->firstText(
             $xpath,
             $context,
-            './/*[contains(concat(" ", normalize-space(@class), " "), " product-price ")]'
+            './/*[contains(concat(" ", normalize-space(@class), " "), " product-price ")' .
+            ' or contains(concat(" ", normalize-space(@class), " "), " store-item-price ")' .
+            ' or (@itemprop="price" and normalize-space(text()) != "")]'
         );
+    }
+
+    /**
+     * Scans free text for bare provider URLs (Spotify/YouTube/... links a
+     * listing writes into its description as plain text rather than as
+     * clickable anchors), complementing the anchor-based extractProviders().
+     *
+     * @return array<string, string>
+     */
+    private function extractProvidersFromText(string $text): array
+    {
+        if ('' === trim($text)) {
+            return [];
+        }
+
+        if (1 !== preg_match_all('#https?://[^\s"\'<>()\]]+#i', $text, $matches) && [] === ($matches[0] ?? [])) {
+            return [];
+        }
+
+        $providers = [];
+
+        foreach ($matches[0] as $url) {
+            $url = rtrim($url, '.,;:!?');
+            $provider = $this->providerForUrl($url);
+
+            if (null !== $provider && ! isset($providers[$provider])) {
+                $providers[$provider] = $url;
+            }
+        }
+
+        return $providers;
     }
 
     /**
@@ -498,9 +554,14 @@ final class HolviHtmlParser
             // page's own header/footer routinely carries Holvi's own
             // site-wide "share on Facebook/Instagram" links, which would
             // otherwise get misattributed as this specific artist's profile.
-            providers: $descriptionNode instanceof DOMElement
-                ? $this->extractProviders($xpath, $descriptionNode, $pageUrl)
-                : [],
+            // Bare URLs written into the description text are picked up too;
+            // anchor links win on any duplicate.
+            providers: array_merge(
+                $this->extractProvidersFromText($descriptionText),
+                $descriptionNode instanceof DOMElement
+                    ? $this->extractProviders($xpath, $descriptionNode, $pageUrl)
+                    : []
+            ),
             price: $this->priceFromMarkup($xpath, $document)
         );
     }
