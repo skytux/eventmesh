@@ -56,21 +56,4 @@ final class ConnectorManager
     {
         return $this->registry->get($id);
     }
-
-    /**
-     * @return array<int, array{id: string, label: string}>
-     */
-    public function sourceRows(): array
-    {
-        $rows = [];
-
-        foreach ($this->registry->all() as $id => $connector) {
-            $rows[] = [
-                'id' => $id,
-                'label' => $connector->label(),
-            ];
-        }
-
-        return $rows;
-    }
 }

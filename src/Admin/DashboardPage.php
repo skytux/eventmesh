@@ -21,11 +21,13 @@ final class DashboardPage
 
     public function render(): void
     {
+        $recentLogs = array_reverse($this->logger->recent());
+
         $this->view->render(
             'dashboard',
             [
-                'panel' => $this->panel(),
-                'logs' => $this->recentLogs(),
+                'panel' => $this->panel($recentLogs),
+                'logs' => $this->recentLogs($recentLogs),
             ]
         );
     }
@@ -96,21 +98,19 @@ final class DashboardPage
      * the status panel and log list in place, without a full page reload.
      *
      * @return array{
-     *     success: bool,
-     *     message: string,
      *     panel: array<string, mixed>,
      *     logs: array<int, array{time: string, level: string, message: string}>
      * }
      */
     public function ajaxSyncResponse(): array
     {
-        $result = $this->runSync();
+        $this->runSync();
+
+        $recentLogs = array_reverse($this->logger->recent());
 
         return [
-            'success' => $result['success'],
-            'message' => $result['message'],
-            'panel' => $this->panel(),
-            'logs' => $this->recentLogs(),
+            'panel' => $this->panel($recentLogs),
+            'logs' => $this->recentLogs($recentLogs),
         ];
     }
 
@@ -156,6 +156,9 @@ final class DashboardPage
      * strings so both the initial render and the AJAX refresh format things
      * the same way.
      *
+     * @param array<int, array<string, mixed>>|null $recentLogs Most-recent-first
+     *        log entries, passed in so a single render doesn't re-read them.
+     *
      * @return array{
      *     status: string,
      *     status_message: string,
@@ -166,11 +169,13 @@ final class DashboardPage
      *     event_count: int
      * }
      */
-    public function panel(): array
+    public function panel(?array $recentLogs = null): array
     {
+        $recentLogs ??= array_reverse($this->logger->recent());
+
         $state = $this->syncState();
         $lastSync = $this->lastSyncSummary();
-        $lastError = $this->latestError();
+        $lastError = $this->latestError($recentLogs);
         $nextScheduled = wp_next_scheduled('eventmesh/background_sync');
 
         return [
@@ -202,12 +207,15 @@ final class DashboardPage
     /**
      * Most-recent-first, formatted for direct display.
      *
+     * @param array<int, array<string, mixed>>|null $recentLogs Most-recent-first
+     *        log entries, passed in so a single render doesn't re-read them.
+     *
      * @return array<int, array{time: string, level: string, message: string}>
      */
-    public function recentLogs(int $limit = 8): array
+    public function recentLogs(?array $recentLogs = null, int $limit = 8): array
     {
-        $entries = array_reverse($this->logger->recent());
-        $entries = array_slice($entries, 0, $limit);
+        $recentLogs ??= array_reverse($this->logger->recent());
+        $entries = array_slice($recentLogs, 0, $limit);
 
         return array_map(
             fn (array $entry): array => [
@@ -220,11 +228,13 @@ final class DashboardPage
     }
 
     /**
+     * @param array<int, array<string, mixed>> $recentLogs Most-recent-first log entries.
+     *
      * @return array{message: string, timestamp: int}|null
      */
-    private function latestError(): ?array
+    private function latestError(array $recentLogs): ?array
     {
-        foreach (array_reverse($this->logger->recent()) as $entry) {
+        foreach ($recentLogs as $entry) {
             if ('ERROR' === strtoupper((string) $entry['level'])) {
                 return [
                     'message' => (string) $entry['message'],
