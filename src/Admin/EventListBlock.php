@@ -574,17 +574,27 @@ final class EventListBlock
     }
 
     /**
-     * The button shows the event's actual price when the source provided one,
-     * falling back to the block's own custom label, then to "Tickets".
+     * The button shows the event's actual price when the block's "Show price"
+     * toggle is on (the default) and the source provided one, falling back to
+     * the block's own custom label, then to "Tickets". With the toggle off, the
+     * price is skipped entirely so the custom label / "Tickets" always wins -
+     * letting an editor place one price button and one plain button side by
+     * side.
      *
      * @param array<string, mixed> $attributes
      */
     private function ticketButtonLabel(int $postId, array $attributes): string
     {
-        $price = EventMeta::resolve($postId, 'price');
+        // Absent attribute means an older button saved before this toggle
+        // existed; default to showing the price, preserving prior behavior.
+        $showPrice = ! isset($attributes['showPrice']) || (bool) $attributes['showPrice'];
 
-        if ('' !== $price) {
-            return $price;
+        if ($showPrice) {
+            $price = EventMeta::resolve($postId, 'price');
+
+            if ('' !== $price) {
+                return $price;
+            }
         }
 
         if (isset($attributes['text']) && is_string($attributes['text']) && '' !== trim($attributes['text'])) {

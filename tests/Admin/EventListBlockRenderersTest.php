@@ -464,6 +464,50 @@ final class EventListBlockRenderersTest extends TestCase
         self::assertStringContainsString('Buy now', $html);
     }
 
+    public function testRenderTicketButtonSkipsThePriceWhenShowPriceIsOff(): void
+    {
+        Functions\when('get_post_meta')->alias(
+            static function (int $postId, string $key) {
+                return match ($key) {
+                    '_eventmesh_url' => 'https://holvi.com/shop/MiaRenwall/product/abc123/',
+                    '_eventmesh_price' => '€15',
+                    default => '',
+                };
+            }
+        );
+
+        $html = $this->block()->renderTicketButton(
+            ['showPrice' => false],
+            '',
+            $this->blockInstance(['postId' => 42])
+        );
+
+        self::assertStringNotContainsString('€15', $html, 'With the toggle off, the price is never used as the label.');
+        self::assertStringContainsString('Tickets', $html);
+    }
+
+    public function testRenderTicketButtonShowsCustomTextInsteadOfPriceWhenShowPriceIsOff(): void
+    {
+        Functions\when('get_post_meta')->alias(
+            static function (int $postId, string $key) {
+                return match ($key) {
+                    '_eventmesh_url' => 'https://holvi.com/shop/MiaRenwall/product/abc123/',
+                    '_eventmesh_price' => '€15',
+                    default => '',
+                };
+            }
+        );
+
+        $html = $this->block()->renderTicketButton(
+            ['showPrice' => false, 'text' => 'Buy now'],
+            '',
+            $this->blockInstance(['postId' => 42])
+        );
+
+        self::assertStringContainsString('Buy now', $html);
+        self::assertStringNotContainsString('€15', $html);
+    }
+
     public function testRenderTicketButtonIsHiddenForPastEvents(): void
     {
         Functions\when('get_post_meta')->alias(
