@@ -7,7 +7,9 @@ namespace EventMesh\Admin;
 use EventMesh\Content\EventPostType;
 use EventMesh\Services\ConnectorManager;
 use EventMesh\Services\SyncRunner;
+use EventMesh\Support\DateTimeFormat;
 use EventMesh\Support\Logger;
+use EventMesh\Support\SyncStatus;
 
 final class DashboardPage
 {
@@ -179,7 +181,7 @@ final class DashboardPage
         $nextScheduled = wp_next_scheduled('eventmesh/background_sync');
 
         return [
-            'status' => null === $state ? __('Idle', 'eventmesh') : $this->humanStatus($state['status']),
+            'status' => null === $state ? __('Idle', 'eventmesh') : SyncStatus::label($state['status']),
             'status_message' => null === $state ? '' : $state['message'],
             'last_sync_text' => null === $lastSync
                 ? __('No sync yet.', 'eventmesh')
@@ -191,15 +193,15 @@ final class DashboardPage
                     $lastSync['failed'],
                     $lastSync['skipped'],
                     $lastSync['archived'],
-                    $this->formatTime($lastSync['timestamp'])
+                    DateTimeFormat::format($lastSync['timestamp'])
                 ),
             'last_error' => null === $lastError
                 ? ''
-                : sprintf('%s — %s', $this->formatTime($lastError['timestamp']), $lastError['message']),
+                : sprintf('%s — %s', DateTimeFormat::format($lastError['timestamp']), $lastError['message']),
             'auto_sync_enabled' => '1' === (string) get_option('eventmesh_enable_background_sync', '1'),
             'next_sync_text' => false === $nextScheduled
                 ? __('Not scheduled', 'eventmesh')
-                : $this->formatTime((int) $nextScheduled),
+                : DateTimeFormat::format((int) $nextScheduled),
             'event_count' => (int) (wp_count_posts(EventPostType::NAME)->publish ?? 0),
         ];
     }
@@ -219,7 +221,7 @@ final class DashboardPage
 
         return array_map(
             fn (array $entry): array => [
-                'time' => $this->formatTime((int) $entry['timestamp']),
+                'time' => DateTimeFormat::format((int) $entry['timestamp']),
                 'level' => (string) $entry['level'],
                 'message' => (string) $entry['message'],
             ],
@@ -244,26 +246,6 @@ final class DashboardPage
         }
 
         return null;
-    }
-
-    private function humanStatus(string $status): string
-    {
-        return match ($status) {
-            'running' => __('Running', 'eventmesh'),
-            'completed' => __('Completed', 'eventmesh'),
-            'completed_with_errors' => __('Completed with errors', 'eventmesh'),
-            'error' => __('Error', 'eventmesh'),
-            default => ucfirst($status),
-        };
-    }
-
-    private function formatTime(int $timestamp): string
-    {
-        if (0 === $timestamp) {
-            return __('Never', 'eventmesh');
-        }
-
-        return date_i18n(get_option('date_format') . ' ' . get_option('time_format'), $timestamp);
     }
 
     /**
