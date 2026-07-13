@@ -19,13 +19,19 @@
     "typography": {
       "fontSize": true,
       "lineHeight": true,
+      "textAlign": true,
       "fontFamily": true,
+      "__experimentalFontFamily": true,
       "fontWeight": true,
+      "__experimentalFontWeight": true,
       "fontStyle": true,
+      "__experimentalFontStyle": true,
       "textDecoration": true,
+      "__experimentalTextDecoration": true,
       "textTransform": true,
+      "__experimentalTextTransform": true,
       "letterSpacing": true,
-      "textAlign": true
+      "__experimentalLetterSpacing": true
     },
     "spacing": {
       "margin": true,

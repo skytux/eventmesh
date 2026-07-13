@@ -20,11 +20,17 @@
     "typography": {
       "fontSize": true,
       "fontFamily": true,
+      "__experimentalFontFamily": true,
       "fontWeight": true,
+      "__experimentalFontWeight": true,
       "fontStyle": true,
+      "__experimentalFontStyle": true,
       "textDecoration": true,
+      "__experimentalTextDecoration": true,
       "textTransform": true,
-      "letterSpacing": true
+      "__experimentalTextTransform": true,
+      "letterSpacing": true,
+      "__experimentalLetterSpacing": true
     },
     "spacing": {
       "margin": true,
