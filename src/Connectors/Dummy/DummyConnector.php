@@ -28,6 +28,17 @@ final class DummyConnector implements ConnectorInterface
     }
 
     /**
+     * Off by default so a production install never syncs sample data on its
+     * own - an admin has to tick it on in the Sources table. The wp-config
+     * constant still force-defaults it on for CI/dev, where there is no
+     * stored per-source choice to consult.
+     */
+    public function enabledByDefault(): bool
+    {
+        return defined('EVENTMESH_ENABLE_TEST_CONNECTOR') && EVENTMESH_ENABLE_TEST_CONNECTOR;
+    }
+
+    /**
      * @return array<int, Event>
      */
     public function fetch(): array

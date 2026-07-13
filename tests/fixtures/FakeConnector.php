@@ -15,7 +15,8 @@ final class FakeConnector implements ConnectorInterface
     public function __construct(
         private readonly string $connectorId = 'fake',
         private readonly array $events = [],
-        private readonly int $errors = 0
+        private readonly int $errors = 0,
+        private readonly bool $enabledByDefault = true
     ) {
     }
 
@@ -27,6 +28,11 @@ final class FakeConnector implements ConnectorInterface
     public function label(): string
     {
         return 'Fake';
+    }
+
+    public function enabledByDefault(): bool
+    {
+        return $this->enabledByDefault;
     }
 
     public function fetch(): array

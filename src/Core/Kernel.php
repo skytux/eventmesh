@@ -14,9 +14,7 @@ use EventMesh\Admin\View;
 use EventMesh\Connectors\Holvi\HolviHtmlParser;
 use EventMesh\Content\EventPostType;
 use EventMesh\Content\EventQuery;
-use EventMesh\Content\PerformerTaxonomy;
 use EventMesh\Content\SingleEventTemplate;
-use EventMesh\Services\ArtistMap;
 use EventMesh\Services\ConnectorManager;
 use EventMesh\Services\CronFallbackTrigger;
 use EventMesh\Services\EventMediaEnricher;
@@ -60,9 +58,6 @@ final class Kernel
 
         $blockAppearanceTools = $this->container->get(BlockAppearanceTools::class);
         $blockAppearanceTools->boot();
-
-        $performerTaxonomy = $this->container->get(PerformerTaxonomy::class);
-        $performerTaxonomy->boot();
 
         do_action(
             'eventmesh/register_connectors',
@@ -173,11 +168,6 @@ final class Kernel
         );
 
         $this->container->singleton(
-            ArtistMap::class,
-            fn () => new ArtistMap()
-        );
-
-        $this->container->singleton(
             EventMediaEnricher::class,
             fn (Container $container) => new EventMediaEnricher(
                 $container->get(Logger::class)
@@ -187,7 +177,6 @@ final class Kernel
         $this->container->singleton(
             ProviderEnricher::class,
             fn (Container $container) => new ProviderEnricher(
-                $container->get(ArtistMap::class),
                 $container->get(Logger::class)
             )
         );
@@ -237,11 +226,6 @@ final class Kernel
         );
 
         $this->container->singleton(
-            PerformerTaxonomy::class,
-            fn () => new PerformerTaxonomy()
-        );
-
-        $this->container->singleton(
             View::class,
             fn () => new View()
         );
@@ -251,8 +235,8 @@ final class Kernel
             fn (Container $container) => new DashboardPage(
                 $container->get(View::class),
                 $container->get(ConnectorManager::class),
-                $container->get(EventSynchronizer::class),
-                $container->get(SyncRunner::class)
+                $container->get(SyncRunner::class),
+                $container->get(Logger::class)
             )
         );
 
@@ -261,7 +245,8 @@ final class Kernel
             fn (Container $container) => new SourcesPage(
                 $container->get(View::class),
                 $container->get(ConnectorManager::class),
-                $container->get(HolviSourceManager::class)
+                $container->get(HolviSourceManager::class),
+                $container->get(SourceSettings::class)
             )
         );
 
@@ -277,10 +262,7 @@ final class Kernel
             SettingsPage::class,
             fn (Container $container) => new SettingsPage(
                 $container->get(View::class),
-                $container->get(ArtistMap::class),
-                $container->get(SourceSettings::class),
-                $container->get(Admin::class),
-                $container->get(ConnectorManager::class)
+                $container->get(Admin::class)
             )
         );
 

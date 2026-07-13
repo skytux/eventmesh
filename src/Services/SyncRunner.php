@@ -147,7 +147,7 @@ final class SyncRunner
                 continue;
             }
 
-            if (! $this->sourceSettings->isEnabled($connectorId)) {
+            if (! $this->sourceSettings->isEnabled($connectorId, $connector->enabledByDefault())) {
                 // A disabled source shouldn't keep publishing content it can
                 // no longer vouch for: archive (draft) everything it owns
                 // instead of skipping silently. pruneStale() with an empty

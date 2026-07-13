@@ -6,7 +6,6 @@ namespace EventMesh\Tests\Sync;
 
 use Brain\Monkey\Functions;
 use EventMesh\Models\Event;
-use EventMesh\Services\ArtistMap;
 use EventMesh\Services\EventMediaEnricher;
 use EventMesh\Services\ProviderEmbedEnricher;
 use EventMesh\Services\ProviderEnricher;
@@ -42,7 +41,7 @@ final class EventSynchronizerTest extends TestCase
         return new EventSynchronizer(
             $logger,
             new EventMediaEnricher($logger),
-            new ProviderEnricher(new ArtistMap(), $logger),
+            new ProviderEnricher($logger),
             new ProviderEmbedEnricher($logger)
         );
     }

@@ -8,7 +8,6 @@ use Brain\Monkey\Functions;
 use EventMesh\Admin\DashboardPage;
 use EventMesh\Admin\View;
 use EventMesh\Core\ConnectorRegistry;
-use EventMesh\Services\ArtistMap;
 use EventMesh\Services\ConnectorManager;
 use EventMesh\Services\CronFallbackTrigger;
 use EventMesh\Services\EventMediaEnricher;
@@ -84,18 +83,11 @@ final class CronFallbackTriggerTest extends TestCase
 
     private function dashboardPage(SyncRunner $syncRunner): DashboardPage
     {
-        $logger = new Logger();
-
         return new DashboardPage(
             new View(),
             new ConnectorManager(new ConnectorRegistry()),
-            new EventSynchronizer(
-                $logger,
-                new EventMediaEnricher($logger),
-                new ProviderEnricher(new ArtistMap(), $logger),
-                new ProviderEmbedEnricher($logger)
-            ),
-            $syncRunner
+            $syncRunner,
+            new Logger()
         );
     }
 
@@ -113,7 +105,7 @@ final class CronFallbackTriggerTest extends TestCase
             new EventSynchronizer(
                 $logger,
                 new EventMediaEnricher($logger),
-                new ProviderEnricher(new ArtistMap(), $logger),
+                new ProviderEnricher($logger),
                 new ProviderEmbedEnricher($logger)
             ),
             $logger,

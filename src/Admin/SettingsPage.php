@@ -4,19 +4,13 @@ declare(strict_types=1);
 
 namespace EventMesh\Admin;
 
-use EventMesh\Services\ArtistMap;
-use EventMesh\Services\ConnectorManager;
-use EventMesh\Services\SourceSettings;
 use EventMesh\Support\FactoryReset;
 
 final class SettingsPage
 {
     public function __construct(
         private readonly View $view,
-        private readonly ArtistMap $artistMap,
-        private readonly SourceSettings $sourceSettings,
-        private readonly Admin $admin,
-        private readonly ConnectorManager $connectors
+        private readonly Admin $admin
     ) {
     }
 
@@ -25,19 +19,10 @@ final class SettingsPage
         $this->view->render(
             'settings',
             [
-                'artist_map_json' => wp_json_encode(
-                    $this->artistMap->all(),
-                    JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
-                ) ?: '{}',
-                'connector_rows' => $this->connectors->sourceRows(),
-                'source_settings' => $this->sourceSettings->all(),
                 'background_sync_enabled' => '1' === (string) get_option('eventmesh_enable_background_sync', '1'),
                 'sync_interval' => $this->admin->configuredSyncInterval(),
                 'sync_intervals' => $this->admin->availableSyncIntervals(),
                 'delete_data_on_uninstall' => '1' === (string) get_option('eventmesh_delete_data_on_uninstall', '0'),
-                'enable_test_connector' => '1' === (string) get_option('eventmesh_enable_test_connector', '0'),
-                'test_connector_forced' => defined('EVENTMESH_ENABLE_TEST_CONNECTOR')
-                    && EVENTMESH_ENABLE_TEST_CONNECTOR,
             ]
         );
     }
@@ -49,14 +34,6 @@ final class SettingsPage
         }
 
         check_admin_referer('eventmesh_settings');
-
-        $artistMapJson = isset($_POST['eventmesh_artist_map'])
-            ? wp_unslash((string) $_POST['eventmesh_artist_map'])
-            : '{}';
-
-        $sourceSettings = isset($_POST['eventmesh_source_enabled'])
-            ? array_map('absint', (array) $_POST['eventmesh_source_enabled'])
-            : [];
 
         $backgroundSyncEnabled = isset($_POST['eventmesh_enable_background_sync'])
             ? '1' === (string) $_POST['eventmesh_enable_background_sync']
@@ -70,35 +47,13 @@ final class SettingsPage
             ? '1' === (string) $_POST['eventmesh_delete_data_on_uninstall']
             : false;
 
-        $enableTestConnector = isset($_POST['eventmesh_enable_test_connector'])
-            ? '1' === (string) $_POST['eventmesh_enable_test_connector']
-            : false;
-
         if (! array_key_exists($syncInterval, $this->admin->availableSyncIntervals())) {
             $syncInterval = 'hourly';
         }
 
-        $artistMapData = json_decode($artistMapJson, true);
-
-        if (! is_array($artistMapData)) {
-            wp_die(esc_html__('The artist map must be valid JSON.', 'eventmesh'));
-        }
-
-        update_option('eventmesh_artist_map', $artistMapJson);
         update_option('eventmesh_enable_background_sync', $backgroundSyncEnabled ? '1' : '0');
         update_option('eventmesh_sync_interval', $syncInterval);
         update_option('eventmesh_delete_data_on_uninstall', $deleteDataOnUninstall ? '1' : '0');
-        update_option('eventmesh_enable_test_connector', $enableTestConnector ? '1' : '0');
-
-        foreach ($sourceSettings as $sourceId => $enabled) {
-            $sourceId = sanitize_key((string) $sourceId);
-
-            if ('' === $sourceId) {
-                continue;
-            }
-
-            $this->sourceSettings->setEnabled($sourceId, 1 === $enabled);
-        }
 
         wp_safe_redirect(
             add_query_arg(
@@ -110,9 +65,9 @@ final class SettingsPage
     }
 
     /**
-     * Wipes all synced events, performer terms, options, and transients back
-     * to a fresh-install state, without deactivating the plugin. Intended
-     * for starting over during setup/testing.
+     * Wipes all synced events, options, and transients back to a fresh-install
+     * state, without deactivating the plugin. Intended for starting over
+     * during setup/testing.
      */
     public function factoryReset(): void
     {
@@ -129,10 +84,9 @@ final class SettingsPage
             [
                 'type' => 'success',
                 'message' => sprintf(
-                    /* translators: 1: number of deleted events, 2: number of deleted performer terms */
-                    __('Factory reset complete: removed %1$d event(s) and %2$d performer term(s). All settings reset.', 'eventmesh'), // phpcs:ignore Generic.Files.LineLength.TooLong
-                    $result['deleted_events'],
-                    $result['deleted_terms']
+                    /* translators: %d: number of deleted events */
+                    __('Factory reset complete: removed %d event(s). All settings reset.', 'eventmesh'),
+                    $result['deleted_events']
                 ),
             ],
             60

@@ -7,15 +7,15 @@ namespace EventMesh\Admin;
 use EventMesh\Content\EventPostType;
 use EventMesh\Services\ConnectorManager;
 use EventMesh\Services\SyncRunner;
-use EventMesh\Sync\EventSynchronizer;
+use EventMesh\Support\Logger;
 
 final class DashboardPage
 {
     public function __construct(
         private readonly View $view,
         private readonly ConnectorManager $connectors,
-        private readonly EventSynchronizer $synchronizer,
-        private readonly SyncRunner $syncRunner
+        private readonly SyncRunner $syncRunner,
+        private readonly Logger $logger
     ) {
     }
 
@@ -24,38 +24,10 @@ final class DashboardPage
         $this->view->render(
             'dashboard',
             [
-                'connector_count' => $this->connectors->count(),
-                'event_count' => wp_count_posts(EventPostType::NAME)->publish ?? 0,
-                'kernel_status' => __('Running', 'eventmesh'),
-                'version' => EVENTMESH_VERSION,
-                'background_sync_enabled' => '1' === (string) get_option('eventmesh_enable_background_sync', '1'),
-                'last_sync' => $this->lastSyncSummary(),
-                'next_sync_timestamp' => wp_next_scheduled('eventmesh/background_sync'),
+                'panel' => $this->panel(),
+                'logs' => $this->recentLogs(),
             ]
         );
-    }
-
-    public function saveBackgroundSyncToggle(): void
-    {
-        if (! current_user_can(Admin::CAPABILITY)) {
-            wp_die(esc_html__('You do not have permission to save this setting.', 'eventmesh'));
-        }
-
-        check_admin_referer('eventmesh_dashboard_toggle');
-
-        $enabled = isset($_POST['eventmesh_enable_background_sync'])
-            ? '1' === (string) $_POST['eventmesh_enable_background_sync']
-            : false;
-
-        update_option('eventmesh_enable_background_sync', $enabled ? '1' : '0');
-
-        wp_safe_redirect(
-            add_query_arg(
-                ['page' => 'eventmesh'],
-                admin_url('admin.php')
-            )
-        );
-        exit;
     }
 
     /**
@@ -109,12 +81,36 @@ final class DashboardPage
             $result['archived']
         );
 
-        $this->markSyncState('completed', $message);
+        $status = $result['failed'] > 0 ? 'completed_with_errors' : 'completed';
+        $this->markSyncState($status, $message);
 
         return [
             'success' => true,
             'synced' => $synced,
             'message' => $message,
+        ];
+    }
+
+    /**
+     * Runs a sync and returns everything the dashboard's JS needs to refresh
+     * the status panel and log list in place, without a full page reload.
+     *
+     * @return array{
+     *     success: bool,
+     *     message: string,
+     *     panel: array<string, mixed>,
+     *     logs: array<int, array{time: string, level: string, message: string}>
+     * }
+     */
+    public function ajaxSyncResponse(): array
+    {
+        $result = $this->runSync();
+
+        return [
+            'success' => $result['success'],
+            'message' => $result['message'],
+            'panel' => $this->panel(),
+            'logs' => $this->recentLogs(),
         ];
     }
 
@@ -153,6 +149,111 @@ final class DashboardPage
         include EVENTMESH_PLUGIN_DIR . 'templates/frontend/sync-status.php';
 
         return (string) ob_get_clean();
+    }
+
+    /**
+     * The full view model for the dashboard status panel, as display-ready
+     * strings so both the initial render and the AJAX refresh format things
+     * the same way.
+     *
+     * @return array{
+     *     status: string,
+     *     status_message: string,
+     *     last_sync_text: string,
+     *     last_error: string,
+     *     auto_sync_enabled: bool,
+     *     next_sync_text: string,
+     *     event_count: int
+     * }
+     */
+    public function panel(): array
+    {
+        $state = $this->syncState();
+        $lastSync = $this->lastSyncSummary();
+        $lastError = $this->latestError();
+        $nextScheduled = wp_next_scheduled('eventmesh/background_sync');
+
+        return [
+            'status' => null === $state ? __('Idle', 'eventmesh') : $this->humanStatus($state['status']),
+            'status_message' => null === $state ? '' : $state['message'],
+            'last_sync_text' => null === $lastSync
+                ? __('No sync yet.', 'eventmesh')
+                : sprintf(
+                    /* translators: 1: created, 2: updated, 3: failed, 4: skipped, 5: archived, 6: date/time */
+                    __('Created %1$d, updated %2$d, failed %3$d, skipped %4$d, archived %5$d — %6$s', 'eventmesh'),
+                    $lastSync['created'],
+                    $lastSync['updated'],
+                    $lastSync['failed'],
+                    $lastSync['skipped'],
+                    $lastSync['archived'],
+                    $this->formatTime($lastSync['timestamp'])
+                ),
+            'last_error' => null === $lastError
+                ? ''
+                : sprintf('%s — %s', $this->formatTime($lastError['timestamp']), $lastError['message']),
+            'auto_sync_enabled' => '1' === (string) get_option('eventmesh_enable_background_sync', '1'),
+            'next_sync_text' => false === $nextScheduled
+                ? __('Not scheduled', 'eventmesh')
+                : $this->formatTime((int) $nextScheduled),
+            'event_count' => (int) (wp_count_posts(EventPostType::NAME)->publish ?? 0),
+        ];
+    }
+
+    /**
+     * Most-recent-first, formatted for direct display.
+     *
+     * @return array<int, array{time: string, level: string, message: string}>
+     */
+    public function recentLogs(int $limit = 8): array
+    {
+        $entries = array_reverse($this->logger->recent());
+        $entries = array_slice($entries, 0, $limit);
+
+        return array_map(
+            fn (array $entry): array => [
+                'time' => $this->formatTime((int) $entry['timestamp']),
+                'level' => (string) $entry['level'],
+                'message' => (string) $entry['message'],
+            ],
+            $entries
+        );
+    }
+
+    /**
+     * @return array{message: string, timestamp: int}|null
+     */
+    private function latestError(): ?array
+    {
+        foreach (array_reverse($this->logger->recent()) as $entry) {
+            if ('ERROR' === strtoupper((string) $entry['level'])) {
+                return [
+                    'message' => (string) $entry['message'],
+                    'timestamp' => (int) $entry['timestamp'],
+                ];
+            }
+        }
+
+        return null;
+    }
+
+    private function humanStatus(string $status): string
+    {
+        return match ($status) {
+            'running' => __('Running', 'eventmesh'),
+            'completed' => __('Completed', 'eventmesh'),
+            'completed_with_errors' => __('Completed with errors', 'eventmesh'),
+            'error' => __('Error', 'eventmesh'),
+            default => ucfirst($status),
+        };
+    }
+
+    private function formatTime(int $timestamp): string
+    {
+        if (0 === $timestamp) {
+            return __('Never', 'eventmesh');
+        }
+
+        return date_i18n(get_option('date_format') . ' ' . get_option('time_format'), $timestamp);
     }
 
     /**

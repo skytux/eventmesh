@@ -19,6 +19,17 @@ interface ConnectorInterface
     public function label(): string;
 
     /**
+     * Whether this connector should be enabled the first time it is seen,
+     * before an admin has made an explicit choice on the Sources page.
+     *
+     * Real sources return true (they carry live data the moment they are
+     * configured); the built-in dummy/test connector returns false so it
+     * never syncs sample data into a production site until deliberately
+     * ticked on.
+     */
+    public function enabledByDefault(): bool;
+
+    /**
      * Fetch remote events.
      *
      * @return array<int, Event>
