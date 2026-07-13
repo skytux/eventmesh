@@ -41,24 +41,39 @@ final class EventPostTypeMetaBoxTest extends TestCase
         return $post;
     }
 
-    public function testRenderMetaBoxPrintsAnInputForEveryKnownProviderPrefilledFromMeta(): void
+    public function testRenderMetaBoxShowsFoundValuesReadOnlyWithEditableManualOverrides(): void
     {
+        Functions\when('selected')->alias(
+            static fn ($a, $b, $echo = true) => (string) $a === (string) $b ? ' selected="selected"' : ''
+        );
         Functions\when('get_post_meta')->alias(
-            static fn (int $postId, string $key) => '_eventmesh_provider_spotify' === $key
-                ? 'https://open.spotify.com/artist/abc'
-                : ''
+            static function (int $postId, string $key = '', bool $single = false) {
+                return match ($key) {
+                    '_eventmesh_provider_spotify' => 'https://open.spotify.com/artist/abc',
+                    '_eventmesh_price' => '€39',
+                    '_eventmesh_manual_price' => '€25',
+                    default => '',
+                };
+            }
         );
 
         ob_start();
         (new EventPostType())->renderMetaBox($this->post());
         $html = (string) ob_get_clean();
 
-        self::assertStringContainsString('name="eventmesh_provider_spotify"', $html);
-        self::assertStringContainsString('name="eventmesh_provider_mixcloud"', $html);
-        self::assertStringContainsString('value="https://open.spotify.com/artist/abc"', $html);
+        // Editable manual inputs, not the scraped meta key.
+        self::assertStringContainsString('name="eventmesh_manual_provider_spotify"', $html);
+        self::assertStringContainsString('name="eventmesh_manual_price"', $html);
+        self::assertStringContainsString('name="eventmesh_manual_venue_name"', $html);
+        self::assertStringContainsString('name="eventmesh_manual_sold_out"', $html);
+        // The manual override prefills the input; the found value shows read-only.
+        self::assertStringContainsString('value="€25"', $html);
+        self::assertStringContainsString('Found: €39', $html);
+        // The scraped provider value is shown as the found value, not in the input.
+        self::assertStringContainsString('Found: https://open.spotify.com/artist/abc', $html);
     }
 
-    public function testSaveMetaBoxPersistsSubmittedProviderUrls(): void
+    public function testSaveMetaBoxPersistsManualOverridesNotTheScrapedMeta(): void
     {
         Functions\when('wp_verify_nonce')->justReturn(true);
         Functions\when('sanitize_text_field')->alias(static fn ($value) => $value);
@@ -76,17 +91,67 @@ final class EventPostTypeMetaBoxTest extends TestCase
 
         $_POST = [
             'eventmesh_providers_nonce' => 'a-valid-nonce',
-            'eventmesh_provider_spotify' => 'https://open.spotify.com/artist/abc',
-            'eventmesh_provider_mixcloud' => '',
+            'eventmesh_manual_provider_spotify' => 'https://open.spotify.com/artist/abc',
+            'eventmesh_manual_price' => '€25',
+            'eventmesh_manual_sold_out' => '1',
         ];
 
         (new EventPostType())->saveMetaBox(42, $this->post());
 
-        self::assertSame(
-            'https://open.spotify.com/artist/abc',
-            $metaWrites['_eventmesh_provider_spotify'] ?? null
+        self::assertSame('https://open.spotify.com/artist/abc', $metaWrites['_eventmesh_manual_provider_spotify'] ?? null);
+        self::assertSame('€25', $metaWrites['_eventmesh_manual_price'] ?? null);
+        self::assertSame('1', $metaWrites['_eventmesh_manual_sold_out'] ?? null);
+        self::assertArrayNotHasKey(
+            '_eventmesh_provider_spotify',
+            $metaWrites,
+            'The edit screen writes only manual overrides; the scraped meta is the sync\'s to own.'
         );
-        self::assertSame('', $metaWrites['_eventmesh_provider_mixcloud'] ?? null);
+    }
+
+    public function testSaveMetaBoxRejectsAnInvalidSoldOutValueAsFollowTheSource(): void
+    {
+        Functions\when('wp_verify_nonce')->justReturn(true);
+        Functions\when('sanitize_text_field')->alias(static fn ($value) => $value);
+        Functions\when('wp_unslash')->alias(static fn ($value) => $value);
+        Functions\when('esc_url_raw')->alias(static fn ($value) => $value);
+
+        $metaWrites = [];
+        Functions\when('update_post_meta')->alias(
+            static function (int $postId, string $key, mixed $value) use (&$metaWrites) {
+                $metaWrites[$key] = $value;
+
+                return true;
+            }
+        );
+
+        $_POST = ['eventmesh_providers_nonce' => 'ok', 'eventmesh_manual_sold_out' => 'garbage'];
+
+        (new EventPostType())->saveMetaBox(42, $this->post());
+
+        self::assertSame('', $metaWrites['_eventmesh_manual_sold_out'] ?? null);
+    }
+
+    public function testSaveMetaBoxNormalizesAManualDateToDateAtom(): void
+    {
+        Functions\when('wp_verify_nonce')->justReturn(true);
+        Functions\when('sanitize_text_field')->alias(static fn ($value) => $value);
+        Functions\when('wp_unslash')->alias(static fn ($value) => $value);
+        Functions\when('esc_url_raw')->alias(static fn ($value) => $value);
+
+        $metaWrites = [];
+        Functions\when('update_post_meta')->alias(
+            static function (int $postId, string $key, mixed $value) use (&$metaWrites) {
+                $metaWrites[$key] = $value;
+
+                return true;
+            }
+        );
+
+        $_POST = ['eventmesh_providers_nonce' => 'ok', 'eventmesh_manual_starts_at' => '2026-06-13T18:00'];
+
+        (new EventPostType())->saveMetaBox(42, $this->post());
+
+        self::assertStringStartsWith('2026-06-13T18:00:00', (string) ($metaWrites['_eventmesh_manual_starts_at'] ?? ''));
     }
 
     public function testSaveMetaBoxDoesNothingWithoutAValidNonce(): void
@@ -155,7 +220,7 @@ final class EventPostTypeMetaBoxTest extends TestCase
 
         $_POST = [
             'eventmesh_providers_nonce' => 'a-valid-nonce',
-            'eventmesh_provider_spotify' => 'https://open.spotify.com/track/abc',
+            'eventmesh_manual_provider_spotify' => 'https://open.spotify.com/track/abc',
         ];
 
         $postType = new EventPostType(new ProviderEmbedEnricher(new Logger()));
