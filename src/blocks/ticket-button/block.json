@@ -47,6 +47,10 @@
     "text": {
       "type": "string",
       "default": "Tickets"
+    },
+    "showPrice": {
+      "type": "boolean",
+      "default": true
     }
   },
   "editorScript": "file:./index.js"
