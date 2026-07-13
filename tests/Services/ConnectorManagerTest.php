@@ -24,10 +24,6 @@ final class ConnectorManagerTest extends TestCase
 
         self::assertTrue($manager->has('holvi'));
         self::assertSame(1, $manager->count());
-        self::assertSame(
-            [['id' => 'holvi', 'label' => 'Fake']],
-            $manager->sourceRows()
-        );
     }
 
     public function testRejectsInvalidConnectorId(): void

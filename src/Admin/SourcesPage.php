@@ -78,16 +78,15 @@ final class SourcesPage
      */
     private function connectorRows(): array
     {
+        $stored = $this->sourceSettings->all();
         $rows = [];
 
         foreach ($this->connectors->all() as $id => $connector) {
+            $id = (string) $id;
             $rows[] = [
-                'id' => (string) $id,
+                'id' => $id,
                 'label' => $connector->label(),
-                'enabled' => $this->sourceSettings->isEnabled(
-                    (string) $id,
-                    $connector->enabledByDefault()
-                ),
+                'enabled' => $stored[$id] ?? $connector->enabledByDefault(),
             ];
         }
 
