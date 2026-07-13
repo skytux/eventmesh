@@ -34,6 +34,11 @@ final class Admin
         );
 
         add_action(
+            'wp_ajax_eventmesh_sync',
+            [$this, 'handleAjaxSync']
+        );
+
+        add_action(
             'admin_notices',
             [$this, 'renderSyncNotice']
         );
@@ -51,11 +56,6 @@ final class Admin
         add_action(
             'admin_post_eventmesh_save_sources',
             [$this->container->get(SourcesPage::class), 'save']
-        );
-
-        add_action(
-            'admin_post_eventmesh_dashboard_toggle',
-            [$this->container->get(DashboardPage::class), 'saveBackgroundSyncToggle']
         );
 
         add_filter('cron_schedules', [$this, 'registerCronSchedules']);
@@ -182,6 +182,28 @@ final class Admin
             )
         );
         exit;
+    }
+
+    /**
+     * AJAX counterpart of handleSync: runs the sync and returns the refreshed
+     * status panel + recent log lines as JSON, so the dashboard can update in
+     * place without a full reload. The plain admin-post form remains the
+     * no-JavaScript fallback.
+     */
+    public function handleAjaxSync(): void
+    {
+        if (! current_user_can(self::CAPABILITY)) {
+            wp_send_json_error(
+                ['message' => __('You do not have permission to run this action.', 'eventmesh')],
+                403
+            );
+        }
+
+        check_ajax_referer('eventmesh_sync');
+
+        $response = $this->container->get(DashboardPage::class)->ajaxSyncResponse();
+
+        wp_send_json_success($response);
     }
 
     public function scheduleBackgroundSync(): void

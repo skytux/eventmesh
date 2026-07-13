@@ -36,6 +36,14 @@ final class DummyConnectorTest extends TestCase
         }
     }
 
+    public function testIsDisabledByDefaultUnlessTheConstantForcesItOn(): void
+    {
+        // The EVENTMESH_ENABLE_TEST_CONNECTOR constant is not defined in the
+        // test environment, so the dummy source stays off until an admin
+        // ticks it on in the Sources table.
+        self::assertFalse((new DummyConnector())->enabledByDefault());
+    }
+
     public function testFetchIncludesASoldOutEvent(): void
     {
         $events = (new DummyConnector())->fetch();

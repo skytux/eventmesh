@@ -12,17 +12,10 @@ if (! defined('ABSPATH')) {
 add_action(
     'eventmesh/register_connectors',
     static function (ConnectorManager $connectors): void {
-        // Off by default so a production install never ships sample data.
-        // Enable it either way that fits the site: the wp-config constant
-        // (locked-down or CI setups) or the Settings-page toggle (a dev/
-        // staging admin who can't - or would rather not - edit wp-config).
-        $viaConstant = defined('EVENTMESH_ENABLE_TEST_CONNECTOR') && EVENTMESH_ENABLE_TEST_CONNECTOR;
-        $viaOption = '1' === (string) get_option('eventmesh_enable_test_connector', '0');
-
-        if (! $viaConstant && ! $viaOption) {
-            return;
-        }
-
+        // Always registered so it appears in the Sources table like any other
+        // connector, but disabled by default (DummyConnector::enabledByDefault)
+        // so a production install never syncs sample data until an admin ticks
+        // it on there - the single enable control for this source.
         $connectors->register(new DummyConnector());
     }
 );

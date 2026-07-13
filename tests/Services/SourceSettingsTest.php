@@ -17,6 +17,22 @@ final class SourceSettingsTest extends TestCase
         self::assertTrue((new SourceSettings())->isEnabled('holvi'));
     }
 
+    public function testUnknownSourceUsesTheProvidedDefault(): void
+    {
+        Functions\when('get_option')->justReturn([]);
+
+        // A connector whose enabledByDefault() is false (the dummy) stays off
+        // until an explicit choice is stored.
+        self::assertFalse((new SourceSettings())->isEnabled('dummy', false));
+    }
+
+    public function testStoredChoiceWinsOverTheProvidedDefault(): void
+    {
+        Functions\when('get_option')->justReturn(['dummy' => true]);
+
+        self::assertTrue((new SourceSettings())->isEnabled('dummy', false));
+    }
+
     public function testDisabledSourceIsReportedDisabled(): void
     {
         Functions\when('get_option')->justReturn(['holvi' => false]);

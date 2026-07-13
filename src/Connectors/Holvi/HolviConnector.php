@@ -59,6 +59,11 @@ final class HolviConnector implements ConnectorInterface
         return __('Holvi', 'eventmesh');
     }
 
+    public function enabledByDefault(): bool
+    {
+        return true;
+    }
+
     /**
      * @return array<int, Event>
      */

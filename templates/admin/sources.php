@@ -2,8 +2,9 @@
 /**
  * Sources admin view.
  *
- * @var array<int, array{id: string, label: string}> $source_rows Registered connector rows.
+ * @var array<int, array{id: string, label: string, enabled: bool}> $connector_rows Registered connectors with their enabled state.
  * @var array<int, array{id: string, url: string, enabled: bool}> $holvi_sources Holvi source rows.
+ * @var array<int, string> $dummy_preview Sample events the dummy connector would generate, one per line.
  */
 
 declare(strict_types=1);
@@ -13,6 +14,8 @@ if (! defined('ABSPATH')) {
 }
 
 $holvi_sources = isset($holvi_sources) && is_array($holvi_sources) ? $holvi_sources : [];
+$connector_rows = isset($connector_rows) && is_array($connector_rows) ? $connector_rows : [];
+$dummy_preview = isset($dummy_preview) && is_array($dummy_preview) ? $dummy_preview : [];
 $next_index = max(1, count($holvi_sources) > 0 ? max(array_keys($holvi_sources)) + 1 : 1);
 ?>
 
@@ -22,6 +25,45 @@ $next_index = max(1, count($holvi_sources) > 0 ? max(array_keys($holvi_sources))
     <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
         <input type="hidden" name="action" value="eventmesh_save_sources" />
         <?php wp_nonce_field('eventmesh_save_sources'); ?>
+
+        <h2><?php esc_html_e('Connectors', 'eventmesh'); ?></h2>
+        <p class="description">
+            <?php esc_html_e('Every installed connector is listed here. Tick a connector to sync its events; unticking it archives its events (moves them to Draft) on the next sync.', 'eventmesh'); ?>
+        </p>
+
+        <table class="widefat striped" style="max-width: 960px; margin-top: 12px;">
+            <thead>
+                <tr>
+                    <th scope="col"><?php esc_html_e('Connector', 'eventmesh'); ?></th>
+                    <th scope="col"><?php esc_html_e('ID', 'eventmesh'); ?></th>
+                    <th scope="col"><?php esc_html_e('Enabled', 'eventmesh'); ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if ([] === $connector_rows) : ?>
+                    <tr>
+                        <td colspan="3">
+                            <?php esc_html_e('No connectors are installed yet.', 'eventmesh'); ?>
+                        </td>
+                    </tr>
+                <?php else : ?>
+                    <?php foreach ($connector_rows as $connector_row) : ?>
+                        <tr>
+                            <td><?php echo esc_html($connector_row['label']); ?></td>
+                            <td><code><?php echo esc_html($connector_row['id']); ?></code></td>
+                            <td>
+                                <label>
+                                    <?php // The hidden 0 submits when the checkbox is unchecked, so unticking actually disables the source. ?>
+                                    <input type="hidden" name="eventmesh_source_enabled[<?php echo esc_attr($connector_row['id']); ?>]" value="0" />
+                                    <input type="checkbox" name="eventmesh_source_enabled[<?php echo esc_attr($connector_row['id']); ?>]" value="1" <?php checked($connector_row['enabled'], true); ?> />
+                                    <?php esc_html_e('Enabled', 'eventmesh'); ?>
+                                </label>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
 
         <div class="card" style="max-width: 960px; margin-top: 20px;">
             <h2><?php esc_html_e('Holvi source URLs', 'eventmesh'); ?></h2>
@@ -66,49 +108,28 @@ $next_index = max(1, count($holvi_sources) > 0 ? max(array_keys($holvi_sources))
                     <?php esc_html_e('Add another source', 'eventmesh'); ?>
                 </button>
             </p>
-
-            <p>
-                <button type="submit" class="button button-primary">
-                    <?php esc_html_e('Save sources', 'eventmesh'); ?>
-                </button>
-            </p>
         </div>
+
+        <?php if ([] !== $dummy_preview) : ?>
+            <div class="card" style="max-width: 960px; margin-top: 20px;">
+                <h2><?php esc_html_e('Dummy (testing) — sample events', 'eventmesh'); ?></h2>
+                <p class="description">
+                    <?php esc_html_e('The dummy connector has no URLs. When enabled above, it generates these sample events on each sync — no network calls:', 'eventmesh'); ?>
+                </p>
+                <ul style="margin-left: 1.5em; list-style: disc;">
+                    <?php foreach ($dummy_preview as $preview_line) : ?>
+                        <li><?php echo esc_html($preview_line); ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
+
+        <p>
+            <button type="submit" class="button button-primary">
+                <?php esc_html_e('Save sources', 'eventmesh'); ?>
+            </button>
+        </p>
     </form>
-
-    <?php if ([] === $source_rows) : ?>
-        <div class="notice notice-info inline" style="margin-top: 20px;">
-            <p>
-                <?php esc_html_e('No connectors are installed yet.', 'eventmesh'); ?>
-            </p>
-        </div>
-    <?php endif; ?>
-
-    <table class="widefat striped" style="margin-top: 20px;">
-        <thead>
-            <tr>
-                <th scope="col"><?php esc_html_e('Connector', 'eventmesh'); ?></th>
-                <th scope="col"><?php esc_html_e('ID', 'eventmesh'); ?></th>
-                <th scope="col"><?php esc_html_e('Status', 'eventmesh'); ?></th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if ([] === $source_rows) : ?>
-                <tr>
-                    <td colspan="3">
-                        <?php esc_html_e('Install a connector plugin to add event sources.', 'eventmesh'); ?>
-                    </td>
-                </tr>
-            <?php else : ?>
-                <?php foreach ($source_rows as $source_row) : ?>
-                    <tr>
-                        <td><?php echo esc_html($source_row['label']); ?></td>
-                        <td><code><?php echo esc_html($source_row['id']); ?></code></td>
-                        <td><?php esc_html_e('Available', 'eventmesh'); ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </tbody>
-    </table>
 </div>
 
 <script>

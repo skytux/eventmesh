@@ -5,25 +5,22 @@ declare(strict_types=1);
 namespace EventMesh\Support;
 
 use EventMesh\Content\EventPostType;
-use EventMesh\Content\PerformerTaxonomy;
 use WP_Query;
 
 /**
  * Wipes everything EventMesh has created or stored, back to a fresh-install
- * state - synced events, taxonomy terms, options, transients, and the
- * scheduled background sync. Used by both the Settings page's "Factory
- * Reset" button (plugin stays active) and uninstall.php (plugin is being
- * removed).
+ * state - synced events, options, transients, and the scheduled background
+ * sync. Used by both the Settings page's "Factory Reset" button (plugin stays
+ * active) and uninstall.php (plugin is being removed).
  */
 final class FactoryReset
 {
     /**
-     * @return array{deleted_events: int, deleted_terms: int}
+     * @return array{deleted_events: int}
      */
     public static function run(): array
     {
         $deletedEvents = self::deleteAllEvents();
-        $deletedTerms = self::deleteAllPerformerTerms();
 
         self::deleteOptions();
         self::deleteTransients();
@@ -32,7 +29,6 @@ final class FactoryReset
 
         return [
             'deleted_events' => $deletedEvents,
-            'deleted_terms' => $deletedTerms,
         ];
     }
 
@@ -59,40 +55,19 @@ final class FactoryReset
         return $deleted;
     }
 
-    private static function deleteAllPerformerTerms(): int
-    {
-        $terms = get_terms(
-            [
-                'taxonomy' => PerformerTaxonomy::NAME,
-                'hide_empty' => false,
-                'fields' => 'ids',
-            ]
-        );
-
-        if (! is_array($terms)) {
-            return 0;
-        }
-
-        $deleted = 0;
-
-        foreach ($terms as $termId) {
-            if (! is_wp_error(wp_delete_term((int) $termId, PerformerTaxonomy::NAME))) {
-                ++$deleted;
-            }
-        }
-
-        return $deleted;
-    }
-
     private static function deleteOptions(): void
     {
         $options = [
             'eventmesh_holvi_sources',
             'eventmesh_holvi_source_urls',
+            'eventmesh_holvi_detail_enriched_at',
             'eventmesh_source_settings',
             'eventmesh_artist_map',
             'eventmesh_enable_background_sync',
+            'eventmesh_enable_test_connector',
             'eventmesh_sync_interval',
+            'eventmesh_delete_data_on_uninstall',
+            'eventmesh_last_sync_attempt_at',
             'eventmesh_recent_logs',
         ];
 

@@ -7,7 +7,6 @@ namespace EventMesh\Tests\Services;
 use Brain\Monkey\Functions;
 use EventMesh\Contracts\ConnectorInterface;
 use EventMesh\Core\ConnectorRegistry;
-use EventMesh\Services\ArtistMap;
 use EventMesh\Services\ConnectorManager;
 use EventMesh\Services\EventMediaEnricher;
 use EventMesh\Services\ProviderEmbedEnricher;
@@ -36,7 +35,7 @@ final class SyncRunnerTest extends TestCase
             new EventSynchronizer(
                 $logger,
                 new EventMediaEnricher($logger),
-                new ProviderEnricher(new ArtistMap(), $logger),
+                new ProviderEnricher($logger),
                 new ProviderEmbedEnricher($logger)
             ),
             $logger,
@@ -71,6 +70,11 @@ final class SyncRunnerTest extends TestCase
                 public function label(): string
                 {
                     return 'Disabled Source';
+                }
+
+                public function enabledByDefault(): bool
+                {
+                    return true;
                 }
 
                 public function fetch(): array

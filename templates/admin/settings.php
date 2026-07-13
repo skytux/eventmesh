@@ -2,16 +2,10 @@
 /**
  * Settings admin view.
  *
- * @var string $holvi_source_urls Holvi source URLs configured for syncing.
- * @var string $artist_map_json   Artist/provider mapping JSON.
- * @var array<int, array{id: string, label: string}> $connector_rows Registered connector rows.
- * @var array<string, bool> $source_settings Source enablement settings.
  * @var bool $background_sync_enabled Whether background sync is enabled.
  * @var string $sync_interval Currently configured background sync interval key.
  * @var array<string, string> $sync_intervals Available interval keys mapped to labels.
  * @var bool $delete_data_on_uninstall Whether uninstalling the plugin should also delete its data.
- * @var bool $enable_test_connector Whether the built-in dummy/test connector is enabled.
- * @var bool $test_connector_forced Whether the wp-config constant forces the test connector on.
  */
 
 declare(strict_types=1);
@@ -30,34 +24,6 @@ if (! defined('ABSPATH')) {
 
         <table class="form-table" role="presentation">
             <tbody>
-                <tr>
-                    <th scope="row">
-                        <?php esc_html_e('Enabled sources', 'eventmesh'); ?>
-                    </th>
-                    <td>
-                        <fieldset>
-                            <legend class="screen-reader-text">
-                                <?php esc_html_e('Enabled sources', 'eventmesh'); ?>
-                            </legend>
-                            <?php if ([] === $connector_rows) : ?>
-                                <p class="description">
-                                    <?php esc_html_e('No connectors are registered yet.', 'eventmesh'); ?>
-                                </p>
-                            <?php endif; ?>
-                            <?php foreach ($connector_rows as $connector_row) : ?>
-                                <label style="display: block; margin-bottom: 4px;">
-                                    <?php // The hidden 0 submits when the checkbox is unchecked, so unticking actually disables the source. ?>
-                                    <input type="hidden" name="eventmesh_source_enabled[<?php echo esc_attr($connector_row['id']); ?>]" value="0" />
-                                    <input type="checkbox" name="eventmesh_source_enabled[<?php echo esc_attr($connector_row['id']); ?>]" value="1" <?php checked($source_settings[$connector_row['id']] ?? true, true); ?> />
-                                    <?php echo esc_html($connector_row['label']); ?>
-                                </label>
-                            <?php endforeach; ?>
-                            <p class="description">
-                                <?php esc_html_e('Disabling a source archives its events (moves them to Draft) on the next sync; re-enabling it republishes them.', 'eventmesh'); ?>
-                            </p>
-                        </fieldset>
-                    </td>
-                </tr>
                 <tr>
                     <th scope="row">
                         <?php esc_html_e('Background sync', 'eventmesh'); ?>
@@ -93,43 +59,6 @@ if (! defined('ABSPATH')) {
                 </tr>
                 <tr>
                     <th scope="row">
-                        <label for="eventmesh_artist_map">
-                            <?php esc_html_e('Artist provider map', 'eventmesh'); ?>
-                        </label>
-                    </th>
-                    <td>
-                        <textarea
-                            id="eventmesh_artist_map"
-                            name="eventmesh_artist_map"
-                            rows="12"
-                            cols="80"
-                            class="large-text code"
-                        ><?php echo esc_textarea($artist_map_json); ?></textarea>
-                        <p class="description">
-                            <?php esc_html_e('Define a JSON map of artists to provider URLs such as spotify, youtube, mixcloud, bandcamp, and soundcloud.', 'eventmesh'); ?>
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
-                        <?php esc_html_e('Test connector', 'eventmesh'); ?>
-                    </th>
-                    <td>
-                        <label>
-                            <input type="checkbox" name="eventmesh_enable_test_connector" value="1" <?php checked($enable_test_connector || $test_connector_forced, true); ?> <?php disabled($test_connector_forced, true); ?> />
-                            <?php esc_html_e('Enable the built-in test connector (sample event data, no network calls)', 'eventmesh'); ?>
-                        </label>
-                        <p class="description">
-                            <?php if ($test_connector_forced) : ?>
-                                <?php esc_html_e('Forced on by the EVENTMESH_ENABLE_TEST_CONNECTOR constant in wp-config.php.', 'eventmesh'); ?>
-                            <?php else : ?>
-                                <?php esc_html_e('For development and demos only. Adds a "Dummy (testing)" source with sample upcoming, sold-out, canceled, and past events. Leave off in production.', 'eventmesh'); ?>
-                            <?php endif; ?>
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
                         <?php esc_html_e('Uninstalling', 'eventmesh'); ?>
                     </th>
                     <td>
@@ -138,7 +67,7 @@ if (! defined('ABSPATH')) {
                             <?php esc_html_e('Delete all EventMesh data when the plugin is deleted', 'eventmesh'); ?>
                         </label>
                         <p class="description">
-                            <?php esc_html_e('Off by default: deleting the plugin keeps every synced event, term, and setting so reinstalling picks up where you left off.', 'eventmesh'); ?>
+                            <?php esc_html_e('Off by default: deleting the plugin keeps every synced event and setting so reinstalling picks up where you left off.', 'eventmesh'); ?>
                         </p>
                     </td>
                 </tr>
@@ -152,7 +81,7 @@ if (! defined('ABSPATH')) {
 
     <h2><?php esc_html_e('Factory reset', 'eventmesh'); ?></h2>
     <p class="description">
-        <?php esc_html_e('Removes every synced event and performer term, and resets all EventMesh settings to their defaults. The plugin itself stays installed and active. This cannot be undone.', 'eventmesh'); ?>
+        <?php esc_html_e('Removes every synced event and resets all EventMesh settings to their defaults. The plugin itself stays installed and active. This cannot be undone.', 'eventmesh'); ?>
     </p>
     <form
         method="post"
