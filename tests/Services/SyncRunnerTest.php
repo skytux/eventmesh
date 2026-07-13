@@ -112,6 +112,37 @@ final class SyncRunnerTest extends TestCase
         self::assertSame(2, $summary['connectors'][0]['archived']);
     }
 
+    public function testRunArchivesEventsWhoseConnectorIsNoLongerRegistered(): void
+    {
+        Functions\when('get_transient')->justReturn(false);
+        Functions\when('set_transient')->justReturn(true);
+        Functions\when('delete_transient')->justReturn(true);
+        Functions\when('update_option')->justReturn(true);
+        Functions\when('is_wp_error')->justReturn(false);
+
+        // Events from a connector that no longer exists (e.g. the test
+        // connector after its toggle was switched off), plus one manually
+        // created event with no source id that must be left alone.
+        $this->queueQueryResults([21, 22]);
+        Functions\when('get_post_meta')->alias(
+            static fn (int $postId) => 21 === $postId ? 'ghost' : ''
+        );
+
+        $drafted = [];
+        Functions\when('wp_update_post')->alias(
+            static function (array $postData) use (&$drafted): int {
+                $drafted[] = (int) $postData['ID'];
+
+                return (int) $postData['ID'];
+            }
+        );
+
+        $summary = $this->runner()->run();
+
+        self::assertSame([21], $drafted);
+        self::assertSame(1, $summary['archived']);
+    }
+
     public function testRunSkipsEntirelyWhenALockIsAlreadyHeld(): void
     {
         Functions\when('get_transient')->justReturn(time());

@@ -233,6 +233,15 @@ final class SyncRunner
             );
         }
 
+        // Only a full run can judge orphanhood: a targeted run (explicit
+        // $connectorIds) deliberately looks at a subset, so "not in the list"
+        // wouldn't mean "no longer registered".
+        if (null === $connectorIds) {
+            $summary['archived'] += $this->synchronizer->pruneOrphanedSources(
+                array_keys($this->connectors->all())
+            );
+        }
+
         return $summary;
     }
 

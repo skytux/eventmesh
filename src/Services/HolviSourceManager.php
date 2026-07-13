@@ -74,7 +74,12 @@ final class HolviSourceManager
             $normalized[] = [
                 'id' => (string) ($source['id'] ?? $index),
                 'url' => esc_url_raw($url),
-                'enabled' => (bool) ($source['enabled'] ?? true),
+                // Default to DISABLED when absent: an unchecked checkbox
+                // submits nothing, so defaulting to true made it impossible
+                // to ever switch a row off (the form pairs each checkbox
+                // with a hidden 0, so a present-and-checked box still
+                // arrives as 1).
+                'enabled' => (bool) ($source['enabled'] ?? false),
             ];
         }
 

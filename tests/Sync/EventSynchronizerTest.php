@@ -157,6 +157,53 @@ final class EventSynchronizerTest extends TestCase
         self::assertSame([20], $draftedIds);
     }
 
+    public function testPruneOrphanedSourcesDraftsPostsOfUnregisteredConnectors(): void
+    {
+        $this->queueQueryResults([10, 20, 30]);
+
+        Functions\when('get_post_meta')->alias(
+            static function (int $postId) {
+                return match ($postId) {
+                    10 => 'holvi',
+                    20 => 'ghost-connector',
+                    30 => 'holvi',
+                    default => '',
+                };
+            }
+        );
+
+        $draftedIds = [];
+        Functions\when('wp_update_post')->alias(
+            static function (array $postarr) use (&$draftedIds) {
+                $draftedIds[] = $postarr['ID'];
+
+                return $postarr['ID'];
+            }
+        );
+
+        $archived = $this->synchronizer()->pruneOrphanedSources(['holvi']);
+
+        self::assertSame(1, $archived);
+        self::assertSame([20], $draftedIds);
+    }
+
+    public function testPruneOrphanedSourcesLeavesManuallyCreatedEventsAlone(): void
+    {
+        $this->queueQueryResults([40]);
+
+        // No _eventmesh_source_id at all: a hand-made event, never owned by
+        // any connector - it must not be archived by connector cleanup.
+        Functions\when('get_post_meta')->justReturn('');
+
+        Functions\when('wp_update_post')->alias(
+            static function (): void {
+                TestCase::fail('A manually created event (no source id) must never be archived.');
+            }
+        );
+
+        self::assertSame(0, $this->synchronizer()->pruneOrphanedSources(['holvi']));
+    }
+
     public function testSyncDoesNotOverwriteAnExistingVenueWhenTheFetchFoundNone(): void
     {
         $this->queueQueryResults([77]);

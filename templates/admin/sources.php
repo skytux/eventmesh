@@ -33,6 +33,7 @@ $next_index = max(1, count($holvi_sources) > 0 ? max(array_keys($holvi_sources))
                 <?php foreach ($holvi_sources as $index => $source) : ?>
                     <div class="eventmesh-holvi-source-row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
                         <label>
+                            <input type="hidden" name="eventmesh_holvi_sources[<?php echo esc_attr((string) $index); ?>][enabled]" value="0" />
                             <input type="checkbox" name="eventmesh_holvi_sources[<?php echo esc_attr((string) $index); ?>][enabled]" value="1" <?php checked($source['enabled'], true); ?> />
                             <?php esc_html_e('Enabled', 'eventmesh'); ?>
                         </label>
@@ -47,6 +48,7 @@ $next_index = max(1, count($holvi_sources) > 0 ? max(array_keys($holvi_sources))
                 <?php if ([] === $holvi_sources) : ?>
                     <div class="eventmesh-holvi-source-row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
                         <label>
+                            <input type="hidden" name="eventmesh_holvi_sources[0][enabled]" value="0" />
                             <input type="checkbox" name="eventmesh_holvi_sources[0][enabled]" value="1" checked="checked" />
                             <?php esc_html_e('Enabled', 'eventmesh'); ?>
                         </label>
@@ -127,7 +129,7 @@ $next_index = max(1, count($holvi_sources) > 0 ? max(array_keys($holvi_sources))
         row.style.alignItems = 'center';
         row.style.gap = '8px';
         row.style.marginBottom = '8px';
-        row.innerHTML = '<label><input type="checkbox" name="eventmesh_holvi_sources[' + nextIndex + '][enabled]" value="1" checked="checked" /> <?php echo esc_js(__('Enabled', 'eventmesh')); ?></label><input type="text" name="eventmesh_holvi_sources[' + nextIndex + '][url]" value="" class="regular-text" placeholder="https://example.com" /><input type="hidden" name="eventmesh_holvi_sources[' + nextIndex + '][id]" value="" /><button type="button" class="button eventmesh-remove-holvi-source"><?php echo esc_js(__('Remove', 'eventmesh')); ?></button>';
+        row.innerHTML = '<label><input type="hidden" name="eventmesh_holvi_sources[' + nextIndex + '][enabled]" value="0" /><input type="checkbox" name="eventmesh_holvi_sources[' + nextIndex + '][enabled]" value="1" checked="checked" /> <?php echo esc_js(__('Enabled', 'eventmesh')); ?></label><input type="text" name="eventmesh_holvi_sources[' + nextIndex + '][url]" value="" class="regular-text" placeholder="https://example.com" /><input type="hidden" name="eventmesh_holvi_sources[' + nextIndex + '][id]" value="" /><button type="button" class="button eventmesh-remove-holvi-source"><?php echo esc_js(__('Remove', 'eventmesh')); ?></button>';
         container.appendChild(row);
         nextIndex += 1;
     });
