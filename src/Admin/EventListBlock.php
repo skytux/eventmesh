@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EventMesh\Admin;
 
 use EventMesh\Connectors\Holvi\HolviHtmlParser;
+use EventMesh\Content\EventPostType;
 use EventMesh\Content\EventQuery;
 use EventMesh\Support\EmbedHtmlSanitizer;
 use EventMesh\Support\EventStatus;
@@ -77,12 +78,70 @@ final class EventListBlock
             ]
         );
 
-        // The Query Loop block's own query attributes can't express
-        // "upcoming events first, past events sorted to the bottom" -
-        // override it server-side regardless of what the editor UI shows.
+        // A plain (namespace-less) events Query Loop can't express "upcoming
+        // first, past events sorted to the bottom" through the editor UI -
+        // override its ordering server-side. The two namespaced variations
+        // (below) instead restrict to only-upcoming / only-past.
         add_filter('query_loop_block_query_vars', [$this->eventQuery, 'markQueryLoopUpcomingFirst']);
         add_filter('query_loop_block_query_vars', [$this, 'resetPastEventsMarker']);
-        add_filter('render_block', [$this, 'markEventRowStatus'], 10, 3);
+        add_filter('pre_render_block', [$this, 'scopeQueryLoopTime'], 10, 2);
+    }
+
+    /**
+     * Binds the eventmesh/upcoming-events and eventmesh/past-events Query Loop
+     * variations to a time-scoped query. The variation's namespace isn't
+     * exposed to query_loop_block_query_vars directly (only the block's
+     * context is), so this reads it from the parsed core/query block here and
+     * registers a query-vars filter scoped to that block's queryId - which
+     * *is* in the child context - so two loops on one page never cross-filter.
+     *
+     * @param string|null          $preRender   Short-circuit render (left untouched).
+     * @param array<string, mixed> $parsedBlock
+     *
+     * @return string|null
+     */
+    public function scopeQueryLoopTime($preRender, array $parsedBlock)
+    {
+        if ('core/query' !== ($parsedBlock['blockName'] ?? '')) {
+            return $preRender;
+        }
+
+        $time = match ($parsedBlock['attrs']['namespace'] ?? '') {
+            'eventmesh/upcoming-events' => 'upcoming',
+            'eventmesh/past-events' => 'past',
+            default => null,
+        };
+
+        if (null === $time) {
+            return $preRender;
+        }
+
+        $queryId = (int) ($parsedBlock['attrs']['queryId'] ?? 0);
+
+        add_filter(
+            'query_loop_block_query_vars',
+            function (array $query, $block) use ($queryId, $time): array {
+                // Guard on both the queryId (distinguishes our two loops from
+                // each other) and the post type (so this can never touch an
+                // unrelated query loop that happens to share a queryId).
+                $context = is_object($block) && isset($block->context) && is_array($block->context)
+                    ? $block->context
+                    : [];
+
+                if (
+                    (int) ($context['queryId'] ?? 0) === $queryId
+                    && EventPostType::NAME === ($query['post_type'] ?? '')
+                ) {
+                    return $this->eventQuery->applyTimeToQueryVars($query, $time);
+                }
+
+                return $query;
+            },
+            10,
+            2
+        );
+
+        return $preRender;
     }
 
     /**
@@ -123,64 +182,6 @@ final class EventListBlock
             : __('Past Events', 'eventmesh');
 
         return sprintf('<%1$s %2$s>%3$s</%1$s>', esc_html($tag), get_block_wrapper_attributes(), esc_html($text));
-    }
-
-    /**
-     * Adds visual "past"/"sold out" marker classes to an event row's
-     * wrapping columns block, so a stale Holvi listing that hasn't been
-     * removed from the source, or a sold-out event, sinks visually instead
-     * of looking identical to a regular upcoming one. Both classes are
-     * independent (a sold-out event can be upcoming or past) and can both
-     * apply to the same row. Scoped narrowly to core/columns blocks
-     * carrying the row's own className, rather than post_type generally, to
-     * avoid any effect on unrelated columns elsewhere on a page.
-     *
-     * Uses the render_block output filter rather than render_block_data:
-     * the latter only fires for the top-level blocks WordPress parses
-     * directly out of post_content, never for blocks nested inside another
-     * block's inner blocks (as this columns row is, several levels under
-     * core/query > core/post-template) - render_block fires for every
-     * block's own WP_Block::render() call regardless of nesting depth.
-     *
-     * @param array<string, mixed> $parsedBlock
-     */
-    public function markEventRowStatus(string $blockContent, array $parsedBlock, $blockInstance): string
-    {
-        if ('core/columns' !== ($parsedBlock['blockName'] ?? '')) {
-            return $blockContent;
-        }
-
-        $className = (string) ($parsedBlock['attrs']['className'] ?? '');
-
-        if (! str_contains($className, 'eventmesh-event-row')) {
-            return $blockContent;
-        }
-
-        $postId = $this->contextPostId($blockInstance);
-
-        if (0 === $postId) {
-            return $blockContent;
-        }
-
-        $extraClasses = trim(
-            ($this->isPastEvent($postId) ? 'eventmesh-event-past ' : '') .
-            ($this->isSoldOut($postId) ? 'eventmesh-sold-out-row ' : '')
-        );
-
-        if ('' === $extraClasses) {
-            return $blockContent;
-        }
-
-        // The rendered content's very first class="..." attribute belongs
-        // to this block's own root wrapper element (its children, already
-        // rendered into $blockContent by this point, come after it) - safe
-        // to target with a single replacement.
-        return (string) preg_replace(
-            '/class="/',
-            'class="' . $extraClasses . ' ',
-            $blockContent,
-            1
-        );
     }
 
     private function isPastEvent(int $postId): bool
@@ -746,13 +747,15 @@ final class EventListBlock
     }
 
     /**
-     * A Query Loop built mostly from core blocks (columns, featured image,
-     * details, group) for layout, with the per-event date/title/venue/
-     * ticket-link values rendered by this plugin's own small dynamic blocks
-     * (eventmesh/event-field, eventmesh/ticket-button) rather than Block
-     * Bindings on core blocks. Everything around those - groups, spacers,
-     * columns, the details toggle - remains ordinary, freely rearrangeable
-     * blocks.
+     * Two independent Query Loops - one upcoming, one past - each built mostly
+     * from core blocks (heading, columns, featured image, details, group) with
+     * the per-event date/title/venue/price values rendered by this plugin's
+     * own small dynamic blocks. The two core/query blocks carry the
+     * eventmesh/upcoming-events and eventmesh/past-events namespaces (with
+     * distinct queryIds), which scopeQueryLoopTime() reads to restrict each
+     * to its own time window. Kept as separate loops - rather than one loop
+     * with a divider - so each section (its heading, and its cards' own
+     * background/styling) can be edited or removed entirely on its own.
      */
     private function registerQueryLoopPattern(): void
     {
@@ -760,10 +763,13 @@ final class EventListBlock
         // a single line, so the long lines in this markup can't be wrapped.
         // phpcs:disable Generic.Files.LineLength.TooLong
         $content = <<<'HTML'
-<!-- wp:query {"query":{"perPage":6,"pages":0,"offset":0,"postType":"eventmesh_event","order":"asc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"}} -->
+<!-- wp:heading -->
+<h2 class="wp-block-heading">__EVENTMESH_UPCOMING__</h2>
+<!-- /wp:heading -->
+
+<!-- wp:query {"queryId":1,"query":{"perPage":10,"pages":0,"offset":0,"postType":"eventmesh_event","order":"asc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"namespace":"eventmesh/upcoming-events","displayLayout":{"type":"list"}} -->
 <div class="wp-block-query">
 <!-- wp:post-template -->
-<!-- wp:eventmesh/past-events-marker /-->
 <!-- wp:columns {"verticalAlignment":"top","className":"eventmesh-event-row"} -->
 <div class="wp-block-columns are-vertically-aligned-top eventmesh-event-row">
 
@@ -792,8 +798,6 @@ final class EventListBlock
 
 <!-- wp:post-content /-->
 
-<!-- wp:eventmesh/ticket-button {"style":{"spacing":{"margin":{"top":"1em"}}}} /-->
-
 </div>
 <!-- /wp:group -->
 
@@ -815,7 +819,47 @@ final class EventListBlock
 
 <!-- wp:query-no-results -->
 <!-- wp:paragraph -->
-<p>__EVENTMESH_NO_RESULTS__</p>
+<p>__EVENTMESH_NO_UPCOMING__</p>
+<!-- /wp:paragraph -->
+<!-- /wp:query-no-results -->
+</div>
+<!-- /wp:query -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">__EVENTMESH_PAST__</h2>
+<!-- /wp:heading -->
+
+<!-- wp:query {"queryId":2,"query":{"perPage":10,"pages":0,"offset":0,"postType":"eventmesh_event","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"namespace":"eventmesh/past-events","displayLayout":{"type":"list"}} -->
+<div class="wp-block-query">
+<!-- wp:post-template -->
+<!-- wp:columns {"verticalAlignment":"top","className":"eventmesh-event-row"} -->
+<div class="wp-block-columns are-vertically-aligned-top eventmesh-event-row">
+
+<!-- wp:column {"verticalAlignment":"top","width":"15%"} -->
+<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:15%">
+<!-- wp:post-featured-image {"width":"80px","height":"80px","isLink":true} /-->
+</div>
+<!-- /wp:column -->
+
+<!-- wp:column {"verticalAlignment":"top","width":"85%"} -->
+<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:85%">
+
+<!-- wp:eventmesh/event-field {"field":"starts_at","style":{"typography":{"fontSize":"0.85em"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} /-->
+
+<!-- wp:eventmesh/event-field {"field":"title","style":{"spacing":{"margin":{"top":"0"}}}} /-->
+
+<!-- wp:eventmesh/event-field {"field":"venue","style":{"typography":{"fontSize":"0.85em"},"spacing":{"margin":{"top":"0"}}}} /-->
+
+</div>
+<!-- /wp:column -->
+
+</div>
+<!-- /wp:columns -->
+<!-- /wp:post-template -->
+
+<!-- wp:query-no-results -->
+<!-- wp:paragraph -->
+<p>__EVENTMESH_NO_PAST__</p>
 <!-- /wp:paragraph -->
 <!-- /wp:query-no-results -->
 </div>
@@ -826,18 +870,21 @@ HTML;
         $content = strtr(
             $content,
             [
+                '__EVENTMESH_UPCOMING__' => esc_html__('Upcoming events', 'eventmesh'),
+                '__EVENTMESH_PAST__' => esc_html__('Past events', 'eventmesh'),
                 '__EVENTMESH_SHOW_MORE__' => esc_html__('Show more', 'eventmesh'),
-                '__EVENTMESH_NO_RESULTS__' => esc_html__('No events found.', 'eventmesh'),
+                '__EVENTMESH_NO_UPCOMING__' => esc_html__('No upcoming events.', 'eventmesh'),
+                '__EVENTMESH_NO_PAST__' => esc_html__('No past events.', 'eventmesh'),
             ]
         );
 
         register_block_pattern(
             'eventmesh/event-query-loop-pattern',
             [
-                'title' => __('EventMesh events (editable layout)', 'eventmesh'),
+                'title' => __('EventMesh events (upcoming + past)', 'eventmesh'),
                 'description' => __(
                     // phpcs:ignore Generic.Files.LineLength.TooLong -- single translatable string, must not be split for extraction
-                    'A Query Loop of events built mostly from ordinary blocks (columns, group, details) so the layout can be freely rearranged, restyled, or extended after inserting it.',
+                    'Two separate, independently styleable Query Loops - one for upcoming events, one for past - each under its own heading, built from ordinary blocks so the layout can be freely rearranged, restyled, or removed.',
                     'eventmesh'
                 ),
                 'content' => $content,

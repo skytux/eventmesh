@@ -167,6 +167,36 @@ final class EventQuery
     }
 
     /**
+     * Restricts a Query Loop block's query vars to only upcoming or only past
+     * events, ordered soonest-first / most-recent-first respectively. Used by
+     * the two namespaced core/query variations (eventmesh/upcoming-events and
+     * eventmesh/past-events) so each loop can be styled independently. Wins
+     * over markQueryLoopUpcomingFirst() by clearing its flag, since these two
+     * are mutually exclusive orderings of the same post type.
+     *
+     * @param array<string, mixed> $query
+     *
+     * @return array<string, mixed>
+     */
+    public function applyTimeToQueryVars(array $query, string $time): array
+    {
+        $timeQuery = $this->timeMetaQuery($time);
+
+        if (null === $timeQuery) {
+            return $query;
+        }
+
+        unset($query[self::UPCOMING_FIRST_FLAG]);
+
+        $query['meta_query'] = $timeQuery;
+        $query['meta_key'] = '_eventmesh_starts_at';
+        $query['orderby'] = 'meta_value';
+        $query['order'] = 'past' === $time ? 'DESC' : 'ASC';
+
+        return $query;
+    }
+
+    /**
      * @return array<int|string, mixed>|null Null means "no filter" (all events).
      */
     private function timeMetaQuery(string $time): ?array

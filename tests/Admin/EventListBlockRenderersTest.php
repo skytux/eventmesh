@@ -536,88 +536,50 @@ final class EventListBlockRenderersTest extends TestCase
         self::assertSame('', $html);
     }
 
-    public function testMarkEventRowStatusAddsThePastClassWhenTheEventHasAlreadyHappened(): void
+    public function testScopeQueryLoopTimeTimeScopesOnlyItsOwnVariationQuery(): void
     {
-        Functions\when('get_post_meta')->justReturn('2000-01-01T00:00:00+00:00');
+        $captured = null;
+        Functions\when('add_filter')->alias(
+            static function (string $hook, callable $callback) use (&$captured): bool {
+                if ('query_loop_block_query_vars' === $hook) {
+                    $captured = $callback;
+                }
 
-        $parsedBlock = ['blockName' => 'core/columns', 'attrs' => ['className' => 'eventmesh-event-row']];
-        $content = '<div class="wp-block-columns eventmesh-event-row">stuff</div>';
-
-        $result = $this->block()->markEventRowStatus($content, $parsedBlock, $this->blockInstance(['postId' => 42]));
-
-        self::assertStringContainsString('eventmesh-event-past', $result);
-    }
-
-    public function testMarkEventRowStatusLeavesFutureEventsAlone(): void
-    {
-        Functions\when('get_post_meta')->justReturn('2999-01-01T00:00:00+00:00');
-
-        $parsedBlock = ['blockName' => 'core/columns', 'attrs' => ['className' => 'eventmesh-event-row']];
-        $content = '<div class="wp-block-columns eventmesh-event-row">stuff</div>';
-
-        $result = $this->block()->markEventRowStatus($content, $parsedBlock, $this->blockInstance(['postId' => 42]));
-
-        self::assertSame($content, $result);
-    }
-
-    public function testMarkEventRowStatusIgnoresBlocksWithoutTheEventRowClass(): void
-    {
-        $parsedBlock = ['blockName' => 'core/columns', 'attrs' => ['className' => 'something-else']];
-        $content = '<div class="wp-block-columns something-else">stuff</div>';
-
-        $result = $this->block()->markEventRowStatus($content, $parsedBlock, $this->blockInstance(['postId' => 42]));
-
-        self::assertSame($content, $result);
-    }
-
-    public function testMarkEventRowStatusIgnoresUnrelatedBlockTypes(): void
-    {
-        $parsedBlock = ['blockName' => 'core/paragraph', 'attrs' => []];
-        $content = '<p>stuff</p>';
-
-        $result = $this->block()->markEventRowStatus($content, $parsedBlock, $this->blockInstance(['postId' => 42]));
-
-        self::assertSame($content, $result);
-    }
-
-    public function testMarkEventRowStatusLeavesContentAloneWithoutAPostIdInContext(): void
-    {
-        $parsedBlock = ['blockName' => 'core/columns', 'attrs' => ['className' => 'eventmesh-event-row']];
-        $content = '<div class="wp-block-columns eventmesh-event-row">stuff</div>';
-
-        $result = $this->block()->markEventRowStatus($content, $parsedBlock, $this->blockInstance([]));
-
-        self::assertSame($content, $result);
-    }
-
-    public function testMarkEventRowStatusAddsTheSoldOutClassForAnUpcomingSoldOutEvent(): void
-    {
-        Functions\when('get_post_meta')->alias(
-            static fn (int $postId, string $key) => '_eventmesh_sold_out' === $key ? '1' : '2999-01-01T00:00:00+00:00'
+                return true;
+            }
         );
 
-        $parsedBlock = ['blockName' => 'core/columns', 'attrs' => ['className' => 'eventmesh-event-row']];
-        $content = '<div class="wp-block-columns eventmesh-event-row">stuff</div>';
+        $block = $this->block();
 
-        $result = $this->block()->markEventRowStatus($content, $parsedBlock, $this->blockInstance(['postId' => 42]));
+        // A core/query without an eventmesh namespace registers nothing and is
+        // returned untouched.
+        self::assertNull($block->scopeQueryLoopTime(null, [
+            'blockName' => 'core/query',
+            'attrs' => ['namespace' => 'someone/else', 'queryId' => 5],
+        ]));
+        self::assertNull($captured);
 
-        self::assertStringContainsString('eventmesh-sold-out-row', $result);
-        self::assertStringNotContainsString('eventmesh-event-past', $result);
-    }
+        // The upcoming variation registers a query-vars filter.
+        self::assertNull($block->scopeQueryLoopTime(null, [
+            'blockName' => 'core/query',
+            'attrs' => ['namespace' => 'eventmesh/upcoming-events', 'queryId' => 7],
+        ]));
+        self::assertIsCallable($captured);
 
-    public function testMarkEventRowStatusAddsBothClassesForAPastSoldOutEvent(): void
-    {
-        Functions\when('get_post_meta')->alias(
-            static fn (int $postId, string $key) => '_eventmesh_sold_out' === $key ? '1' : '2000-01-01T00:00:00+00:00'
+        // It time-scopes only the matching queryId + events post type.
+        $matching = $captured(['post_type' => 'eventmesh_event'], $this->blockInstance(['queryId' => 7]));
+        self::assertArrayHasKey('meta_query', $matching, 'The matching loop must be time-scoped.');
+        self::assertSame('ASC', $matching['order'], 'Upcoming events sort soonest-first.');
+
+        // A different queryId, or a non-events query sharing the id, is left alone.
+        self::assertArrayNotHasKey(
+            'meta_query',
+            $captured(['post_type' => 'eventmesh_event'], $this->blockInstance(['queryId' => 8]))
         );
-
-        $parsedBlock = ['blockName' => 'core/columns', 'attrs' => ['className' => 'eventmesh-event-row']];
-        $content = '<div class="wp-block-columns eventmesh-event-row">stuff</div>';
-
-        $result = $this->block()->markEventRowStatus($content, $parsedBlock, $this->blockInstance(['postId' => 42]));
-
-        self::assertStringContainsString('eventmesh-sold-out-row', $result);
-        self::assertStringContainsString('eventmesh-event-past', $result);
+        self::assertArrayNotHasKey(
+            'meta_query',
+            $captured(['post_type' => 'post'], $this->blockInstance(['queryId' => 7]))
+        );
     }
 
     public function testRenderProviderEmbedRendersTheCachedHtml(): void
