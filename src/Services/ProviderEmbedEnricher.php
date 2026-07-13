@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EventMesh\Services;
 
 use EventMesh\Support\EmbedHtmlSanitizer;
+use EventMesh\Support\EventMeta;
 use EventMesh\Support\Logger;
 
 /**
@@ -104,7 +105,9 @@ final class ProviderEmbedEnricher
     private function pickProvider(int $postId): array
     {
         foreach (self::PRIORITY_PROVIDERS as $provider) {
-            $url = trim((string) get_post_meta($postId, '_eventmesh_provider_' . $provider, true));
+            // Resolve so a manually-entered provider link on the edit screen
+            // drives the embed, overriding whatever was scraped.
+            $url = EventMeta::resolve($postId, 'provider_' . $provider);
 
             if ('' !== $url) {
                 return [$provider, $url];

@@ -8,6 +8,7 @@ use EventMesh\Connectors\Holvi\HolviHtmlParser;
 use EventMesh\Content\EventPostType;
 use EventMesh\Content\EventQuery;
 use EventMesh\Support\EmbedHtmlSanitizer;
+use EventMesh\Support\EventMeta;
 use EventMesh\Support\EventStatus;
 use EventMesh\Support\KnownProviders;
 
@@ -186,7 +187,7 @@ final class EventListBlock
 
     private function isPastEvent(int $postId): bool
     {
-        $startsAt = (string) get_post_meta($postId, '_eventmesh_starts_at', true);
+        $startsAt = EventMeta::resolve($postId, 'starts_at');
 
         if ('' === $startsAt) {
             return false;
@@ -197,7 +198,7 @@ final class EventListBlock
 
     private function isSoldOut(int $postId): bool
     {
-        return '1' === (string) get_post_meta($postId, '_eventmesh_sold_out', true);
+        return EventMeta::isSoldOut($postId);
     }
 
     /**
@@ -239,7 +240,7 @@ final class EventListBlock
      */
     private function renderPriceField(int $postId, array $attributes): string
     {
-        $price = trim((string) get_post_meta($postId, '_eventmesh_price', true));
+        $price = EventMeta::resolve($postId, 'price');
 
         if ('' === $price) {
             return '';
@@ -298,7 +299,7 @@ final class EventListBlock
      */
     private function renderVenueField(int $postId, array $attributes): string
     {
-        $venue = (string) get_post_meta($postId, '_eventmesh_venue_name', true);
+        $venue = EventMeta::resolve($postId, 'venue_name');
 
         if ('' === $venue) {
             return '';
@@ -387,9 +388,15 @@ final class EventListBlock
      */
     private function eventDates(int $postId): array
     {
-        $start = $this->parseMetaDate((string) get_post_meta($postId, '_eventmesh_starts_at', true));
-        $end = $this->parseMetaDate((string) get_post_meta($postId, '_eventmesh_ends_at', true));
-        $yearKnown = '1' === (string) get_post_meta($postId, '_eventmesh_starts_at_year_known', true);
+        $start = $this->parseMetaDate(EventMeta::resolve($postId, 'starts_at'));
+        $end = $this->parseMetaDate(EventMeta::resolve($postId, 'ends_at'));
+
+        // A hand-entered start date always carries a full date (year and
+        // all), so trust the year; otherwise fall back to whether the source
+        // stated one.
+        $yearKnown = '' !== EventMeta::resolve($postId, 'starts_at')
+            && ('' !== trim((string) get_post_meta($postId, '_eventmesh_manual_starts_at', true))
+                || '1' === (string) get_post_meta($postId, '_eventmesh_starts_at_year_known', true));
 
         return [$start, $end, $yearKnown];
     }
@@ -563,7 +570,7 @@ final class EventListBlock
      */
     private function ticketButtonLabel(int $postId, array $attributes): string
     {
-        $price = trim((string) get_post_meta($postId, '_eventmesh_price', true));
+        $price = EventMeta::resolve($postId, 'price');
 
         if ('' !== $price) {
             return $price;
@@ -653,18 +660,11 @@ final class EventListBlock
         $labels = KnownProviders::labels();
         $links = [];
 
-        foreach (get_post_meta($postId) as $key => $values) {
-            if (! str_starts_with($key, '_eventmesh_provider_')) {
+        foreach (EventMeta::resolvedProviders($postId) as $providerKey => $url) {
+            if ($url === $embeddedUrl) {
                 continue;
             }
 
-            $url = trim((string) ($values[0] ?? ''));
-
-            if ('' === $url || $url === $embeddedUrl) {
-                continue;
-            }
-
-            $providerKey = substr($key, strlen('_eventmesh_provider_'));
             $label = $labels[$providerKey] ?? ucfirst($providerKey);
 
             $links[] = sprintf('<li><a href="%s">%s</a></li>', esc_url($url), esc_html($label));
