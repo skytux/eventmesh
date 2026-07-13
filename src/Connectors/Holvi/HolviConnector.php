@@ -257,7 +257,8 @@ final class HolviConnector implements ConnectorInterface
                 ? $detailed->startsAtYearKnown()
                 : $event->startsAtYearKnown(),
             soldOut: $event->soldOut() || $detailed->soldOut(),
-            providers: array_merge($event->providers(), $detailed->providers())
+            providers: array_merge($event->providers(), $detailed->providers()),
+            price: '' !== $detailed->price() ? $detailed->price() : $event->price()
         );
     }
 
