@@ -6,8 +6,8 @@
   "category": "widgets",
   "textdomain": "eventmesh",
   "icon": "calendar-alt",
-  "description": "Shows one computed value for the current event in a Query Loop (formatted date, title without its embedded date, or venue). Rendered directly in PHP rather than via Block Bindings.",
-  "keywords": ["event", "date", "venue", "eventmesh"],
+  "description": "Shows one computed value for the current event in a Query Loop: the date & time, title (without its embedded date), venue, price, or a single date/time or date/time range. Rendered directly in PHP rather than via Block Bindings.",
+  "keywords": ["event", "date", "venue", "price", "eventmesh"],
   "usesContext": ["postId"],
   "supports": {
     "html": false,
@@ -45,11 +45,11 @@
     },
     "tag": {
       "type": "string",
-      "default": "h4"
+      "default": "p"
     },
     "linked": {
       "type": "boolean",
-      "default": true
+      "default": false
     }
   },
   "editorScript": "file:./index.js"

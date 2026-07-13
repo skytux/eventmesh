@@ -103,7 +103,7 @@ final class EventListBlockRenderersTest extends TestCase
         self::assertSame('', $html);
     }
 
-    public function testRenderEventFieldTitleStripsTheDateAndLinksToThePost(): void
+    public function testRenderEventFieldTitleStripsTheDateAndDefaultsToAnUnlinkedParagraph(): void
     {
         Functions\when('get_the_title')->justReturn('Some Band 12.8.2026');
         Functions\when('get_permalink')->justReturn('https://example.test/events/some-band/');
@@ -113,8 +113,24 @@ final class EventListBlockRenderersTest extends TestCase
 
         self::assertStringContainsString('Some Band', $html);
         self::assertStringNotContainsString('12.8.2026', $html);
+        self::assertStringStartsWith('<p ', $html, 'Fields default to a paragraph, not a heading.');
+        self::assertStringNotContainsString('<a ', $html, 'Nothing links by default; the link is an opt-in toggle.');
+    }
+
+    public function testRenderEventFieldTitleLinksWhenLinkedIsTurnedOn(): void
+    {
+        Functions\when('get_the_title')->justReturn('Some Band 12.8.2026');
+        Functions\when('get_permalink')->justReturn('https://example.test/events/some-band/');
+        Functions\when('get_post_meta')->justReturn('');
+
+        $html = $this->block()->renderEventField(
+            ['field' => 'title', 'linked' => true],
+            '',
+            $this->blockInstance(['postId' => 42])
+        );
+
         self::assertStringContainsString('https://example.test/events/some-band/', $html);
-        self::assertStringStartsWith('<h4 ', $html);
+        self::assertStringContainsString('<a ', $html);
     }
 
     public function testRenderEventFieldTitleIsNotStruckThroughWhenMerelySoldOut(): void
@@ -193,14 +209,16 @@ final class EventListBlockRenderersTest extends TestCase
         self::assertSame('', $html);
     }
 
-    public function testRenderEventFieldVenueLinksToTheEventPageByDefault(): void
+    public function testRenderEventFieldVenueDoesNotLinkByDefault(): void
     {
         Functions\when('get_permalink')->justReturn('https://example.test/events/some-band/');
         Functions\when('get_post_meta')->justReturn('The Basement Club');
 
         $html = $this->block()->renderEventField(['field' => 'venue'], '', $this->blockInstance(['postId' => 42]));
 
-        self::assertStringContainsString('<a href="https://example.test/events/some-band/">', $html);
+        self::assertStringStartsWith('<p ', $html);
+        self::assertStringNotContainsString('<a ', $html, 'The venue is unlinked by default.');
+        self::assertStringContainsString('The Basement Club', $html);
     }
 
     public function testRenderEventFieldVenueCanBeConfiguredAsAnH2Unlinked(): void
@@ -223,6 +241,136 @@ final class EventListBlockRenderersTest extends TestCase
         $html = $this->block()->renderEventField(['field' => 'starts_at'], '', $this->blockInstance([]));
 
         self::assertSame('', $html);
+    }
+
+    public function testRenderEventFieldPriceRendersThePriceUnlinked(): void
+    {
+        Functions\when('get_post_meta')->alias(
+            static fn (int $postId, string $key) => '_eventmesh_price' === $key ? '€15' : ''
+        );
+
+        $html = $this->block()->renderEventField(['field' => 'price'], '', $this->blockInstance(['postId' => 42]));
+
+        self::assertStringContainsString('€15', $html);
+        self::assertStringStartsWith('<p ', $html);
+        self::assertStringNotContainsString('<a ', $html);
+    }
+
+    public function testRenderEventFieldPriceReturnsEmptyStringWhenThereIsNoPrice(): void
+    {
+        Functions\when('get_post_meta')->justReturn('');
+
+        $html = $this->block()->renderEventField(['field' => 'price'], '', $this->blockInstance(['postId' => 42]));
+
+        self::assertSame('', $html);
+    }
+
+    /**
+     * Meta for an event that starts 13 June 2026 18:00 and ends the next day
+     * at 21:00, so every granular date/time field has something to show.
+     */
+    private function twoDayTimedEventMeta(): void
+    {
+        Functions\when('get_the_title')->justReturn('Some Band');
+        Functions\when('get_post_meta')->alias(
+            static function (int $postId, string $key) {
+                return match ($key) {
+                    '_eventmesh_starts_at' => '2026-06-13T18:00:00+00:00',
+                    '_eventmesh_ends_at' => '2026-06-14T21:00:00+00:00',
+                    '_eventmesh_starts_at_year_known' => '1',
+                    default => '',
+                };
+            }
+        );
+    }
+
+    public function testRenderEventFieldStartDateShowsTheDateWithoutTime(): void
+    {
+        $this->twoDayTimedEventMeta();
+
+        $html = $this->block()->renderEventField(['field' => 'start_date'], '', $this->blockInstance(['postId' => 42]));
+
+        self::assertStringContainsString('Sat 13 June 2026', $html);
+        self::assertStringNotContainsString('18:00', $html);
+    }
+
+    public function testRenderEventFieldEndDateShowsTheEndDate(): void
+    {
+        $this->twoDayTimedEventMeta();
+
+        $html = $this->block()->renderEventField(['field' => 'end_date'], '', $this->blockInstance(['postId' => 42]));
+
+        self::assertStringContainsString('Sun 14 June 2026', $html);
+    }
+
+    public function testRenderEventFieldDateRangeSpansBothDays(): void
+    {
+        $this->twoDayTimedEventMeta();
+
+        $html = $this->block()->renderEventField(['field' => 'date_range'], '', $this->blockInstance(['postId' => 42]));
+
+        self::assertStringContainsString('Sat 13 June 2026 - Sun 14 June 2026', $html);
+    }
+
+    public function testRenderEventFieldStartTimeShowsOnlyTheTime(): void
+    {
+        $this->twoDayTimedEventMeta();
+
+        $html = $this->block()->renderEventField(['field' => 'start_time'], '', $this->blockInstance(['postId' => 42]));
+
+        self::assertStringContainsString('18:00', $html);
+        self::assertStringNotContainsString('June', $html);
+    }
+
+    public function testRenderEventFieldTimeRangeShowsStartAndEndTimes(): void
+    {
+        $this->twoDayTimedEventMeta();
+
+        $html = $this->block()->renderEventField(['field' => 'time_range'], '', $this->blockInstance(['postId' => 42]));
+
+        self::assertStringContainsString('18:00 - 21:00', $html);
+    }
+
+    public function testRenderEventFieldTimeFieldsAreEmptyForADateOnlyEvent(): void
+    {
+        // Midnight start, no end: no time-of-day is known.
+        Functions\when('get_the_title')->justReturn('Some Band');
+        Functions\when('get_post_meta')->alias(
+            static fn (int $postId, string $key) => '_eventmesh_starts_at' === $key ? '2026-06-13T00:00:00+00:00' : ''
+        );
+
+        $block = $this->block();
+
+        self::assertSame(
+            '',
+            $block->renderEventField(['field' => 'start_time'], '', $this->blockInstance(['postId' => 42]))
+        );
+        self::assertSame(
+            '',
+            $block->renderEventField(['field' => 'end_time'], '', $this->blockInstance(['postId' => 42]))
+        );
+        self::assertSame(
+            '',
+            $block->renderEventField(['field' => 'time_range'], '', $this->blockInstance(['postId' => 42]))
+        );
+    }
+
+    public function testRenderEventFieldDateFieldIsStruckThroughWhenCanceled(): void
+    {
+        Functions\when('get_the_title')->justReturn('Some Band CANCELED');
+        Functions\when('get_post_meta')->alias(
+            static function (int $postId, string $key) {
+                return match ($key) {
+                    '_eventmesh_starts_at' => '2026-06-13T18:00:00+00:00',
+                    '_eventmesh_starts_at_year_known' => '1',
+                    default => '',
+                };
+            }
+        );
+
+        $html = $this->block()->renderEventField(['field' => 'start_date'], '', $this->blockInstance(['postId' => 42]));
+
+        self::assertStringContainsString('text-decoration:line-through', $html);
     }
 
     /**
