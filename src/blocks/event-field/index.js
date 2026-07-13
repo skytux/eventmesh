@@ -6,6 +6,7 @@
 	var PanelBody = components.PanelBody;
 	var SelectControl = components.SelectControl;
 	var ToggleControl = components.ToggleControl;
+	var TextControl = components.TextControl;
 	var ServerSideRender = serverSideRender;
 
 	blocks.registerBlockType( 'eventmesh/event-field', {
@@ -62,6 +63,17 @@
 							checked: !! attributes.linked,
 							onChange: function ( value ) {
 								setAttributes( { linked: value } );
+							},
+						} ),
+						el( TextControl, {
+							label: __( 'Prefix', 'eventmesh' ),
+							help: __(
+								'Shown before the value, only when the value exists. Include your own spacing, e.g. "at ".',
+								'eventmesh'
+							),
+							value: attributes.prefix || '',
+							onChange: function ( value ) {
+								setAttributes( { prefix: value } );
 							},
 						} )
 					)

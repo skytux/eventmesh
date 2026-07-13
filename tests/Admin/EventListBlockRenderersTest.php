@@ -236,6 +236,46 @@ final class EventListBlockRenderersTest extends TestCase
         self::assertStringNotContainsString('<a ', $html);
     }
 
+    public function testRenderEventFieldRendersAnEditorSetPrefixBeforeTheValue(): void
+    {
+        Functions\when('get_post_meta')->justReturn('The Basement Club');
+
+        $html = $this->block()->renderEventField(
+            ['field' => 'venue', 'prefix' => 'at '],
+            '',
+            $this->blockInstance(['postId' => 42])
+        );
+
+        self::assertStringContainsString('at The Basement Club', $html);
+    }
+
+    public function testRenderEventFieldPrefixSitsOutsideTheLink(): void
+    {
+        Functions\when('get_permalink')->justReturn('https://example.test/events/some-band/');
+        Functions\when('get_post_meta')->justReturn('The Basement Club');
+
+        $html = $this->block()->renderEventField(
+            ['field' => 'venue', 'prefix' => 'at ', 'linked' => true],
+            '',
+            $this->blockInstance(['postId' => 42])
+        );
+
+        self::assertStringContainsString('at <a ', $html, 'The prefix is plain text before the link, not part of it.');
+    }
+
+    public function testRenderEventFieldPrefixIsHiddenWhenTheValueIsEmpty(): void
+    {
+        Functions\when('get_post_meta')->justReturn('');
+
+        $html = $this->block()->renderEventField(
+            ['field' => 'venue', 'prefix' => 'at '],
+            '',
+            $this->blockInstance(['postId' => 42])
+        );
+
+        self::assertSame('', $html, 'With no venue there is no value, so the prefix must not appear on its own.');
+    }
+
     public function testRenderEventFieldReturnsEmptyStringWithoutAPostIdInContext(): void
     {
         $html = $this->block()->renderEventField(['field' => 'starts_at'], '', $this->blockInstance([]));

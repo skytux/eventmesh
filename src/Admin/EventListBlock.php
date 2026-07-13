@@ -358,6 +358,17 @@ final class EventListBlock
             default => esc_html($text),
         };
 
+        // An optional editor-set prefix (e.g. "at " for a venue), rendered as
+        // plain text before - and outside - any link/strikethrough on the
+        // value. It only ever reaches here when the value is non-empty (each
+        // field bails early otherwise), so it appears with the value and
+        // vanishes with it. The author supplies their own trailing spacing.
+        $prefix = isset($attributes['prefix']) && is_string($attributes['prefix']) ? $attributes['prefix'] : '';
+
+        if ('' !== $prefix) {
+            $inner = esc_html($prefix) . $inner;
+        }
+
         return sprintf('<%1$s %2$s>%3$s</%1$s>', esc_html($tag), get_block_wrapper_attributes(), $inner);
     }
 
