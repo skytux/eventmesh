@@ -76,6 +76,11 @@ final class HolviConnectorTest extends TestCase
         self::assertSame('Authentic Dating 26.5.2026', $event->title());
         self::assertStringContainsString('Haluatko tutustua', $event->description());
         self::assertSame(self::DETAIL_URL, $event->url());
+        self::assertStringContainsString(
+            '39.00',
+            $event->price(),
+            'The detail-page price must survive the enrichment merge, not be dropped.'
+        );
         self::assertSame(0, $connector->fetchErrors());
     }
 
