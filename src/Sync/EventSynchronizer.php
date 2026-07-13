@@ -174,6 +174,76 @@ final class EventSynchronizer
         return $archived;
     }
 
+    /**
+     * Move published posts to Draft when the source that owns them is no
+     * longer registered at all - a connector that was uninstalled, or the
+     * test connector after its toggle was switched off. Skipping such posts
+     * (as the per-connector sync loop necessarily does, having no connector
+     * to iterate for them) would leave content live that nothing can ever
+     * update or retire again.
+     *
+     * Posts with no _eventmesh_source_id at all (manually created events)
+     * are deliberately left alone - they were never owned by a connector.
+     *
+     * @param array<int, string> $knownSourceIds IDs of every currently registered connector.
+     */
+    public function pruneOrphanedSources(array $knownSourceIds): int
+    {
+        $query = new WP_Query(
+            [
+                'post_type' => EventPostType::NAME,
+                'post_status' => 'publish',
+                'posts_per_page' => -1,
+                'fields' => 'ids',
+                'no_found_rows' => true,
+            ]
+        );
+
+        $archived = 0;
+
+        foreach ($query->posts as $postId) {
+            $postId = (int) $postId;
+            $sourceId = (string) get_post_meta($postId, '_eventmesh_source_id', true);
+
+            if ('' === $sourceId || in_array($sourceId, $knownSourceIds, true)) {
+                continue;
+            }
+
+            $result = wp_update_post(
+                [
+                    'ID' => $postId,
+                    'post_status' => 'draft',
+                ],
+                true
+            );
+
+            if (is_wp_error($result)) {
+                $this->logger->error(
+                    sprintf(
+                        'Failed to archive orphaned event #%d (source "%s"): %s',
+                        $postId,
+                        $sourceId,
+                        $result->get_error_message()
+                    )
+                );
+                continue;
+            }
+
+            ++$archived;
+        }
+
+        if ($archived > 0) {
+            $this->logger->info(
+                sprintf(
+                    'Archived %d event(s) whose source connector is no longer registered.',
+                    $archived
+                )
+            );
+        }
+
+        return $archived;
+    }
+
     private function findExistingPostId(Event $event): int
     {
         $query = new WP_Query(
