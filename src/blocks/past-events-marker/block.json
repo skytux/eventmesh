@@ -4,6 +4,7 @@
   "name": "eventmesh/past-events-marker",
   "title": "EventMesh past events marker",
   "category": "widgets",
+  "textdomain": "eventmesh",
   "icon": "calendar-alt",
   "description": "Inside a Query Loop of events, renders a heading exactly once, right at the point where upcoming events give way to past ones. Renders nothing for every other post. Rendered directly in PHP, not via Block Bindings.",
   "keywords": ["past", "events", "divider", "eventmesh"],

@@ -4,6 +4,7 @@
   "name": "eventmesh/event-field",
   "title": "EventMesh event field",
   "category": "widgets",
+  "textdomain": "eventmesh",
   "icon": "calendar-alt",
   "description": "Shows one computed value for the current event in a Query Loop (formatted date, title without its embedded date, or venue). Rendered directly in PHP rather than via Block Bindings.",
   "keywords": ["event", "date", "venue", "eventmesh"],

@@ -2,11 +2,12 @@
 /**
  * Plugin Name: EventMesh
  * Description: Synchronize external event sources into native WordPress content.
- * Version: 0.1.0-alpha
+ * Version: 1.0.0
  * Requires at least: 6.8
  * Requires PHP: 8.2
- * Author: You
- * License: GPL-2.0-or-later
+ * Author: Lou H
+ * License: GPL-2.0
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: eventmesh
  */
 
@@ -16,7 +17,7 @@ if (! defined('ABSPATH')) {
 	exit;
 }
 
-define('EVENTMESH_VERSION', '0.1.0-alpha');
+define('EVENTMESH_VERSION', '1.0.0');
 define('EVENTMESH_PLUGIN_FILE', __FILE__);
 define('EVENTMESH_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('EVENTMESH_PLUGIN_URL', plugin_dir_url(__FILE__));

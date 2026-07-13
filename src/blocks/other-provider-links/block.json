@@ -4,6 +4,7 @@
   "name": "eventmesh/other-provider-links",
   "title": "EventMesh other provider links",
   "category": "widgets",
+  "textdomain": "eventmesh",
   "icon": "admin-links",
   "description": "Lists any of the current event's provider links other than the one already shown as a compact embed. Rendered directly in PHP, not via Block Bindings.",
   "keywords": ["providers", "links", "eventmesh"],
