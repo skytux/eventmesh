@@ -1,0 +1,12 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^cd 'c:\\\\Users\\\\Lou\\\\Nextcloud\\\\Documents\\\\Projects\\\\wordpress-eventmesh' ; php -l src/Admin/DashboardPage\\.php ; php -l templates/admin/dashboard\\.php$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^cd 'c:\\\\Users\\\\Lou\\\\Nextcloud\\\\Documents\\\\Projects\\\\wordpress-eventmesh' ; php -l src/Content/PerformerTaxonomy\\.php ; php -l src/Core/Kernel\\.php$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}
