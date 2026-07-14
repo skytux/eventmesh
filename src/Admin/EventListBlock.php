@@ -358,15 +358,22 @@ final class EventListBlock
             default => esc_html($text),
         };
 
-        // An optional editor-set prefix (e.g. "at " for a venue), rendered as
-        // plain text before - and outside - any link/strikethrough on the
-        // value. It only ever reaches here when the value is non-empty (each
-        // field bails early otherwise), so it appears with the value and
-        // vanishes with it. The author supplies their own trailing spacing.
+        // Optional editor-set prefix/suffix (e.g. "at " before a venue, or
+        // " onwards" after a start date), rendered as plain text outside any
+        // link/strikethrough on the value. They only ever reach here when the
+        // value is non-empty (each field bails early otherwise), so they appear
+        // with the value and vanish with it. The author supplies their own
+        // spacing.
         $prefix = isset($attributes['prefix']) && is_string($attributes['prefix']) ? $attributes['prefix'] : '';
 
         if ('' !== $prefix) {
             $inner = esc_html($prefix) . $inner;
+        }
+
+        $suffix = isset($attributes['suffix']) && is_string($attributes['suffix']) ? $attributes['suffix'] : '';
+
+        if ('' !== $suffix) {
+            $inner .= esc_html($suffix);
         }
 
         return sprintf('<%1$s %2$s>%3$s</%1$s>', esc_html($tag), get_block_wrapper_attributes(), $inner);
@@ -559,7 +566,13 @@ final class EventListBlock
             return sprintf('<span %s>%s</span>', $wrapperAttributes, esc_html__('Sold out', 'eventmesh'));
         }
 
-        $text = $this->ticketButtonLabel($postId, $attributes);
+        // Optional editor-set prefix/suffix wrap the resolved label (price,
+        // custom text, or "Tickets"), e.g. "From €15 →". Plain text, author
+        // supplies their own spacing. Deliberately not applied to the sold-out
+        // state above, which is a status that overrides the label entirely.
+        $prefix = isset($attributes['prefix']) && is_string($attributes['prefix']) ? $attributes['prefix'] : '';
+        $suffix = isset($attributes['suffix']) && is_string($attributes['suffix']) ? $attributes['suffix'] : '';
+        $text = $prefix . $this->ticketButtonLabel($postId, $attributes) . $suffix;
 
         $wrapperAttributes = get_block_wrapper_attributes(
             [

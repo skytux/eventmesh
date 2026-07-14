@@ -90,6 +90,7 @@ No. The only outgoing requests are the ones described under External services, a
 * Holvi connector with multi-URL source management.
 * Events post type with background sync, locking, and cron fallback.
 * Gutenberg blocks: event list, event field (date/title/venue), ticket button, provider embed, other-provider links, past-events marker.
+* Optional editor-set prefix and suffix on the event-field and ticket-button blocks (e.g. "at Venue", "From €15 →").
 * Provider links parsed from source pages, with oEmbed embeds for Spotify, YouTube, Mixcloud, Bandcamp, and SoundCloud.
 * Per-event overrides for every field — title, description, date, venue, price, sold-out, provider links, and the featured image — that survive re-sync, each with a "Follow source again".
 * Sold-out and CANCELED handling, past/upcoming ordering with a divider.
