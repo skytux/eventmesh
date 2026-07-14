@@ -19,7 +19,8 @@ EventMesh pulls event listings from external sources into real WordPress posts (
 * **Background sync** — events are imported and kept up to date on a schedule you choose (15 minutes to daily), with a visitor-triggered fallback when WP-Cron is unreliable and a sync-health panel under Diagnostics.
 * **Holvi connector** — point the plugin at one or more Holvi shop URLs and their event listings are imported, including dates, venues, images, sold-out state, and ticket links.
 * **Gutenberg blocks** — an event list block plus Query Loop-ready blocks for the event date, title, venue, ticket button, provider embeds (Spotify, YouTube, Mixcloud, Bandcamp, SoundCloud), and a "Past Events" divider. All blocks support the standard color, typography, border, and spacing controls.
-* **Provider links & embeds** — provider links (Spotify, YouTube, Mixcloud, Bandcamp, SoundCloud) found on a source's event page are attached to the event and rendered as embeds. Every field and link is editable per event from the editor, and your overrides survive the next sync.
+* **Provider links & embeds** — provider links (Spotify, YouTube, Mixcloud, Bandcamp, SoundCloud) found on a source's event page are attached to the event and rendered as embeds.
+* **Editable overrides** — every event field (title, description, date, venue, price, sold-out state, and provider links) and the featured image is editable per event and kept on the next sync. A per-field "Follow source again" discards your version and returns to the source whenever you want it.
 * **Sold out and canceled handling** — sold-out events show a non-clickable Sold out state, events with CANCELED in the title are struck through, and past events sort below upcoming ones under a divider.
 * **Reversible source management** — disable a source and its events are archived (moved to Draft) on the next sync; re-enable it and they are republished. Uninstalling keeps your data unless you opt in to deletion.
 * **Connector-agnostic architecture** — new sources can be added as connectors without touching the core plugin.
@@ -64,7 +65,7 @@ It is archived (moved to Draft), not deleted. If it reappears at the source, it 
 
 = Can I edit synced events? =
 
-Yes — they are normal posts. Fields EventMesh manages (title, dates, ticket link) are overwritten on the next sync; everything else you add is kept. The venue is preserved once set, even if a later sync cannot find one.
+Yes — they are normal posts. Edit the title, description, or featured image right in the editor, or override the date, venue, price, sold-out state, and provider links in the EventMesh box; your changes are kept on every sync. Each field has a "Follow source again" control that hands it back to the source when you want it. Anything else you add to the post is always kept.
 
 = How do I add another event source? =
 
@@ -90,7 +91,7 @@ No. The only outgoing requests are the ones described under External services, a
 * Events post type with background sync, locking, and cron fallback.
 * Gutenberg blocks: event list, event field (date/title/venue), ticket button, provider embed, other-provider links, past-events marker.
 * Provider links parsed from source pages, with oEmbed embeds for Spotify, YouTube, Mixcloud, Bandcamp, and SoundCloud.
-* Editable per-event field and link overrides that survive re-sync.
+* Per-event overrides for every field — title, description, date, venue, price, sold-out, provider links, and the featured image — that survive re-sync, each with a "Follow source again".
 * Sold-out and CANCELED handling, past/upcoming ordering with a divider.
 * Per-source enablement in the Sources table, with reversible archiving.
 * Status dashboard with an AJAX "Sync now" and last-error reporting.

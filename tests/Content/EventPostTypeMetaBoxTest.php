@@ -108,6 +108,60 @@ final class EventPostTypeMetaBoxTest extends TestCase
         );
     }
 
+    public function testRenderMetaBoxOffersFollowSourceAgainForTitleAndDescription(): void
+    {
+        Functions\when('selected')->alias(static fn ($a, $b, $echo = true) => '');
+        Functions\when('has_post_thumbnail')->justReturn(false);
+        Functions\when('get_post_meta')->justReturn('');
+
+        ob_start();
+        (new EventPostType())->renderMetaBox($this->post());
+        $html = (string) ob_get_clean();
+
+        self::assertStringContainsString('name="eventmesh_reset_title"', $html);
+        self::assertStringContainsString('name="eventmesh_reset_content"', $html);
+    }
+
+    public function testSaveMetaBoxRevertsTitleToTheSourceWhenFollowSourceAgainIsTicked(): void
+    {
+        Functions\when('wp_verify_nonce')->justReturn(true);
+        Functions\when('sanitize_text_field')->alias(static fn ($value) => $value);
+        Functions\when('wp_unslash')->alias(static fn ($value) => $value);
+        Functions\when('esc_url_raw')->alias(static fn ($value) => $value);
+        Functions\when('wp_trim_words')->alias(static fn ($text) => $text);
+        Functions\when('remove_action')->justReturn(true);
+        Functions\when('add_action')->justReturn(true);
+        Functions\when('update_post_meta')->justReturn(true);
+        Functions\when('get_post_meta')->alias(
+            static fn (int $postId, string $key = '', bool $single = false) => '_eventmesh_source_title' === $key
+                ? 'The Source Title'
+                : ''
+        );
+
+        $updated = [];
+        Functions\when('wp_update_post')->alias(
+            static function (array $postarr) use (&$updated) {
+                $updated = $postarr;
+
+                return (int) $postarr['ID'];
+            }
+        );
+
+        $_POST = [
+            'eventmesh_providers_nonce' => 'ok',
+            'eventmesh_reset_title' => '1',
+        ];
+
+        (new EventPostType())->saveMetaBox(42, $this->post());
+
+        self::assertSame('The Source Title', $updated['post_title'] ?? null);
+        self::assertArrayNotHasKey(
+            'post_content',
+            $updated,
+            'Only the ticked field (title) should be reverted; the description was not ticked.'
+        );
+    }
+
     public function testSaveMetaBoxRejectsAnInvalidSoldOutValueAsFollowTheSource(): void
     {
         Functions\when('wp_verify_nonce')->justReturn(true);

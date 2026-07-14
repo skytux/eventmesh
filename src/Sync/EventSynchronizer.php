@@ -25,16 +25,50 @@ final class EventSynchronizer
     public function sync(Event $event): int
     {
         $postId = $this->findExistingPostId($event);
+        $isNew = 0 === $postId;
+
+        $sourceTitle = $event->title();
+        $sourceContent = $event->description();
+
+        // Title and description are native post fields a person edits directly
+        // in the block editor. Only overwrite them while they still match what
+        // this plugin last wrote - once someone has changed either by hand, we
+        // leave it alone so their edit survives every future sync (the edit
+        // screen's "Follow source again" is how they hand control back).
+        $writeTitle = true;
+        $writeContent = true;
+
+        if (! $isNew) {
+            $existing = get_post($postId);
+
+            if ($existing instanceof \WP_Post) {
+                $writeTitle = $this->followsSource(
+                    $existing->post_title,
+                    (string) get_post_meta($postId, '_eventmesh_synced_title', true)
+                );
+                $writeContent = $this->followsSource(
+                    md5((string) $existing->post_content),
+                    (string) get_post_meta($postId, '_eventmesh_synced_content_hash', true)
+                );
+            }
+        }
+
         $postData = [
             'ID' => $postId,
             'post_type' => EventPostType::NAME,
             'post_status' => 'publish',
-            'post_title' => $event->title(),
-            'post_content' => $event->description(),
-            'post_excerpt' => wp_trim_words($event->description(), 55, ''),
         ];
 
-        if (0 === $postId) {
+        if ($writeTitle) {
+            $postData['post_title'] = $sourceTitle;
+        }
+
+        if ($writeContent) {
+            $postData['post_content'] = $sourceContent;
+            $postData['post_excerpt'] = wp_trim_words($sourceContent, 55, '');
+        }
+
+        if ($isNew) {
             unset($postData['ID']);
             $result = wp_insert_post($postData, true);
         } else {
@@ -54,6 +88,21 @@ final class EventSynchronizer
         }
 
         $syncedPostId = (int) $result;
+
+        // Always keep the source's latest title/description on hand so the edit
+        // screen can restore them, and fingerprint whatever we actually wrote
+        // so the next sync can detect a human edit and back off.
+        update_post_meta($syncedPostId, '_eventmesh_source_title', $sourceTitle);
+        update_post_meta($syncedPostId, '_eventmesh_source_content', $sourceContent);
+
+        if ($writeTitle) {
+            update_post_meta($syncedPostId, '_eventmesh_synced_title', $sourceTitle);
+        }
+
+        if ($writeContent) {
+            update_post_meta($syncedPostId, '_eventmesh_synced_content_hash', md5($sourceContent));
+        }
+
         $this->writeMeta($syncedPostId, $event);
         $this->mediaEnricher->enrich($syncedPostId, $event);
         $this->providerEnricher->enrich($syncedPostId, $event);
@@ -242,6 +291,24 @@ final class EventSynchronizer
         }
 
         return $archived;
+    }
+
+    /**
+     * Whether the sync still "owns" a native field and may overwrite it.
+     *
+     * With no fingerprint yet (a brand-new field, or a post from before this
+     * tracking existed) the sync adopts the source exactly as it always did,
+     * and starts fingerprinting from now on. Once a fingerprint exists, the
+     * sync only overwrites while the field still matches it - i.e. nobody has
+     * edited the field by hand since we last wrote it.
+     */
+    private function followsSource(string $current, string $lastWritten): bool
+    {
+        if ('' === $lastWritten) {
+            return true;
+        }
+
+        return $current === $lastWritten;
     }
 
     private function findExistingPostId(Event $event): int
