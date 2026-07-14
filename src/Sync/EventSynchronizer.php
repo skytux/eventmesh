@@ -185,6 +185,13 @@ final class EventSynchronizer
                 continue;
             }
 
+            // An editor can pin an event to stay published even after it leaves
+            // the source (e.g. a recurring night the shop delisted between
+            // dates). Its details simply freeze at the last sync.
+            if ('1' === (string) get_post_meta($postId, '_eventmesh_manual_pinned', true)) {
+                continue;
+            }
+
             $result = wp_update_post(
                 [
                     'ID' => $postId,
