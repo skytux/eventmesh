@@ -131,6 +131,7 @@ final class EventPostTypeMetaBoxTest extends TestCase
         Functions\when('wp_trim_words')->alias(static fn ($text) => $text);
         Functions\when('remove_action')->justReturn(true);
         Functions\when('add_action')->justReturn(true);
+        Functions\when('get_post')->justReturn(null);
         Functions\when('update_post_meta')->justReturn(true);
         Functions\when('get_post_meta')->alias(
             static fn (int $postId, string $key = '', bool $single = false) => '_eventmesh_source_title' === $key

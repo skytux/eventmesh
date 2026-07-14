@@ -374,12 +374,19 @@ final class EventPostType
             wp_update_post($update);
             add_action('save_post_' . self::NAME, [$this, 'saveMetaBox'], 10, 2);
 
-            if ($resetTitle) {
-                update_post_meta($postId, '_eventmesh_synced_title', (string) $update['post_title']);
-            }
+            // Re-fingerprint from the stored post (kses/slashing may have
+            // adjusted the value) so the next sync recognises it as following
+            // the source again rather than a fresh manual edit.
+            $restored = get_post($postId);
 
-            if ($resetContent) {
-                update_post_meta($postId, '_eventmesh_synced_content_hash', md5((string) $update['post_content']));
+            if ($restored instanceof \WP_Post) {
+                if ($resetTitle) {
+                    update_post_meta($postId, '_eventmesh_synced_title', $restored->post_title);
+                }
+
+                if ($resetContent) {
+                    update_post_meta($postId, '_eventmesh_synced_content_hash', md5((string) $restored->post_content));
+                }
             }
         }
 
