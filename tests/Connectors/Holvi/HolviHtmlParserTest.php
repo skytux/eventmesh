@@ -26,7 +26,7 @@ final class HolviHtmlParserTest extends TestCase
 
     private function fixture(string $name): string
     {
-        $contents = file_get_contents(dirname(__DIR__, 2) . '/fixtures/holvi/' . $name);
+        $contents = file_get_contents(dirname(__DIR__, 2) . '/Fixtures/holvi/' . $name);
 
         self::assertIsString($contents);
 
