@@ -422,6 +422,46 @@ final class EventSynchronizerTest extends TestCase
         self::assertSame('New source body', $written['post_content'] ?? null);
     }
 
+    public function testAWordPressReEncodedFieldStillCountsAsFollowingTheSource(): void
+    {
+        $this->queueQueryResults([63]);
+
+        // WordPress stored the source title "Rock & Roll" as "Rock &amp; Roll";
+        // the post and the fingerprint both hold that stored form, so nothing
+        // has been edited by hand and the sync must stay in control.
+        $existing = new \WP_Post();
+        $existing->ID = 63;
+        $existing->post_title = 'Rock &amp; Roll';
+        $existing->post_content = 'Body';
+        Functions\when('get_post')->justReturn($existing);
+        Functions\when('get_post_meta')->alias(
+            static fn (int $postId, string $key = '', bool $single = false) => match ($key) {
+                '_eventmesh_synced_title' => 'Rock &amp; Roll',
+                '_eventmesh_synced_content_hash' => md5('Body'),
+                default => '',
+            }
+        );
+
+        $written = [];
+        Functions\when('wp_update_post')->alias(
+            static function (array $postarr) use (&$written) {
+                $written = $postarr;
+
+                return (int) $postarr['ID'];
+            }
+        );
+
+        $this->synchronizer()->sync(
+            new Event(sourceId: 'holvi', externalId: 'ext-amp', title: 'Rock & Roll', description: 'Body')
+        );
+
+        self::assertSame(
+            'Rock & Roll',
+            $written['post_title'] ?? null,
+            'A field WordPress merely re-encoded on save must still follow the source, not be mistaken for a manual edit.'
+        );
+    }
+
     public function testPruneStaleReturnsZeroWhenNothingIsMissing(): void
     {
         $this->queueQueryResults([10, 20]);

@@ -90,18 +90,15 @@ final class EventSynchronizer
         $syncedPostId = (int) $result;
 
         // Always keep the source's latest title/description on hand so the edit
-        // screen can restore them, and fingerprint whatever we actually wrote
-        // so the next sync can detect a human edit and back off.
+        // screen can restore them.
         update_post_meta($syncedPostId, '_eventmesh_source_title', $sourceTitle);
         update_post_meta($syncedPostId, '_eventmesh_source_content', $sourceContent);
 
-        if ($writeTitle) {
-            update_post_meta($syncedPostId, '_eventmesh_synced_title', $sourceTitle);
-        }
-
-        if ($writeContent) {
-            update_post_meta($syncedPostId, '_eventmesh_synced_content_hash', md5($sourceContent));
-        }
+        // Fingerprint what we wrote as WordPress actually stored it - title and
+        // content pass through kses/slashing on save, so hashing the raw source
+        // value would mistake that sanitisation for a human edit next time and
+        // wrongly freeze the field. Re-read and fingerprint the stored value.
+        $this->fingerprintWrittenFields($syncedPostId, $writeTitle, $writeContent);
 
         $this->writeMeta($syncedPostId, $event);
         $this->mediaEnricher->enrich($syncedPostId, $event);
@@ -291,6 +288,32 @@ final class EventSynchronizer
         }
 
         return $archived;
+    }
+
+    /**
+     * Records the fingerprint of the title/content as WordPress stored them,
+     * re-reading the post so the stored (kses/slashed) form is what a later
+     * sync compares against.
+     */
+    private function fingerprintWrittenFields(int $postId, bool $wroteTitle, bool $wroteContent): void
+    {
+        if (! $wroteTitle && ! $wroteContent) {
+            return;
+        }
+
+        $stored = get_post($postId);
+
+        if (! $stored instanceof \WP_Post) {
+            return;
+        }
+
+        if ($wroteTitle) {
+            update_post_meta($postId, '_eventmesh_synced_title', $stored->post_title);
+        }
+
+        if ($wroteContent) {
+            update_post_meta($postId, '_eventmesh_synced_content_hash', md5((string) $stored->post_content));
+        }
     }
 
     /**
