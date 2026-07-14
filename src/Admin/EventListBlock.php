@@ -73,6 +73,13 @@ final class EventListBlock
         );
 
         register_block_type(
+            EVENTMESH_PLUGIN_DIR . 'src/blocks/all-provider-links',
+            [
+                'render_callback' => [$this, 'renderAllProviderLinks'],
+            ]
+        );
+
+        register_block_type(
             EVENTMESH_PLUGIN_DIR . 'src/blocks/past-events-marker',
             [
                 'render_callback' => [$this, 'renderPastEventsMarker'],
@@ -691,11 +698,41 @@ final class EventListBlock
         }
 
         $embeddedUrl = (string) get_post_meta($postId, '_eventmesh_embed_source_url', true);
+
+        return $this->providerLinksMarkup($postId, $embeddedUrl);
+    }
+
+    /**
+     * Lists every one of the current event's provider links, including any one
+     * also shown as a compact embed - the counterpart to
+     * renderOtherProviderLinks() for when the full set is wanted in one place.
+     *
+     * @param array<string, mixed> $attributes
+     */
+    public function renderAllProviderLinks(array $attributes, string $content, $block): string
+    {
+        $postId = $this->contextPostId($block);
+
+        if (0 === $postId) {
+            return '';
+        }
+
+        return $this->providerLinksMarkup($postId, '');
+    }
+
+    /**
+     * Builds a <ul> of the event's resolved provider links. A non-empty
+     * $skipUrl omits the link whose URL matches it (used to avoid repeating the
+     * one already shown as an embed); '' includes every link. Returns '' when
+     * no links remain, so the block renders nothing rather than an empty list.
+     */
+    private function providerLinksMarkup(int $postId, string $skipUrl): string
+    {
         $labels = KnownProviders::labels();
         $links = [];
 
         foreach (EventMeta::resolvedProviders($postId) as $providerKey => $url) {
-            if ($url === $embeddedUrl) {
+            if ('' !== $skipUrl && $url === $skipUrl) {
                 continue;
             }
 

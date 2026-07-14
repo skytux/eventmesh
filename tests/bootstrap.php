@@ -78,9 +78,16 @@ if (! class_exists('WP_Query')) {
             $this->posts = array_shift(self::$nextResults) ?? [];
         }
 
+        public bool $is_404 = false;
+
         public function get(string $key, mixed $default = false): mixed
         {
             return $this->query_vars[$key] ?? $default;
+        }
+
+        public function set_404(): void
+        {
+            $this->is_404 = true;
         }
     }
 }

@@ -832,6 +832,54 @@ final class EventListBlockRenderersTest extends TestCase
         self::assertSame('', $html);
     }
 
+    public function testRenderAllProviderLinksIncludesTheEmbeddedOneToo(): void
+    {
+        Functions\when('get_post_meta')->alias(
+            static function (int $postId, string $key = '', bool $single = false) {
+                if ('_eventmesh_embed_source_url' === $key) {
+                    return 'https://open.spotify.com/track/abc';
+                }
+
+                if ('' === $key) {
+                    return [
+                        '_eventmesh_provider_spotify' => ['https://open.spotify.com/track/abc'],
+                        '_eventmesh_provider_youtube' => ['https://youtube.com/watch?v=xyz'],
+                    ];
+                }
+
+                return '';
+            }
+        );
+
+        $html = $this->block()->renderAllProviderLinks([], '', $this->blockInstance(['postId' => 42]));
+
+        self::assertStringContainsString(
+            'open.spotify.com/track/abc',
+            $html,
+            'The "all" block lists every link, including the one shown as an embed.'
+        );
+        self::assertStringContainsString('youtube.com/watch?v=xyz', $html);
+        self::assertStringStartsWith('<ul ', $html);
+    }
+
+    public function testRenderAllProviderLinksReturnsEmptyStringWhenTheEventHasNoLinks(): void
+    {
+        Functions\when('get_post_meta')->alias(
+            static fn (int $postId, string $key = '', bool $single = false) => '' === $key ? [] : ''
+        );
+
+        $html = $this->block()->renderAllProviderLinks([], '', $this->blockInstance(['postId' => 42]));
+
+        self::assertSame('', $html);
+    }
+
+    public function testRenderAllProviderLinksReturnsEmptyStringWithoutAPostIdInContext(): void
+    {
+        $html = $this->block()->renderAllProviderLinks([], '', $this->blockInstance([]));
+
+        self::assertSame('', $html);
+    }
+
     public function testRenderPastEventsMarkerRendersOnceForTheFirstPastEvent(): void
     {
         Functions\when('get_post_meta')->justReturn('2000-01-01T00:00:00+00:00');

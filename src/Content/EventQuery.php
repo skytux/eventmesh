@@ -21,9 +21,19 @@ final class EventQuery
      */
     private const UPCOMING_FIRST_FLAG = 'eventmesh_upcoming_first';
 
+    /**
+     * Query var opting a WP_Query into excludeHiddenClause(). Set on every
+     * front-end listing query (recent() and the Query Loop query-var filters)
+     * so an editor's "Hide"/"Disable" flag keeps an event out of listings,
+     * while wp-admin's events table, REST, etc. - which never set it - still
+     * show every event.
+     */
+    private const EXCLUDE_HIDDEN_FLAG = 'eventmesh_exclude_hidden';
+
     public function boot(): void
     {
         add_filter('posts_clauses', [$this, 'applyUpcomingFirstClauses'], 10, 2);
+        add_filter('posts_where', [$this, 'excludeHiddenClause'], 10, 2);
     }
 
     /**
@@ -46,6 +56,7 @@ final class EventQuery
             'post_status' => 'publish',
             'posts_per_page' => 6,
             'no_found_rows' => true,
+            self::EXCLUDE_HIDDEN_FLAG => true,
         ];
 
         if (! isset($args['meta_query'])) {
@@ -115,6 +126,7 @@ final class EventQuery
         }
 
         $query[self::UPCOMING_FIRST_FLAG] = true;
+        $query[self::EXCLUDE_HIDDEN_FLAG] = true;
 
         return $query;
     }
@@ -186,8 +198,32 @@ final class EventQuery
         $query['meta_key'] = '_eventmesh_starts_at';
         $query['orderby'] = 'meta_value';
         $query['order'] = 'past' === $time ? 'DESC' : 'ASC';
+        $query[self::EXCLUDE_HIDDEN_FLAG] = true;
 
         return $query;
+    }
+
+    /**
+     * Excludes events an editor has hidden or disabled from any query that
+     * opted in via EXCLUDE_HIDDEN_FLAG. Done as a NOT IN subquery on postmeta
+     * (rather than a meta_query) so it never disturbs the meta_key/orderby the
+     * time-scoped and upcoming-first listings already depend on. Both flags are
+     * manual-only meta most events never carry.
+     */
+    public function excludeHiddenClause(string $where, WP_Query $query): string
+    {
+        if (! $query->get(self::EXCLUDE_HIDDEN_FLAG)) {
+            return $where;
+        }
+
+        global $wpdb;
+
+        $where .= " AND {$wpdb->posts}.ID NOT IN ("
+            . "SELECT post_id FROM {$wpdb->postmeta}"
+            . " WHERE meta_key IN ('_eventmesh_manual_hidden', '_eventmesh_manual_disabled')"
+            . " AND meta_value = '1')";
+
+        return $where;
     }
 
     /**

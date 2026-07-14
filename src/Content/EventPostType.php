@@ -31,6 +31,30 @@ final class EventPostType
         add_action('add_meta_boxes', [$this, 'registerMetaBox']);
         add_action('save_post_' . self::NAME, [$this, 'saveMetaBox'], 10, 2);
         add_filter('single_template', [$this, 'singleTemplate']);
+        add_action('template_redirect', [$this, 'blockDisabledEvent']);
+    }
+
+    /**
+     * A "Disabled" event is hidden everywhere: its own front-end page returns
+     * 404 as if it didn't exist (it stays editable in wp-admin). A merely
+     * "Hidden" event only drops out of listings - see EventQuery - so its page
+     * still works for anyone with the link.
+     */
+    public function blockDisabledEvent(): void
+    {
+        if (! is_singular(self::NAME)) {
+            return;
+        }
+
+        if ('1' !== (string) get_post_meta(get_queried_object_id(), '_eventmesh_manual_disabled', true)) {
+            return;
+        }
+
+        global $wp_query;
+
+        $wp_query->set_404();
+        status_header(404);
+        nocache_headers();
     }
 
     public function register(): void
@@ -147,6 +171,8 @@ final class EventPostType
 
         wp_nonce_field('eventmesh_save_providers_' . $post->ID, 'eventmesh_providers_nonce');
 
+        $this->renderVisibilityControls($post);
+
         // phpcs:ignore Generic.Files.LineLength.TooLong -- single gettext literal; splitting it breaks extraction.
         echo '<p class="description">' . esc_html__('Each field shows the value found on the last sync; type a value below it to override what appears on the front end. Overrides are kept and never replaced by a later sync. Leave blank to use the found value.', 'eventmesh') . '</p>';
 
@@ -224,6 +250,33 @@ final class EventPostType
                 $label
             )),
             esc_html($stateText)
+        );
+    }
+
+    /**
+     * "Hide" keeps an event out of the front-end listings; "Disable" also
+     * makes its own page return 404. Both are manual-only flags the sync never
+     * touches, so an editor's choice survives every future sync.
+     */
+    private function renderVisibilityControls(\WP_Post $post): void
+    {
+        $hidden = '1' === (string) get_post_meta($post->ID, '_eventmesh_manual_hidden', true);
+        $disabled = '1' === (string) get_post_meta($post->ID, '_eventmesh_manual_disabled', true);
+
+        echo '<p><strong>' . esc_html__('Visibility', 'eventmesh') . '</strong></p>';
+
+        printf(
+            '<p style="margin-bottom:.5em"><label>'
+                . '<input type="checkbox" name="eventmesh_manual_hidden" value="1"%s /> %s</label></p>',
+            checked($hidden, true, false),
+            esc_html__('Hide from event listings', 'eventmesh')
+        );
+
+        printf(
+            '<p style="margin-bottom:.5em"><label>'
+                . '<input type="checkbox" name="eventmesh_manual_disabled" value="1"%s /> %s</label></p>',
+            checked($disabled, true, false),
+            esc_html__('Disable (also returns 404 on its own page)', 'eventmesh')
         );
     }
 
@@ -331,6 +384,8 @@ final class EventPostType
         $this->saveDateOverride($postId, 'starts_at');
         $this->saveDateOverride($postId, 'ends_at');
         $this->saveSoldOutOverride($postId);
+        $this->saveCheckboxOverride($postId, 'hidden');
+        $this->saveCheckboxOverride($postId, 'disabled');
 
         foreach (KnownProviders::labels() as $key => $label) {
             $this->saveTextOverride($postId, 'provider_' . $key, true);
@@ -454,6 +509,19 @@ final class EventPostType
 
         update_post_meta($postId, '_eventmesh_manual_sold_out', $value);
     }
+
+    /**
+     * A visibility checkbox (hidden/disabled): stored as '1' when ticked, ''
+     * otherwise. Unlike the text overrides this always writes, because an
+     * absent checkbox means "unticked", not "leave as-is".
+     */
+    private function saveCheckboxOverride(int $postId, string $baseKey): void
+    {
+        $field = 'eventmesh_manual_' . $baseKey;
+        $value = isset($_POST[$field]) && '1' === (string) $_POST[$field] ? '1' : '';
+
+        update_post_meta($postId, '_eventmesh_manual_' . $baseKey, $value);
+    }
     // phpcs:enable WordPress.Security.NonceVerification.Missing
 
     private function registerMeta(): void
@@ -474,7 +542,8 @@ final class EventPostType
         // Editable manual overrides, written only from the event's own edit
         // screen (never the sync), that win over the scraped value above.
         $manualFields = ['_eventmesh_manual_price', '_eventmesh_manual_venue_name',
-            '_eventmesh_manual_starts_at', '_eventmesh_manual_ends_at', '_eventmesh_manual_sold_out'];
+            '_eventmesh_manual_starts_at', '_eventmesh_manual_ends_at', '_eventmesh_manual_sold_out',
+            '_eventmesh_manual_hidden', '_eventmesh_manual_disabled'];
 
         foreach (KnownProviders::labels() as $key => $label) {
             $manualFields[] = '_eventmesh_manual_provider_' . $key;
