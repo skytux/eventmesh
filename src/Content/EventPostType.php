@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace EventMesh\Content;
 
+use EventMesh\Services\EventMediaEnricher;
 use EventMesh\Services\ProviderEmbedEnricher;
 use EventMesh\Support\KnownProviders;
 
@@ -15,11 +16,12 @@ final class EventPostType
      * Nullable/optional: eventmesh.php's activation hook constructs this
      * class directly (new EventPostType()) just to call register() before
      * the DI container exists yet, and never touches the code path that
-     * needs this - only saveMetaBox() does, which only ever runs through
+     * needs these - only saveMetaBox() does, which only ever runs through
      * the normal Kernel-booted instance.
      */
     public function __construct(
-        private readonly ?ProviderEmbedEnricher $providerEmbedEnricher = null
+        private readonly ?ProviderEmbedEnricher $providerEmbedEnricher = null,
+        private readonly ?EventMediaEnricher $mediaEnricher = null
     ) {
     }
 
@@ -159,6 +161,70 @@ final class EventPostType
         foreach (KnownProviders::labels() as $key => $label) {
             $this->renderOverrideRow($post, 'provider_' . $key, $label, 'url');
         }
+
+        $this->renderSourceResetControls($post);
+    }
+
+    /**
+     * Title, description, and the featured image are native fields a person
+     * edits directly; the sync keeps their edits. This section reports whether
+     * each currently follows the source and offers a per-field "follow source
+     * again" that discards the manual version on save.
+     */
+    private function renderSourceResetControls(\WP_Post $post): void
+    {
+        $titleState = $this->isCustomized(
+            $post->post_title,
+            (string) get_post_meta($post->ID, '_eventmesh_synced_title', true)
+        )
+            ? __('Customized', 'eventmesh')
+            : __('Following source', 'eventmesh');
+
+        $contentState = $this->isCustomized(
+            md5((string) $post->post_content),
+            (string) get_post_meta($post->ID, '_eventmesh_synced_content_hash', true)
+        )
+            ? __('Customized', 'eventmesh')
+            : __('Following source', 'eventmesh');
+
+        echo '<p><strong>' . esc_html__('Synced content', 'eventmesh') . '</strong></p>';
+        // phpcs:ignore Generic.Files.LineLength.TooLong -- single gettext literal; splitting it breaks extraction.
+        echo '<p class="description">' . esc_html__('The title, description, and featured image follow the source until you edit them, then your version is kept on every sync. Tick a box to discard your version and follow the source again when you save.', 'eventmesh') . '</p>';
+
+        $this->renderResetRow('title', __('Title', 'eventmesh'), $titleState);
+        $this->renderResetRow('content', __('Description', 'eventmesh'), $contentState);
+
+        // Only offer the image reset when the source actually has an image to
+        // fall back to; a manual image can't be cheaply told from the source's,
+        // so the state hint is just whether one is currently set.
+        if ('' !== trim((string) get_post_meta($post->ID, '_eventmesh_image_url', true))) {
+            $imageState = has_post_thumbnail($post->ID)
+                ? __('Featured image set', 'eventmesh')
+                : __('No featured image', 'eventmesh');
+
+            $this->renderResetRow('image', __('Featured image', 'eventmesh'), $imageState);
+        }
+    }
+
+    private function isCustomized(string $current, string $fingerprint): bool
+    {
+        return '' !== $fingerprint && $current !== $fingerprint;
+    }
+
+    private function renderResetRow(string $key, string $label, string $stateText): void
+    {
+        printf(
+            '<p style="margin-bottom:.5em"><label>'
+                . '<input type="checkbox" name="eventmesh_reset_%s" value="1" /> %s</label> '
+                . '<span class="description">(%s)</span></p>',
+            esc_attr($key),
+            esc_html(sprintf(
+                /* translators: %s: field name, e.g. Title */
+                __('Follow source again for %s', 'eventmesh'),
+                $label
+            )),
+            esc_html($stateText)
+        );
     }
 
     /**
@@ -270,8 +336,58 @@ final class EventPostType
             $this->saveTextOverride($postId, 'provider_' . $key, true);
         }
 
+        $this->applySourceResets($postId);
+
         $this->providerEmbedEnricher?->enrich($postId);
     }
+
+    /**
+     * Discards the manual title/description/featured-image for any field whose
+     * "Follow source again" box was ticked, restoring the source's last-synced
+     * value and re-fingerprinting it so the next sync resumes control.
+     *
+     * The nonce is verified in saveOverrides() before this runs.
+     */
+    // phpcs:disable WordPress.Security.NonceVerification.Missing
+    private function applySourceResets(int $postId): void
+    {
+        $resetTitle = isset($_POST['eventmesh_reset_title']) && '1' === (string) $_POST['eventmesh_reset_title'];
+        $resetContent = isset($_POST['eventmesh_reset_content']) && '1' === (string) $_POST['eventmesh_reset_content'];
+        $resetImage = isset($_POST['eventmesh_reset_image']) && '1' === (string) $_POST['eventmesh_reset_image'];
+
+        $update = ['ID' => $postId];
+
+        if ($resetTitle) {
+            $update['post_title'] = (string) get_post_meta($postId, '_eventmesh_source_title', true);
+        }
+
+        if ($resetContent) {
+            $sourceContent = (string) get_post_meta($postId, '_eventmesh_source_content', true);
+            $update['post_content'] = $sourceContent;
+            $update['post_excerpt'] = wp_trim_words($sourceContent, 55, '');
+        }
+
+        if (count($update) > 1) {
+            // Rewriting the post re-enters this same save_post handler, so
+            // detach it for the duration to avoid recursing.
+            remove_action('save_post_' . self::NAME, [$this, 'saveMetaBox'], 10);
+            wp_update_post($update);
+            add_action('save_post_' . self::NAME, [$this, 'saveMetaBox'], 10, 2);
+
+            if ($resetTitle) {
+                update_post_meta($postId, '_eventmesh_synced_title', (string) $update['post_title']);
+            }
+
+            if ($resetContent) {
+                update_post_meta($postId, '_eventmesh_synced_content_hash', md5((string) $update['post_content']));
+            }
+        }
+
+        if ($resetImage) {
+            $this->mediaEnricher?->reapplyFromSource($postId);
+        }
+    }
+    // phpcs:enable WordPress.Security.NonceVerification.Missing
 
     // The nonce is verified in saveOverrides() before any of these helpers
     // run; phpcs can't see across method boundaries, hence the scoped disable.
@@ -370,11 +486,20 @@ final class EventPostType
             );
         }
 
-        // Computed by ProviderEmbedEnricher from a trusted oEmbed response,
-        // never meant to be user-edited - kept out of REST entirely rather
-        // than relying on auth_callback, since there's no legitimate case
-        // for any REST client to write raw embed HTML directly.
-        foreach (['_eventmesh_embed_html', '_eventmesh_embed_source_url'] as $field) {
+        // Plugin-managed bookkeeping for the native title/description overrides:
+        // the source's last-synced values (for "follow source again") and the
+        // fingerprints of what the sync last wrote (to detect a human edit).
+        // Internal only - no REST client has any reason to write these.
+        $internalFields = [
+            '_eventmesh_embed_html',
+            '_eventmesh_embed_source_url',
+            '_eventmesh_source_title',
+            '_eventmesh_source_content',
+            '_eventmesh_synced_title',
+            '_eventmesh_synced_content_hash',
+        ];
+
+        foreach ($internalFields as $field) {
             register_post_meta(
                 self::NAME,
                 $field,

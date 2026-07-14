@@ -31,6 +31,10 @@ final class EventSynchronizerTest extends TestCase
         // every sync() call; '' means "nothing to embed" so it no-ops
         // without needing wp_remote_get stubbed in tests that don't care.
         Functions\when('get_post_meta')->justReturn('');
+        // No existing WP_Post by default: the title/description divergence check
+        // then finds no fingerprint and writes the source values, exactly as
+        // sync did before this tracking existed.
+        Functions\when('get_post')->justReturn(null);
         Functions\when('wp_kses')->returnArg(1);
     }
 
@@ -344,6 +348,78 @@ final class EventSynchronizerTest extends TestCase
 
         self::assertCount(1, $requested, 'sync() should trigger ProviderEmbedEnricher, which fetches the oEmbed for the found provider link.');
         self::assertStringContainsString('open.spotify.com/oembed', $requested[0]);
+    }
+
+    public function testSyncKeepsAManuallyEditedTitleAndDescription(): void
+    {
+        $this->queueQueryResults([61]);
+
+        $existing = new \WP_Post();
+        $existing->ID = 61;
+        $existing->post_title = 'My custom headline';
+        $existing->post_content = 'My custom body';
+        Functions\when('get_post')->justReturn($existing);
+
+        // The fingerprints of what the sync last wrote differ from the post's
+        // current title/body, i.e. a person edited both fields by hand.
+        Functions\when('get_post_meta')->alias(
+            static fn (int $postId, string $key = '', bool $single = false) => match ($key) {
+                '_eventmesh_synced_title' => 'Source Title',
+                '_eventmesh_synced_content_hash' => md5('Source body'),
+                default => '',
+            }
+        );
+
+        $written = [];
+        Functions\when('wp_update_post')->alias(
+            static function (array $postarr) use (&$written) {
+                $written = $postarr;
+
+                return (int) $postarr['ID'];
+            }
+        );
+
+        $event = new Event(sourceId: 'holvi', externalId: 'ext-edited', title: 'Source Title', description: 'Source body');
+        $this->synchronizer()->sync($event);
+
+        self::assertArrayNotHasKey('post_title', $written, 'A hand-edited title must survive a later sync.');
+        self::assertArrayNotHasKey('post_content', $written, 'A hand-edited description must survive a later sync.');
+    }
+
+    public function testSyncUpdatesTitleAndDescriptionThatStillFollowTheSource(): void
+    {
+        $this->queueQueryResults([62]);
+
+        $existing = new \WP_Post();
+        $existing->ID = 62;
+        $existing->post_title = 'Old Source Title';
+        $existing->post_content = 'Old source body';
+        Functions\when('get_post')->justReturn($existing);
+
+        // The post still matches what the sync last wrote: nobody has edited it,
+        // so the sync stays in control and adopts the new source values.
+        Functions\when('get_post_meta')->alias(
+            static fn (int $postId, string $key = '', bool $single = false) => match ($key) {
+                '_eventmesh_synced_title' => 'Old Source Title',
+                '_eventmesh_synced_content_hash' => md5('Old source body'),
+                default => '',
+            }
+        );
+
+        $written = [];
+        Functions\when('wp_update_post')->alias(
+            static function (array $postarr) use (&$written) {
+                $written = $postarr;
+
+                return (int) $postarr['ID'];
+            }
+        );
+
+        $event = new Event(sourceId: 'holvi', externalId: 'ext-follow', title: 'New Source Title', description: 'New source body');
+        $this->synchronizer()->sync($event);
+
+        self::assertSame('New Source Title', $written['post_title'] ?? null);
+        self::assertSame('New source body', $written['post_content'] ?? null);
     }
 
     public function testPruneStaleReturnsZeroWhenNothingIsMissing(): void

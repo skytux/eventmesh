@@ -140,7 +140,8 @@ final class Kernel
         $this->container->singleton(
             EventPostType::class,
             fn (Container $container) => new EventPostType(
-                $container->get(ProviderEmbedEnricher::class)
+                $container->get(ProviderEmbedEnricher::class),
+                $container->get(EventMediaEnricher::class)
             )
         );
 
