@@ -42,6 +42,46 @@ An event list block, plus Query Loop-ready blocks for the event date, title, ven
 | ![Event list block](.wordpress-org/screenshot-3.png) | ![Diagnostics](.wordpress-org/screenshot-5.png) |
 | The event list block in the editor | Diagnostics with the background-sync health panel |
 
+## How the Holvi parser works
+
+For each configured shop URL, EventMesh fetches the **listing page**, parses it, then fetches each event's own **detail page** and merges the richer data over the listing (the detail page usually carries the full description and is often the only reliable source of the venue and date).
+
+### Decoding, in priority order
+
+1. **JSON-LD** (`<script type="application/ld+json">`) is preferred. EventMesh reads a `@graph` array, a top-level array, or a single object, and accepts items whose `@type` is `Event` or `Product` — Holvi tags each listing as a schema.org `Product` (with the date in its `name` and an `offers` block), not an `Event`.
+2. **HTML markup** is the fallback, used only when no JSON-LD events are found. It scans elements whose class contains `event`, `product`, or `store-item`, or that carry `data-event-id` or `itemtype=".../schema.org/Product"`, and reads fields from `itemprop=` attributes, Holvi's own class names (`store-item-name`, `product-price`, …), `<time datetime>`, headings, and links.
+
+Both paths produce the same event fields.
+
+### Fields it populates
+
+| Field | From JSON-LD | From HTML markup |
+|---|---|---|
+| **Title** | `name` | `itemprop="name"`, `.store-item-name`, or first `<h1>`–`<h4>` |
+| **Description** | `description` | `itemprop="description"` / `.store-item-description` (detail page keeps inner HTML) |
+| **URL** | `url` | first `<a href>` (resolved to absolute) |
+| **Start / end date** | `startDate` / `endDate` | `<time datetime>`, else `<time>` text |
+| **Start / end time** | from description text (see below) | same |
+| **Venue** | `location` name | `itemprop="location"`, else a `Venue:` / `Location:` line in the description |
+| **Price** | `offers.price` (or `lowPrice`) + `priceCurrency` → `€`/`$`/`£` symbol, trailing `.00` trimmed | `.product-price` / `.store-item-price` / `itemprop="price"`, taken verbatim |
+| **Sold out** | `offers.availability` contains `SoldOut` | an element class contains `sold-out`, or the stock element reads "Sold out" |
+| **Image** | `image` | an `<image-carousel images="[…JSON…]">` attribute (HTML-entity-decoded JSON), `itemprop="image"`, `<img src>`, or a CSS `background: url(…)` |
+| **Provider links** | `sameAs` URLs | known-provider `<a href>` links plus bare URLs written into the description text |
+
+Provider links are matched by host against the known set — Spotify, YouTube, Mixcloud, Bandcamp, SoundCloud, Instagram, Facebook.
+
+### Dates and times
+
+A structured `<time datetime="…">` or JSON-LD `startDate`/`endDate` is used directly (any ISO date/time). When there is no structured date, EventMesh reads a Finnish/European **dotted** date out of the title or description text: `12.8.2026`, `12.8.` (no year), or a `27.6-28.6.2026` range. With no year it resolves to the **next upcoming** occurrence — never a past date. Times come from `klo 18:00-21:00` (`klo` is Finnish for "at") or a bare `18:00-21:00`; a date with no time stays at midnight. The date is kept in the stored title (so events stay identifiable in wp-admin) and stripped only for front-end display.
+
+### Filtering out non-events
+
+The markup selectors and the `Product` type also match gift cards, merch, and other non-dated listings. An item with **no date at all** is kept only if its title *looks like* it names a date (dotted, ISO `2026-08-12`, `12/8`, or `Aug 12` / `12 Aug` style); otherwise it is skipped. An item with a real structured date is always kept.
+
+### Canceled events
+
+Holvi provides no structured "canceled" flag, so EventMesh treats the word **`CANCELED`** or **`CANCELLED`** (either spelling, case-insensitive) anywhere in the **event title** as the cancellation signal. The word is left visible in the title, and the front end strikes through the title and date for those events. This is deliberately separate from *sold out*, which comes from the availability/stock signals above rather than the title.
+
 ## Development
 
 ```sh

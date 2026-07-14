@@ -42,6 +42,36 @@ When a synced event links to an artist page or track on one of these providers (
 **Event images**
 When a source lists an image for an event, the plugin downloads that image from the URL the source provided (which may be a CDN) into your media library, so events display images hosted on your own site.
 
+== How EventMesh reads a Holvi page ==
+
+For each shop URL, EventMesh fetches the listing page, then each event's own detail page, and merges the richer detail data over the listing (the detail page usually has the full description and the most reliable venue and date).
+
+It decodes the page two ways, in order:
+
+1. JSON-LD (the `<script type="application/ld+json">` data Holvi embeds) is preferred. Holvi tags each listing as a schema.org Product — with the date in its name and an offers block — so both Product and Event types are read.
+2. HTML markup is the fallback, used only when no JSON-LD is found. It scans product / store-item / event elements and reads their itemprop attributes, Holvi's own class names, `<time>` tags, headings, and links.
+
+Fields it populates for each event:
+
+* Title — the listing name (kept with its date so events are identifiable in wp-admin; the date is hidden only for front-end display).
+* Description — the item description (the detail page keeps its formatting).
+* Ticket link — the listing/detail URL.
+* Start and end date — from a structured date, or a Finnish/European dotted date found in the text (see below).
+* Start and end time — from "klo 18:00-21:00" (Finnish "klo" = "at") or a bare "18:00-21:00" in the text.
+* Venue — the schema.org location, or a "Venue:" / "Location:" line in the description.
+* Price — the offer price and currency (shown with €/$/£), or Holvi's already-formatted price element.
+* Sold out — the offer availability ("SoldOut"), or a "sold-out" class / "Sold out" stock label.
+* Featured image — the listing image, including Holvi's JSON image-carousel and CSS background images.
+* Provider links — Spotify, YouTube, Mixcloud, Bandcamp, SoundCloud, Instagram, and Facebook links found in the listing or description.
+
+= Dates and times =
+
+A structured date is used as-is. Otherwise EventMesh reads a dotted date from the text: "12.8.2026", "12.8." (no year), or a "27.6-28.6.2026" range. When no year is given it picks the next upcoming occurrence, never a past date. A date with no time of day stays at midnight. Listings with no date at all (such as gift cards or merch) are skipped unless the title itself looks like it names a date.
+
+= Canceled events =
+
+Holvi has no structured "canceled" flag, so EventMesh treats the word CANCELED or CANCELLED (either spelling, any case) anywhere in the event title as the signal. The word stays visible, and the front end strikes through the title and date. This is separate from "sold out", which comes from the availability and stock signals above, not the title.
+
 == Installation ==
 
 1. Upload the plugin files to `/wp-content/plugins/eventmesh/`, or install through the WordPress plugins screen.
