@@ -276,6 +276,46 @@ final class EventListBlockRenderersTest extends TestCase
         self::assertSame('', $html, 'With no venue there is no value, so the prefix must not appear on its own.');
     }
 
+    public function testRenderEventFieldRendersAnEditorSetSuffixAfterTheValue(): void
+    {
+        Functions\when('get_post_meta')->justReturn('The Basement Club');
+
+        $html = $this->block()->renderEventField(
+            ['field' => 'venue', 'suffix' => ' hall'],
+            '',
+            $this->blockInstance(['postId' => 42])
+        );
+
+        self::assertStringContainsString('The Basement Club hall', $html);
+    }
+
+    public function testRenderEventFieldSuffixSitsOutsideTheLink(): void
+    {
+        Functions\when('get_permalink')->justReturn('https://example.test/events/some-band/');
+        Functions\when('get_post_meta')->justReturn('The Basement Club');
+
+        $html = $this->block()->renderEventField(
+            ['field' => 'venue', 'suffix' => ' hall', 'linked' => true],
+            '',
+            $this->blockInstance(['postId' => 42])
+        );
+
+        self::assertStringContainsString('</a> hall', $html, 'The suffix is plain text after the link, not part of it.');
+    }
+
+    public function testRenderEventFieldSuffixIsHiddenWhenTheValueIsEmpty(): void
+    {
+        Functions\when('get_post_meta')->justReturn('');
+
+        $html = $this->block()->renderEventField(
+            ['field' => 'venue', 'suffix' => ' hall'],
+            '',
+            $this->blockInstance(['postId' => 42])
+        );
+
+        self::assertSame('', $html, 'With no venue there is no value, so the suffix must not appear on its own.');
+    }
+
     public function testRenderEventFieldReturnsEmptyStringWithoutAPostIdInContext(): void
     {
         $html = $this->block()->renderEventField(['field' => 'starts_at'], '', $this->blockInstance([]));
@@ -506,6 +546,50 @@ final class EventListBlockRenderersTest extends TestCase
 
         self::assertStringContainsString('Buy now', $html);
         self::assertStringNotContainsString('€15', $html);
+    }
+
+    public function testRenderTicketButtonWrapsTheLabelWithAPrefixAndSuffix(): void
+    {
+        Functions\when('get_post_meta')->alias(
+            static function (int $postId, string $key) {
+                return match ($key) {
+                    '_eventmesh_url' => 'https://holvi.com/shop/MiaRenwall/product/abc123/',
+                    '_eventmesh_price' => '€15',
+                    default => '',
+                };
+            }
+        );
+
+        $html = $this->block()->renderTicketButton(
+            ['prefix' => 'From ', 'suffix' => ' →'],
+            '',
+            $this->blockInstance(['postId' => 42])
+        );
+
+        self::assertStringContainsString('From €15 →', $html, 'The prefix and suffix wrap the resolved label.');
+    }
+
+    public function testRenderTicketButtonDoesNotApplyAffixesToTheSoldOutState(): void
+    {
+        Functions\when('get_post_meta')->alias(
+            static function (int $postId, string $key) {
+                return match ($key) {
+                    '_eventmesh_url' => 'https://holvi.com/shop/MiaRenwall/product/abc123/',
+                    '_eventmesh_sold_out' => '1',
+                    default => '',
+                };
+            }
+        );
+
+        $html = $this->block()->renderTicketButton(
+            ['prefix' => 'From ', 'suffix' => ' →'],
+            '',
+            $this->blockInstance(['postId' => 42])
+        );
+
+        self::assertStringContainsString('Sold out', $html);
+        self::assertStringNotContainsString('From ', $html, 'Sold out is a status, so the label prefix/suffix must not wrap it.');
+        self::assertStringNotContainsString('→', $html);
     }
 
     public function testRenderTicketButtonIsHiddenForPastEvents(): void

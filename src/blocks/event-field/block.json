@@ -60,6 +60,10 @@
     "prefix": {
       "type": "string",
       "default": ""
+    },
+    "suffix": {
+      "type": "string",
+      "default": ""
     }
   },
   "editorScript": "file:./index.js"

@@ -6,6 +6,7 @@
 	var InspectorControls = blockEditor.InspectorControls;
 	var PanelBody = components.PanelBody;
 	var ToggleControl = components.ToggleControl;
+	var TextControl = components.TextControl;
 	var __ = i18n.__;
 
 	blocks.registerBlockType( 'eventmesh/ticket-button', {
@@ -43,6 +44,28 @@
 							checked: showPrice,
 							onChange: function ( value ) {
 								setAttributes( { showPrice: value } );
+							},
+						} ),
+						el( TextControl, {
+							label: __( 'Prefix', 'eventmesh' ),
+							help: __(
+								'Shown before the button label, e.g. "From ". Skipped on the "Sold out" state.',
+								'eventmesh'
+							),
+							value: attributes.prefix || '',
+							onChange: function ( value ) {
+								setAttributes( { prefix: value } );
+							},
+						} ),
+						el( TextControl, {
+							label: __( 'Suffix', 'eventmesh' ),
+							help: __(
+								'Shown after the button label, e.g. " →". Skipped on the "Sold out" state.',
+								'eventmesh'
+							),
+							value: attributes.suffix || '',
+							onChange: function ( value ) {
+								setAttributes( { suffix: value } );
 							},
 						} )
 					)

@@ -75,6 +75,17 @@
 							onChange: function ( value ) {
 								setAttributes( { prefix: value } );
 							},
+						} ),
+						el( TextControl, {
+							label: __( 'Suffix', 'eventmesh' ),
+							help: __(
+								'Shown after the value, only when the value exists. Include your own spacing, e.g. " onwards".',
+								'eventmesh'
+							),
+							value: attributes.suffix || '',
+							onChange: function ( value ) {
+								setAttributes( { suffix: value } );
+							},
 						} )
 					)
 				),
