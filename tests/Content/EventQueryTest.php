@@ -229,4 +229,46 @@ final class EventQueryTest extends TestCase
 
         self::assertSame($query, (new EventQuery())->applyTimeToQueryVars($query, 'all'));
     }
+
+    public function testRecentOptsIntoHiddenExclusion(): void
+    {
+        $this->queueQueryResults([]);
+
+        (new EventQuery())->recent();
+
+        self::assertTrue(\WP_Query::$lastArgs['eventmesh_exclude_hidden'] ?? false);
+    }
+
+    public function testTimeScopedQueryVarsAlsoOptIntoHiddenExclusion(): void
+    {
+        $result = (new EventQuery())->applyTimeToQueryVars(['post_type' => 'eventmesh_event'], 'upcoming');
+
+        self::assertTrue($result['eventmesh_exclude_hidden'] ?? false);
+    }
+
+    public function testMarkQueryLoopUpcomingFirstAlsoOptsIntoHiddenExclusion(): void
+    {
+        $result = (new EventQuery())->markQueryLoopUpcomingFirst(['post_type' => 'eventmesh_event']);
+
+        self::assertTrue($result['eventmesh_exclude_hidden'] ?? false);
+    }
+
+    public function testExcludeHiddenClauseAddsASubqueryOnlyWhenFlagged(): void
+    {
+        $eventQuery = new EventQuery();
+
+        $unflagged = new \WP_Query(['post_type' => 'eventmesh_event']);
+        self::assertSame(
+            ' AND 1=1',
+            $eventQuery->excludeHiddenClause(' AND 1=1', $unflagged),
+            'A query that did not opt in must be left untouched.'
+        );
+
+        $flagged = new \WP_Query(['post_type' => 'eventmesh_event', 'eventmesh_exclude_hidden' => true]);
+        $where = $eventQuery->excludeHiddenClause(' AND 1=1', $flagged);
+
+        self::assertStringContainsString('NOT IN', $where);
+        self::assertStringContainsString('_eventmesh_manual_hidden', $where);
+        self::assertStringContainsString('_eventmesh_manual_disabled', $where);
+    }
 }

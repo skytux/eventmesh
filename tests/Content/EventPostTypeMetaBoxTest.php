@@ -24,6 +24,9 @@ final class EventPostTypeMetaBoxTest extends TestCase
         Functions\when('wp_nonce_field')->justReturn('');
         Functions\when('current_user_can')->justReturn(true);
         Functions\when('wp_kses')->returnArg(1);
+        Functions\when('checked')->alias(
+            static fn ($a, $b = true, $echo = true) => (string) $a === (string) $b ? ' checked="checked"' : ''
+        );
     }
 
     protected function tearDown(): void
@@ -120,6 +123,84 @@ final class EventPostTypeMetaBoxTest extends TestCase
 
         self::assertStringContainsString('name="eventmesh_reset_title"', $html);
         self::assertStringContainsString('name="eventmesh_reset_content"', $html);
+    }
+
+    public function testRenderMetaBoxOffersHideAndDisableCheckboxes(): void
+    {
+        Functions\when('selected')->alias(static fn ($a, $b, $echo = true) => '');
+        Functions\when('has_post_thumbnail')->justReturn(false);
+        Functions\when('get_post_meta')->justReturn('');
+
+        ob_start();
+        (new EventPostType())->renderMetaBox($this->post());
+        $html = (string) ob_get_clean();
+
+        self::assertStringContainsString('name="eventmesh_manual_hidden"', $html);
+        self::assertStringContainsString('name="eventmesh_manual_disabled"', $html);
+    }
+
+    public function testSaveMetaBoxStoresHiddenAsOneAndUntickedDisabledAsEmpty(): void
+    {
+        Functions\when('wp_verify_nonce')->justReturn(true);
+        Functions\when('sanitize_text_field')->alias(static fn ($value) => $value);
+        Functions\when('wp_unslash')->alias(static fn ($value) => $value);
+        Functions\when('esc_url_raw')->alias(static fn ($value) => $value);
+
+        $metaWrites = [];
+        Functions\when('update_post_meta')->alias(
+            static function (int $postId, string $key, mixed $value) use (&$metaWrites) {
+                $metaWrites[$key] = $value;
+
+                return true;
+            }
+        );
+
+        // "Hide" ticked, "Disable" left unticked (absent from the POST).
+        $_POST = [
+            'eventmesh_providers_nonce' => 'ok',
+            'eventmesh_manual_hidden' => '1',
+        ];
+
+        (new EventPostType())->saveMetaBox(42, $this->post());
+
+        self::assertSame('1', $metaWrites['_eventmesh_manual_hidden'] ?? null);
+        self::assertSame(
+            '',
+            $metaWrites['_eventmesh_manual_disabled'] ?? null,
+            'An unticked checkbox must be stored as empty, not left at a stale "1".'
+        );
+    }
+
+    public function testBlockDisabledEventForcesA404OnADisabledEventsPage(): void
+    {
+        Functions\when('is_singular')->justReturn(true);
+        Functions\when('get_queried_object_id')->justReturn(42);
+        Functions\when('get_post_meta')->alias(
+            static fn (int $postId, string $key = '', bool $single = false) => '_eventmesh_manual_disabled' === $key
+                ? '1'
+                : ''
+        );
+        Functions\when('status_header')->justReturn(null);
+        Functions\when('nocache_headers')->justReturn(null);
+
+        $GLOBALS['wp_query'] = new \WP_Query([]);
+
+        (new EventPostType())->blockDisabledEvent();
+
+        self::assertTrue($GLOBALS['wp_query']->is_404, 'A disabled event page must be turned into a 404.');
+    }
+
+    public function testBlockDisabledEventLeavesAnUndisabledEventAlone(): void
+    {
+        Functions\when('is_singular')->justReturn(true);
+        Functions\when('get_queried_object_id')->justReturn(42);
+        Functions\when('get_post_meta')->justReturn('');
+
+        $GLOBALS['wp_query'] = new \WP_Query([]);
+
+        (new EventPostType())->blockDisabledEvent();
+
+        self::assertFalse($GLOBALS['wp_query']->is_404, 'A normal (non-disabled) event page must render normally.');
     }
 
     public function testSaveMetaBoxRevertsTitleToTheSourceWhenFollowSourceAgainIsTicked(): void
