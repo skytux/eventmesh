@@ -160,6 +160,41 @@ final class EventSynchronizerTest extends TestCase
         self::assertSame([20], $draftedIds);
     }
 
+    public function testPruneStaleKeepsAPinnedEventPublished(): void
+    {
+        $this->queueQueryResults([10, 20]);
+
+        Functions\when('get_post_meta')->alias(
+            static function (int $postId, string $key = '', bool $single = false) {
+                if ('_eventmesh_manual_pinned' === $key) {
+                    return 20 === $postId ? '1' : '';
+                }
+
+                return match ($postId) {
+                    10 => 'stale-a',
+                    20 => 'stale-b',
+                    default => '',
+                };
+            }
+        );
+
+        $draftedIds = [];
+        Functions\when('wp_update_post')->alias(
+            static function (array $postarr) use (&$draftedIds) {
+                $draftedIds[] = $postarr['ID'];
+
+                return $postarr['ID'];
+            }
+        );
+
+        // Neither event is in the latest fetch, but #20 is pinned to stay
+        // published, so only #10 is archived.
+        $archived = $this->synchronizer()->pruneStale('holvi', []);
+
+        self::assertSame(1, $archived);
+        self::assertSame([10], $draftedIds, 'A pinned event must survive pruning even when it left the source.');
+    }
+
     public function testPruneOrphanedSourcesDraftsPostsOfUnregisteredConnectors(): void
     {
         $this->queueQueryResults([10, 20, 30]);

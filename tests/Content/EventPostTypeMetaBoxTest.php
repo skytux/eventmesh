@@ -137,6 +137,7 @@ final class EventPostTypeMetaBoxTest extends TestCase
 
         self::assertStringContainsString('name="eventmesh_manual_hidden"', $html);
         self::assertStringContainsString('name="eventmesh_manual_disabled"', $html);
+        self::assertStringContainsString('name="eventmesh_manual_pinned"', $html);
     }
 
     public function testSaveMetaBoxStoresHiddenAsOneAndUntickedDisabledAsEmpty(): void
@@ -155,15 +156,17 @@ final class EventPostTypeMetaBoxTest extends TestCase
             }
         );
 
-        // "Hide" ticked, "Disable" left unticked (absent from the POST).
+        // "Hide" and "Keep published" ticked, "Disable" left unticked.
         $_POST = [
             'eventmesh_providers_nonce' => 'ok',
             'eventmesh_manual_hidden' => '1',
+            'eventmesh_manual_pinned' => '1',
         ];
 
         (new EventPostType())->saveMetaBox(42, $this->post());
 
         self::assertSame('1', $metaWrites['_eventmesh_manual_hidden'] ?? null);
+        self::assertSame('1', $metaWrites['_eventmesh_manual_pinned'] ?? null);
         self::assertSame(
             '',
             $metaWrites['_eventmesh_manual_disabled'] ?? null,

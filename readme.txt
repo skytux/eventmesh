@@ -22,6 +22,7 @@ EventMesh pulls event listings from external sources into real WordPress posts (
 * **Provider links & embeds** — provider links (Spotify, YouTube, Mixcloud, Bandcamp, SoundCloud) found on a source's event page are attached to the event and rendered as embeds.
 * **Editable overrides** — every event field (title, description, date, venue, price, sold-out state, and provider links) and the featured image is editable per event and kept on the next sync. A per-field "Follow source again" discards your version and returns to the source whenever you want it.
 * **Hide and disable events** — "Hide" keeps an event out of the front-end listings while its own page still works; "Disable" also makes its page return 404. Both are per-event and survive re-sync.
+* **Keep events the source dropped** — pin an event to stay published even after it disappears from its source (instead of being archived on the next sync); its details freeze at the last sync.
 * **Sold out and canceled handling** — sold-out events show a non-clickable Sold out state, events with CANCELED in the title are struck through, and past events sort below upcoming ones under a divider.
 * **Reversible source management** — disable a source and its events are archived (moved to Draft) on the next sync; re-enable it and they are republished. Uninstalling keeps your data unless you opt in to deletion.
 * **Connector-agnostic architecture** — new sources can be added as connectors without touching the core plugin.
@@ -94,7 +95,7 @@ No. The only outgoing requests are the ones described under External services, a
 * Optional editor-set prefix and suffix on the event-field and ticket-button blocks (e.g. "at Venue", "From €15 →").
 * Provider links parsed from source pages, with oEmbed embeds for Spotify, YouTube, Mixcloud, Bandcamp, and SoundCloud.
 * Per-event overrides for every field — title, description, date, venue, price, sold-out, provider links, and the featured image — that survive re-sync, each with a "Follow source again".
-* Per-event "Hide" (drop from listings) and "Disable" (also 404 its page), plus an all-provider-links block listing every provider link.
+* Per-event "Hide" (drop from listings), "Disable" (also 404 its page), and "Keep published if removed from the source", plus an all-provider-links block listing every provider link.
 * Sold-out and CANCELED handling, past/upcoming ordering with a divider.
 * Per-source enablement in the Sources table, with reversible archiving.
 * Status dashboard with an AJAX "Sync now" and last-error reporting.

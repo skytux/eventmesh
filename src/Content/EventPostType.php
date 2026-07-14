@@ -262,6 +262,7 @@ final class EventPostType
     {
         $hidden = '1' === (string) get_post_meta($post->ID, '_eventmesh_manual_hidden', true);
         $disabled = '1' === (string) get_post_meta($post->ID, '_eventmesh_manual_disabled', true);
+        $pinned = '1' === (string) get_post_meta($post->ID, '_eventmesh_manual_pinned', true);
 
         echo '<p><strong>' . esc_html__('Visibility', 'eventmesh') . '</strong></p>';
 
@@ -278,6 +279,15 @@ final class EventPostType
             checked($disabled, true, false),
             esc_html__('Disable (also returns 404 on its own page)', 'eventmesh')
         );
+
+        printf(
+            '<p style="margin-bottom:.25em"><label>'
+                . '<input type="checkbox" name="eventmesh_manual_pinned" value="1"%s /> %s</label></p>',
+            checked($pinned, true, false),
+            esc_html__('Keep published if removed from the source', 'eventmesh')
+        );
+        // phpcs:ignore Generic.Files.LineLength.TooLong -- single gettext literal; splitting it breaks extraction.
+        echo '<p class="description" style="margin-top:0">' . esc_html__('Normally an event that no longer appears in its source is moved to Draft on the next sync. Tick this to keep it published; its details stay frozen at the last sync.', 'eventmesh') . '</p>';
     }
 
     /**
@@ -386,6 +396,7 @@ final class EventPostType
         $this->saveSoldOutOverride($postId);
         $this->saveCheckboxOverride($postId, 'hidden');
         $this->saveCheckboxOverride($postId, 'disabled');
+        $this->saveCheckboxOverride($postId, 'pinned');
 
         foreach (KnownProviders::labels() as $key => $label) {
             $this->saveTextOverride($postId, 'provider_' . $key, true);
@@ -543,7 +554,7 @@ final class EventPostType
         // screen (never the sync), that win over the scraped value above.
         $manualFields = ['_eventmesh_manual_price', '_eventmesh_manual_venue_name',
             '_eventmesh_manual_starts_at', '_eventmesh_manual_ends_at', '_eventmesh_manual_sold_out',
-            '_eventmesh_manual_hidden', '_eventmesh_manual_disabled'];
+            '_eventmesh_manual_hidden', '_eventmesh_manual_disabled', '_eventmesh_manual_pinned'];
 
         foreach (KnownProviders::labels() as $key => $label) {
             $manualFields[] = '_eventmesh_manual_provider_' . $key;
