@@ -35,4 +35,25 @@ final class EmbedHtmlSanitizerTest extends TestCase
         self::assertArrayHasKey('src', $capturedAllowedTags['iframe']);
         self::assertArrayHasKey('allowfullscreen', $capturedAllowedTags['iframe']);
     }
+
+    public function testSanitizeMarksTheEmbedIframeLazyLoading(): void
+    {
+        Functions\when('wp_kses')->returnArg(1);
+
+        $result = EmbedHtmlSanitizer::sanitize('<iframe src="https://open.spotify.com/embed/track/abc"></iframe>');
+
+        self::assertStringContainsString('<iframe loading="lazy"', $result);
+    }
+
+    public function testSanitizeDoesNotAddASecondLoadingAttribute(): void
+    {
+        Functions\when('wp_kses')->returnArg(1);
+
+        $result = EmbedHtmlSanitizer::sanitize(
+            '<iframe loading="eager" src="https://open.spotify.com/embed/track/abc"></iframe>'
+        );
+
+        self::assertStringNotContainsString('loading="lazy"', $result);
+        self::assertSame(1, substr_count($result, 'loading='), 'An iframe that already sets loading must be left as-is.');
+    }
 }
