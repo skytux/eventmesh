@@ -5,6 +5,13 @@
  * page. Each iframe ships with data-src instead of src; this sets src when it
  * approaches view. A <noscript> copy handles the no-JavaScript case, so nothing
  * here can leave the page blank.
+ *
+ * Crucially, promotion is held until AFTER the window "load" event (and then
+ * an idle callback). Setting an iframe's src before load makes it a subresource
+ * that "load" waits for - which would delay any load-gated theme animations
+ * until the players finished. Waiting until load has already fired lets the
+ * page settle and its animations run first; the players then load without
+ * blocking or contending with them.
  */
 ( function () {
 	function loadEmbed( iframe ) {
@@ -51,9 +58,21 @@
 		} );
 	}
 
-	if ( 'loading' === document.readyState ) {
-		document.addEventListener( 'DOMContentLoaded', init );
+	// Run during idle time after load, so promoting the iframes never competes
+	// with the page's own load-time work.
+	function schedule() {
+		if ( 'requestIdleCallback' in window ) {
+			window.requestIdleCallback( init, { timeout: 2000 } );
+		} else {
+			window.setTimeout( init, 200 );
+		}
+	}
+
+	// Hold until the window "load" event has fired, so setting src can't delay
+	// load (and any animations gated on it). If load already fired, go now.
+	if ( 'complete' === document.readyState ) {
+		schedule();
 	} else {
-		init();
+		window.addEventListener( 'load', schedule );
 	}
 } )();
