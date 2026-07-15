@@ -270,6 +270,20 @@ final class Admin
             [],
             (string) filemtime($path)
         );
+
+        // Registered here (not enqueued) so ProviderEmbedMarkup can enqueue it
+        // on demand, only on pages that actually render a deferred embed.
+        $embedScript = EVENTMESH_PLUGIN_DIR . 'assets/js/embed-lazy.js';
+
+        if (is_readable($embedScript)) {
+            wp_register_script(
+                'eventmesh-embed-lazy',
+                EVENTMESH_PLUGIN_URL . 'assets/js/embed-lazy.js',
+                [],
+                (string) filemtime($embedScript),
+                ['in_footer' => true, 'strategy' => 'defer']
+            );
+        }
     }
 
     public function renderStatusShortcode(array $attributes = []): string

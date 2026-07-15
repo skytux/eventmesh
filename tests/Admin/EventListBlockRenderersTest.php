@@ -753,6 +753,9 @@ final class EventListBlockRenderersTest extends TestCase
     public function testRenderProviderEmbedRendersTheCachedHtml(): void
     {
         Functions\when('get_post_meta')->justReturn('<iframe src="https://open.spotify.com/embed/track/abc"></iframe>');
+        // Deferral off: the embed renders with a live src (see
+        // ProviderEmbedMarkupTest for the deferred data-src path).
+        Functions\when('get_option')->justReturn('0');
 
         $html = $this->block()->renderProviderEmbed([], '', $this->blockInstance(['postId' => 42]));
 

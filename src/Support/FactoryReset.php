@@ -67,6 +67,7 @@ final class FactoryReset
             'eventmesh_enable_test_connector',
             'eventmesh_sync_interval',
             'eventmesh_delete_data_on_uninstall',
+            'eventmesh_defer_embeds',
             'eventmesh_last_sync_attempt_at',
             'eventmesh_recent_logs',
         ];
