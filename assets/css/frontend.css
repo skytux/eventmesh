@@ -41,3 +41,14 @@
     max-height: 70px;
     width: 100%;
 }
+
+/*
+ * A deferred embed (data-src, no src yet) is an empty frame until embed-lazy.js
+ * promotes it. Give it a faint placeholder and reserve its height so there's no
+ * blank flash or layout shift while it waits to scroll into view.
+ */
+.eventmesh-provider-embed iframe[data-src] {
+    min-height: 70px;
+    background: rgba(127, 127, 127, 0.08);
+    border: 0;
+}

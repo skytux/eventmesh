@@ -20,10 +20,24 @@ final class AdminFrontendAssetsTest extends TestCase
             }
         );
 
+        $scriptHandle = '';
+        Functions\when('wp_register_script')->alias(
+            static function (string $handle) use (&$scriptHandle) {
+                $scriptHandle = $handle;
+
+                return true;
+            }
+        );
+
         (new Admin(new Container()))->enqueueFrontendStyles();
 
         self::assertSame('eventmesh-frontend', $registered[0]);
         self::assertStringContainsString('assets/css/frontend.css', $registered[1]);
         self::assertNotSame('', $registered[2]);
+        self::assertSame(
+            'eventmesh-embed-lazy',
+            $scriptHandle,
+            'The deferred-embed script is registered so it can be enqueued on demand.'
+        );
     }
 }

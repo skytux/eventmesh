@@ -6,6 +6,7 @@
  * @var string $sync_interval Currently configured background sync interval key.
  * @var array<string, string> $sync_intervals Available interval keys mapped to labels.
  * @var bool $delete_data_on_uninstall Whether uninstalling the plugin should also delete its data.
+ * @var bool $defer_embeds Whether provider embeds load only when scrolled into view.
  */
 
 declare(strict_types=1);
@@ -54,6 +55,21 @@ if (! defined('ABSPATH')) {
                         </select>
                         <p class="description">
                             <?php esc_html_e('How often background sync runs. Actual timing still depends on site traffic unless real server cron is configured.', 'eventmesh'); ?>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <?php esc_html_e('Provider embeds', 'eventmesh'); ?>
+                    </th>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="eventmesh_defer_embeds" value="1" <?php checked($defer_embeds, true); ?> />
+                            <?php esc_html_e('Load embedded players only when scrolled into view', 'eventmesh'); ?>
+                        </label>
+                        <p class="description">
+                            <?php // phpcs:ignore Generic.Files.LineLength.TooLong -- single gettext literal; splitting it breaks extraction. ?>
+                            <?php esc_html_e('Defers each Spotify/SoundCloud/Mixcloud player until the visitor scrolls to it, so a page with many events loads faster. Players without JavaScript fall back to loading normally.', 'eventmesh'); ?>
                         </p>
                     </td>
                 </tr>
