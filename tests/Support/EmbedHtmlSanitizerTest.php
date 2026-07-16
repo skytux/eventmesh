@@ -16,6 +16,13 @@ use EventMesh\Tests\TestCase;
  */
 final class EmbedHtmlSanitizerTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Functions\when('__')->returnArg(1);
+    }
+
     public function testSanitizeCallsWpKsesWithAnIframeOnlyAllowlist(): void
     {
         $html = '<iframe src="https://open.spotify.com/embed/track/abc"></iframe><script>alert(1)</script>';
@@ -43,6 +50,27 @@ final class EmbedHtmlSanitizerTest extends TestCase
         $result = EmbedHtmlSanitizer::sanitize('<iframe src="https://open.spotify.com/embed/track/abc"></iframe>');
 
         self::assertStringContainsString('<iframe loading="lazy"', $result);
+    }
+
+    public function testSanitizeGivesAnUntitledIframeAProviderNamedTitle(): void
+    {
+        Functions\when('wp_kses')->returnArg(1);
+
+        $result = EmbedHtmlSanitizer::sanitize('<iframe src="https://open.spotify.com/embed/track/abc"></iframe>');
+
+        self::assertStringContainsString('title="Spotify player"', $result);
+    }
+
+    public function testSanitizeKeepsAnExistingIframeTitle(): void
+    {
+        Functions\when('wp_kses')->returnArg(1);
+
+        $result = EmbedHtmlSanitizer::sanitize(
+            '<iframe title="My player" src="https://w.soundcloud.com/player/?url=x"></iframe>'
+        );
+
+        self::assertStringContainsString('title="My player"', $result);
+        self::assertStringNotContainsString('SoundCloud player', $result);
     }
 
     public function testSanitizeDoesNotAddASecondLoadingAttribute(): void

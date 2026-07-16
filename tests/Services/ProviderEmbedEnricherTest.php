@@ -24,6 +24,7 @@ final class ProviderEmbedEnricherTest extends TestCase
         Functions\when('get_option')->justReturn([]);
         Functions\when('update_option')->justReturn(true);
         Functions\when('wp_kses')->returnArg(1);
+        Functions\when('__')->returnArg(1);
     }
 
     private function enricher(): ProviderEmbedEnricher

@@ -35,7 +35,49 @@ final class EmbedHtmlSanitizer
 
     public static function sanitize(string $html): string
     {
-        return wp_kses(self::lazyLoadIframes($html), self::ALLOWED_TAGS);
+        return wp_kses(self::lazyLoadIframes(self::titledIframes($html)), self::ALLOWED_TAGS);
+    }
+
+    /**
+     * Gives each embed iframe a screen-reader title if it lacks one - provider
+     * oEmbed markup often omits it, which fails accessibility audits ("frame
+     * without a title"). Named for the provider where the src makes it obvious.
+     */
+    private static function titledIframes(string $html): string
+    {
+        return (string) preg_replace_callback(
+            '/<iframe\b[^>]*>/i',
+            static function (array $matches): string {
+                if (false !== stripos($matches[0], ' title=')) {
+                    return $matches[0];
+                }
+
+                return (string) preg_replace(
+                    '/<iframe\b/i',
+                    '<iframe title="' . self::iframeTitle($matches[0]) . '"',
+                    $matches[0],
+                    1
+                );
+            },
+            $html
+        );
+    }
+
+    private static function iframeTitle(string $iframeTag): string
+    {
+        $labels = [
+            'spotify' => __('Spotify player', 'eventmesh'),
+            'soundcloud' => __('SoundCloud player', 'eventmesh'),
+            'mixcloud' => __('Mixcloud player', 'eventmesh'),
+        ];
+
+        foreach ($labels as $needle => $label) {
+            if (false !== stripos($iframeTag, $needle)) {
+                return $label;
+            }
+        }
+
+        return __('Embedded media player', 'eventmesh');
     }
 
     /**

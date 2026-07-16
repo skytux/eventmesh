@@ -36,6 +36,7 @@ final class EventSynchronizerTest extends TestCase
         // sync did before this tracking existed.
         Functions\when('get_post')->justReturn(null);
         Functions\when('wp_kses')->returnArg(1);
+        Functions\when('__')->returnArg(1);
     }
 
     private function synchronizer(): EventSynchronizer
