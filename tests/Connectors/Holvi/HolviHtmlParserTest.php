@@ -386,6 +386,72 @@ final class HolviHtmlParserTest extends TestCase
         self::assertSame('21:00', $event->endsAt()->format('H:i'));
     }
 
+    public function testSingleDayEndTimeIsTheLatestTimeInTheText(): void
+    {
+        // Doors "18:30-19:00" come first; the real finish "22:00" is later in
+        // the schedule. The end must be the latest time, not the first range.
+        $event = $this->parser()->parseDetailPage(
+            '<html><body><h1 itemprop="name">Club Night 1.1.2030</h1>' .
+            '<div itemprop="description"><p>18:30-19:00 Doors. 20:00 Main act. 22:00 Close.</p></div></body></html>',
+            'https://shop.holvi.com/e/club/'
+        );
+
+        self::assertNotNull($event);
+        self::assertSame('18:30', $event->startsAt()->format('H:i'));
+        self::assertNotNull($event->endsAt());
+        self::assertSame('22:00', $event->endsAt()->format('H:i'), 'The latest time wins as the end.');
+        self::assertSame(
+            $event->startsAt()->format('Y-m-d'),
+            $event->endsAt()->format('Y-m-d'),
+            'A single-day event keeps start and end on the same day.'
+        );
+    }
+
+    public function testSingleDayLatestEndAlongsideAKloStart(): void
+    {
+        // Mirrors a real Ecstatic Dance listing: doors and warm-up first, then
+        // "21:30 Loppupiiri" (closing). "klo 19:00" gives the start; 21:30 end.
+        $event = $this->parser()->parseDetailPage(
+            '<html><body><h1 itemprop="name">Ecstatic Dance 8.8.2026</h1>' .
+            '<div itemprop="description"><p>18:30-19:00 Ovet auki. 19:00 Alkupiiri. ' .
+            '19:30 Ecstatic Dance. 21:30 Loppupiiri. Ovet suljetaan klo 19:00.</p></div></body></html>',
+            'https://shop.holvi.com/e/ecstatic/'
+        );
+
+        self::assertNotNull($event);
+        self::assertSame('2026-08-08 19:00', $event->startsAt()->format('Y-m-d H:i'));
+        self::assertNotNull($event->endsAt());
+        self::assertSame('2026-08-08 21:30', $event->endsAt()->format('Y-m-d H:i'));
+    }
+
+    public function testExplicitSameDayScheduleFormatWinsOverGuessing(): void
+    {
+        $event = $this->parser()->parseDetailPage(
+            '<html><body><h1 itemprop="name">Workshop</h1>' .
+            '<div itemprop="description"><p>Aikataulu: 8.8.2026 19:00 - 21:30. Tervetuloa!</p></div></body></html>',
+            'https://shop.holvi.com/e/workshop/'
+        );
+
+        self::assertNotNull($event);
+        self::assertSame('2026-08-08 19:00', $event->startsAt()->format('Y-m-d H:i'));
+        self::assertNotNull($event->endsAt());
+        self::assertSame('2026-08-08 21:30', $event->endsAt()->format('Y-m-d H:i'));
+    }
+
+    public function testExplicitMultiDayScheduleFormat(): void
+    {
+        $event = $this->parser()->parseDetailPage(
+            '<html><body><h1 itemprop="name">Retreat</h1>' .
+            '<div itemprop="description"><p>8.8.2026 19:00 - 10.8.2026 21:30</p></div></body></html>',
+            'https://shop.holvi.com/e/retreat/'
+        );
+
+        self::assertNotNull($event);
+        self::assertSame('2026-08-08 19:00', $event->startsAt()->format('Y-m-d H:i'));
+        self::assertNotNull($event->endsAt());
+        self::assertSame('2026-08-10 21:30', $event->endsAt()->format('Y-m-d H:i'), 'Spans to the explicit end day.');
+    }
+
     public function testParseDetailPageReturnsNullWithoutATitle(): void
     {
         $event = $this->parser()->parseDetailPage('<html><body><p>no title here</p></body></html>', self::SOURCE_URL);

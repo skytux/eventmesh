@@ -74,6 +74,17 @@ Provider links are matched by host against the known set — Spotify, YouTube, M
 
 A structured `<time datetime="…">` or JSON-LD `startDate`/`endDate` is used directly (any ISO date/time). When there is no structured date, EventMesh reads a Finnish/European **dotted** date out of the title or description text: `12.8.2026`, `12.8.` (no year), or a `27.6-28.6.2026` range. With no year it resolves to the **next upcoming** occurrence — never a past date. Times come from `klo 18:00-21:00` (`klo` is Finnish for "at") or a bare `18:00-21:00`; a date with no time stays at midnight. The date is kept in the stored title (so events stay identifiable in wp-admin) and stripped only for front-end display.
 
+**End time on a single day.** For an event that starts and ends on the same day, the end time is taken from the **latest** time mentioned anywhere in the text. Event schedules list doors and warm-ups first (`18:30–19:00 doors`) and the actual finish last (`21:30 closing`), so EventMesh reaches the real end instead of stopping at the first range it sees.
+
+**Multi-day events and exact control.** A bare time can't say which day it belongs to, so for events spanning more than one day — or whenever you want to pin an exact start/end from the source — write an explicit schedule anywhere in the description:
+
+```
+8.8.2026 19:00 - 21:30              (same day; only the end time given)
+8.8.2026 19:00 - 10.8.2026 21:30    (spanning days)
+```
+
+Dates are `day.month.year`; times are 24-hour (`18:30` or `18.30`, optionally after `klo`); the separator is a hyphen or dash. When present this **wins over every other date/time signal**. (You can also set the start and end by hand on the event's edit screen — those overrides survive re-sync.)
+
 ### Filtering out non-events
 
 The markup selectors and the `Product` type also match gift cards, merch, and other non-dated listings. An item with **no date at all** is kept only if its title *looks like* it names a date (dotted, ISO `2026-08-12`, `12/8`, or `Aug 12` / `12 Aug` style); otherwise it is skipped. An item with a real structured date is always kept.
