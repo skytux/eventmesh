@@ -759,12 +759,12 @@ final class EventListBlockRenderersTest extends TestCase
 
         $html = $this->block()->renderProviderEmbed([], '', $this->blockInstance(['postId' => 42]));
 
-        // The embed iframe is marked loading="lazy" so a page full of events
-        // doesn't fire every third-party player request on load.
-        self::assertStringContainsString(
-            '<iframe loading="lazy" src="https://open.spotify.com/embed/track/abc"></iframe>',
-            $html
-        );
+        // The embed iframe is marked loading="lazy" (so a page full of events
+        // doesn't fire every player request on load) and given an accessible
+        // title (provider oEmbed markup omits it).
+        self::assertStringContainsString('loading="lazy"', $html);
+        self::assertStringContainsString('title="Spotify player"', $html);
+        self::assertStringContainsString('src="https://open.spotify.com/embed/track/abc"', $html);
         self::assertStringStartsWith('<div ', $html);
     }
 

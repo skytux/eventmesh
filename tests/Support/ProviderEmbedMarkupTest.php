@@ -19,6 +19,7 @@ final class ProviderEmbedMarkupTest extends TestCase
         // EmbedHtmlSanitizer::sanitize() runs wp_kses; pass it through so the
         // test exercises this class's own deferral logic, not wp_kses.
         Functions\when('wp_kses')->returnArg(1);
+        Functions\when('__')->returnArg(1);
     }
 
     public function testReturnsAPlainLiveIframeWhenDeferralIsOff(): void
