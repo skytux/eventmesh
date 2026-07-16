@@ -152,23 +152,19 @@ final class HolviHtmlParser
         $description = $this->stringValue($item['description'] ?? '');
         $structuredEndDate = $this->dateValue($this->stringValue($item['endDate'] ?? ''));
         $resolved = $this->resolveDate($title, $this->dateValue($this->stringValue($item['startDate'] ?? '')));
-        [$startsAt, $endsAt] = $this->applyTimeRange(
-            $resolved['date'],
-            $structuredEndDate ?? $resolved['endDate'],
-            $description
-        );
+        $schedule = $this->schedule($resolved, $structuredEndDate, $description);
 
         return new Event(
             sourceId: 'holvi',
             externalId: $this->externalId($url, $title),
             title: $title,
-            startsAt: $startsAt,
-            endsAt: $endsAt,
+            startsAt: $schedule['start'],
+            endsAt: $schedule['end'],
             url: $url,
             description: $description,
             imageUrl: $this->imageValue($item['image'] ?? '', $sourceUrl),
             venueName: $this->resolveVenue($this->placeValue($item['location'] ?? ''), $description),
-            startsAtYearKnown: $resolved['yearKnown'],
+            startsAtYearKnown: $schedule['yearKnown'],
             soldOut: $this->isSoldOutFromJsonLd($item),
             providers: $this->providersFromSameAs($item['sameAs'] ?? []),
             price: $this->priceFromJsonLd($item)
@@ -354,19 +350,19 @@ final class HolviHtmlParser
         );
         $resolved = $this->resolveDate($title, $this->dateValue($dateText));
         $structuredVenue = $this->firstText($xpath, $element, './/*[@itemprop="location"]');
-        [$startsAt, $endsAt] = $this->applyTimeRange($resolved['date'], $resolved['endDate'], $description);
+        $schedule = $this->schedule($resolved, null, $description);
 
         return new Event(
             sourceId: 'holvi',
             externalId: $this->externalId($url, $title),
             title: $title,
-            startsAt: $startsAt,
-            endsAt: $endsAt,
+            startsAt: $schedule['start'],
+            endsAt: $schedule['end'],
             url: $url,
             description: $description,
             imageUrl: $imageUrl,
             venueName: $this->resolveVenue($structuredVenue, $description),
-            startsAtYearKnown: $resolved['yearKnown'],
+            startsAtYearKnown: $schedule['yearKnown'],
             soldOut: $this->isSoldOut($xpath, $element),
             providers: array_merge(
                 $this->extractProvidersFromText($description),
@@ -533,14 +529,15 @@ final class HolviHtmlParser
             $endDate = $contentDate['endDate'];
         }
 
-        [$startsAt, $endsAt] = $this->applyTimeRange($resolved['date'], $endDate, $descriptionText);
+        $resolved['endDate'] = $endDate;
+        $schedule = $this->schedule($resolved, null, $descriptionText);
 
         return new Event(
             sourceId: 'holvi',
             externalId: $this->externalId($pageUrl, $title),
             title: $title,
-            startsAt: $startsAt,
-            endsAt: $endsAt,
+            startsAt: $schedule['start'],
+            endsAt: $schedule['end'],
             url: $pageUrl,
             description: '' !== $descriptionHtml ? $descriptionHtml : $descriptionText,
             imageUrl: $this->imageUrlFromElement($xpath, $document, $pageUrl),
@@ -548,7 +545,7 @@ final class HolviHtmlParser
                 $this->firstText($xpath, $document, '//*[@itemprop="location"]'),
                 $descriptionText
             ),
-            startsAtYearKnown: $resolved['yearKnown'],
+            startsAtYearKnown: $schedule['yearKnown'],
             soldOut: $this->isSoldOut($xpath, $document),
             // Scoped to the description node, not the whole document - the
             // page's own header/footer routinely carries Holvi's own
@@ -598,6 +595,87 @@ final class HolviHtmlParser
             'endDate' => $found['endDate'],
             'yearKnown' => $found['yearKnown'],
         ];
+    }
+
+    /**
+     * Resolves an event's start and end, preferring - when present in the text
+     * - the explicit "start - end" datetime format over the date/time guessed
+     * from the title and description. Otherwise falls back to the resolved date
+     * plus applyTimeRange()'s single-day time handling.
+     *
+     * @param array{date: ?DateTimeImmutable, endDate: ?DateTimeImmutable, yearKnown: bool} $resolved
+     *
+     * @return array{start: ?DateTimeImmutable, end: ?DateTimeImmutable, yearKnown: bool}
+     */
+    private function schedule(array $resolved, ?DateTimeImmutable $structuredEndDate, string $text): array
+    {
+        $explicit = $this->explicitSchedule($text);
+
+        if (null !== $explicit) {
+            return ['start' => $explicit['start'], 'end' => $explicit['end'], 'yearKnown' => true];
+        }
+
+        [$start, $end] = $this->applyTimeRange(
+            $resolved['date'],
+            $structuredEndDate ?? $resolved['endDate'],
+            $text
+        );
+
+        return ['start' => $start, 'end' => $end, 'yearKnown' => $resolved['yearKnown']];
+    }
+
+    /**
+     * The explicit, unambiguous schedule a source can write into an event's
+     * description to pin its exact start and end. Required for events that span
+     * more than one day, where a bare time can't say which day it belongs to.
+     * Two forms:
+     *
+     *   8.8.2026 19:00 - 21:30              (same day; only the end time given)
+     *   8.8.2026 19:00 - 10.8.2026 21:30    (spanning days)
+     *
+     * Dates are day.month.year; times are 24-hour ("18:30" or "18.30"),
+     * optionally after "klo"; the separator is a hyphen or dash. When present
+     * this wins over every other date/time signal.
+     *
+     * @return array{start: DateTimeImmutable, end: DateTimeImmutable}|null
+     */
+    private function explicitSchedule(string $text): ?array
+    {
+        $pattern = '/(?<sd>\d{1,2})\.(?<smo>\d{1,2})\.(?<sy>\d{4})\s+(?:klo\s+)?(?<sh>\d{1,2})[.:](?<smin>\d{2})'
+            . '\s*[-\x{2013}\x{2014}]\s*'
+            . '(?:(?<ed>\d{1,2})\.(?<emo>\d{1,2})\.(?<ey>\d{4})\s+(?:klo\s+)?)?'
+            . '(?<eh>\d{1,2})[.:](?<emin>\d{2})/iu';
+
+        if (1 !== preg_match($pattern, $text, $m)) {
+            return null;
+        }
+
+        $start = $this->buildDate((int) $m['sy'], (int) $m['smo'], (int) $m['sd'], true);
+
+        if (null === $start) {
+            return null;
+        }
+
+        $start = $start->setTime((int) $m['sh'], (int) $m['smin']);
+
+        $endDate = '' !== ($m['ed'] ?? '')
+            ? $this->buildDate((int) $m['ey'], (int) $m['emo'], (int) $m['ed'], true)
+            : $start;
+
+        if (null === $endDate) {
+            return null;
+        }
+
+        $end = $endDate->setTime((int) $m['eh'], (int) $m['emin']);
+
+        // An end at or before the start is a mistake (e.g. a same-day "22:00 -
+        // 02:00" that really crosses midnight) - fall back rather than store a
+        // negative span; such events should give the end its own date.
+        if ($end <= $start) {
+            return null;
+        }
+
+        return ['start' => $start, 'end' => $end];
     }
 
     /**
@@ -691,6 +769,14 @@ final class HolviHtmlParser
      * way start/end times surface at all for events without a structured
      * <time datetime> that already included one.
      *
+     * For a single-day event (no end date) the end is then taken from the
+     * LATEST time mentioned anywhere in the text, not just the first range.
+     * Event schedules list doors/warm-up first ("18:30-19:00 doors") and the
+     * real finish last ("21:30 closing"), so the first range would end the
+     * event far too early. Multi-day events can't be resolved from bare times
+     * (a time can't say which day it belongs to) - they use the explicit
+     * "start - end" datetime format instead; see explicitSchedule().
+     *
      * @return array{0: ?DateTimeImmutable, 1: ?DateTimeImmutable}
      */
     private function applyTimeRange(?DateTimeImmutable $start, ?DateTimeImmutable $end, string $text): array
@@ -712,7 +798,61 @@ final class HolviHtmlParser
             $newEnd = ($end ?? $start)->setTime($time['endHour'], $time['endMinute']);
         }
 
+        // Single-day (no end date): let the latest time in the text win as the
+        // end, as long as it is after the start.
+        if (null === $end) {
+            $latest = $this->latestTimeInText($text);
+
+            if (null !== $latest) {
+                $candidate = $newStart->setTime($latest['hour'], $latest['minute']);
+
+                if ($candidate > $newStart) {
+                    $newEnd = $candidate;
+                }
+            }
+        }
+
         return [$newStart, $newEnd];
+    }
+
+    /**
+     * The latest time-of-day mentioned anywhere in the text. Matches colon
+     * times ("21:30") and "klo 21.30"/"klo 21:30"; a bare dotted time is
+     * deliberately not matched so a date like "18.03.2026" is never misread as
+     * a time.
+     *
+     * @return array{hour: int, minute: int}|null
+     */
+    private function latestTimeInText(string $text): ?array
+    {
+        $pattern = '/\bklo\s+(\d{1,2})[.:](\d{2})\b|\b(\d{1,2}):(\d{2})\b/i';
+
+        if (0 === preg_match_all($pattern, $text, $sets, PREG_SET_ORDER)) {
+            return null;
+        }
+
+        $latest = null;
+
+        foreach ($sets as $set) {
+            $hour = '' !== ($set[1] ?? '') ? (int) $set[1] : (int) ($set[3] ?? -1);
+            $minute = '' !== ($set[2] ?? '') ? (int) $set[2] : (int) ($set[4] ?? 0);
+
+            if ($hour < 0 || $hour > 23 || $minute > 59) {
+                continue;
+            }
+
+            $value = $hour * 60 + $minute;
+
+            if (null === $latest || $value > $latest['value']) {
+                $latest = ['hour' => $hour, 'minute' => $minute, 'value' => $value];
+            }
+        }
+
+        if (null === $latest) {
+            return null;
+        }
+
+        return ['hour' => $latest['hour'], 'minute' => $latest['minute']];
     }
 
     /**

@@ -68,6 +68,17 @@ Fields it populates for each event:
 
 A structured date is used as-is. Otherwise EventMesh reads a dotted date from the text: "12.8.2026", "12.8." (no year), or a "27.6-28.6.2026" range. When no year is given it picks the next upcoming occurrence, never a past date. A date with no time of day stays at midnight. Listings with no date at all (such as gift cards or merch) are skipped unless the title itself looks like it names a date.
 
+Times of day come from "klo 18:00-21:00" or a bare "18:00-21:00". For an event that starts and ends on the same day, the end time is the latest time found anywhere in the text - schedules list doors and warm-ups first and the real finish last, so EventMesh reaches the actual end instead of stopping at the first range.
+
+= Multi-day events and exact start/end =
+
+A bare time can't say which day it belongs to, so for events that span more than one day - or whenever you want to pin an exact start and end from the source - write an explicit schedule anywhere in the description:
+
+* Same day, giving only the end time: 8.8.2026 19:00 - 21:30
+* Spanning days: 8.8.2026 19:00 - 10.8.2026 21:30
+
+Dates are day.month.year; times are 24-hour ("18:30" or "18.30"), optionally after "klo"; the separator is a hyphen or dash. When present, this wins over every other date/time signal. You can also set the start and end by hand on the event's own edit screen; those overrides survive the next sync.
+
 = Canceled events =
 
 Holvi has no structured "canceled" flag, so EventMesh treats the word CANCELED or CANCELLED (either spelling, any case) anywhere in the event title as the signal. The word stays visible, and the front end strikes through the title and date. This is separate from "sold out", which comes from the availability and stock signals above, not the title.
