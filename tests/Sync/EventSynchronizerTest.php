@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace EventMesh\Tests\Sync;
 
+use Brain\Monkey\Actions;
 use Brain\Monkey\Functions;
 use EventMesh\Models\Event;
 use EventMesh\Services\EventMediaEnricher;
@@ -76,6 +77,62 @@ final class EventSynchronizerTest extends TestCase
         $postId = $this->synchronizer()->sync($this->event('ext-existing'));
 
         self::assertSame(55, $postId);
+    }
+
+    /**
+     * The only contract EventCrew - or any other plugin - can build on: a
+     * new event fires with isNew true, exactly once, with the real post id.
+     */
+    public function testFiresEventSyncedWithIsNewTrueOnInsert(): void
+    {
+        $this->queueQueryResults([]);
+
+        Functions\when('wp_insert_post')->justReturn(501);
+
+        Actions\expectDone('eventmesh/event_synced')
+            ->once()
+            ->with(501, true);
+
+        $postId = $this->synchronizer()->sync($this->event('ext-new'));
+
+        self::assertSame(501, $postId);
+    }
+
+    /**
+     * A re-sync of an event that already existed - even one that changes its
+     * time - fires with isNew false, which is what lets a listener choose to
+     * act only on genuinely new events without re-deriving that itself.
+     */
+    public function testFiresEventSyncedWithIsNewFalseOnUpdate(): void
+    {
+        $this->queueQueryResults([55]);
+
+        Functions\when('wp_update_post')->alias(static fn (array $postarr) => (int) $postarr['ID']);
+
+        Actions\expectDone('eventmesh/event_synced')
+            ->once()
+            ->with(55, false);
+
+        $postId = $this->synchronizer()->sync($this->event('ext-existing'));
+
+        self::assertSame(55, $postId);
+    }
+
+    /**
+     * A failed insert must not tell any listener an event was synced - there
+     * is no post for it to act on.
+     */
+    public function testDoesNotFireEventSyncedWhenInsertFails(): void
+    {
+        $this->queueQueryResults([]);
+
+        Functions\when('wp_insert_post')->justReturn(new \WP_Error('db', 'insert failed'));
+
+        Actions\expectDone('eventmesh/event_synced')->never();
+
+        $postId = $this->synchronizer()->sync($this->event('ext-fail'));
+
+        self::assertSame(0, $postId);
     }
 
     public function testSyncReturnsZeroAndLogsWhenInsertFails(): void

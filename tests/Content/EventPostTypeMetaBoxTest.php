@@ -27,6 +27,11 @@ final class EventPostTypeMetaBoxTest extends TestCase
         Functions\when('checked')->alias(
             static fn ($a, $b = true, $echo = true) => (string) $a === (string) $b ? ' checked="checked"' : ''
         );
+
+        // saveDateOverride() and toDateTimeLocal() both read the site
+        // timezone via LocalTime; without a stub the call throws inside
+        // Brain\Monkey and LocalTime::parse() silently swallows it as null.
+        Functions\when('wp_timezone')->justReturn(new \DateTimeZone('Europe/Helsinki'));
     }
 
     protected function tearDown(): void

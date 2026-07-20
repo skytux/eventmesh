@@ -9,6 +9,7 @@ use EventMesh\Models\Event;
 use EventMesh\Services\EventMediaEnricher;
 use EventMesh\Services\ProviderEmbedEnricher;
 use EventMesh\Services\ProviderEnricher;
+use EventMesh\Support\LocalTime;
 use EventMesh\Support\Logger;
 use WP_Query;
 
@@ -104,6 +105,19 @@ final class EventSynchronizer
         $this->mediaEnricher->enrich($syncedPostId, $event);
         $this->providerEnricher->enrich($syncedPostId, $event);
         $this->providerEmbedEnricher->enrich($syncedPostId);
+
+        /**
+         * Fires after one event has been fully synced - post created or
+         * updated, every meta field and enrichment already written. This is
+         * EventMesh's only side of any integration with it; nothing in this
+         * plugin knows or cares who, if anyone, is listening.
+         *
+         * @param int  $postId The eventmesh_event post ID.
+         * @param bool $isNew  True only the first time this event was ever
+         *                     seen; every later re-sync fires with this
+         *                     false, even one that changes the event's time.
+         */
+        do_action('eventmesh/event_synced', $syncedPostId, $isNew);
 
         return $syncedPostId;
     }
@@ -375,9 +389,9 @@ final class EventSynchronizer
     {
         update_post_meta($postId, '_eventmesh_source_id', $event->sourceId());
         update_post_meta($postId, '_eventmesh_external_id', $event->externalId());
-        update_post_meta($postId, '_eventmesh_starts_at', $event->startsAt()?->format(DATE_ATOM) ?? '');
+        update_post_meta($postId, '_eventmesh_starts_at', LocalTime::store($event->startsAt()));
         update_post_meta($postId, '_eventmesh_starts_at_year_known', $event->startsAtYearKnown() ? '1' : '');
-        update_post_meta($postId, '_eventmesh_ends_at', $event->endsAt()?->format(DATE_ATOM) ?? '');
+        update_post_meta($postId, '_eventmesh_ends_at', LocalTime::store($event->endsAt()));
         update_post_meta($postId, '_eventmesh_url', esc_url_raw($event->url()));
         update_post_meta($postId, '_eventmesh_image_url', esc_url_raw($event->imageUrl()));
         update_post_meta($postId, '_eventmesh_sold_out', $event->soldOut() ? '1' : '');

@@ -24,7 +24,6 @@ final class EventListBlockRenderersTest extends TestCase
             static fn (array $extra = []) => 'class="wp-block-eventmesh-test"'
                 . implode('', array_map(static fn ($k, $v) => sprintf(' %s="%s"', $k, $v), array_keys($extra), $extra))
         );
-        Functions\when('date_i18n')->alias(static fn (string $format, int $timestamp) => gmdate($format, $timestamp));
         Functions\when('wp_kses')->returnArg(1);
         // Real function names/signatures (matching WordPress core) so a
         // wrong-arity call would surface here as a MissingFunctionExpectations
