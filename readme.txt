@@ -4,7 +4,7 @@ Tags: events, sync, holvi, gutenberg, event list
 Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -128,6 +128,12 @@ No. The only outgoing requests are the ones described under External services, a
 
 == Changelog ==
 
+= 1.1.0 =
+* Scraped event times are now stored and shown as the source's own local wall-clock, with no timezone attached — fixing imported events landing two or three hours off.
+* Log and sync timestamps now display in the site's configured timezone rather than the server clock.
+* New `eventmesh/event_synced` action (post id, is-new) fires after each event syncs, for sibling plugins to build on.
+* New `eventmesh/integrations` filter, and a "Connected plugins" panel on the Diagnostics screen listing whoever answered it.
+
 = 1.0.0 =
 * Initial release.
 * Holvi connector with multi-URL source management.
@@ -144,6 +150,9 @@ No. The only outgoing requests are the ones described under External services, a
 * Built-in dummy/test source (enable in Sources) for demos.
 
 == Upgrade Notice ==
+
+= 1.1.0 =
+Fixes imported event times being hours off, and log times showing in the server's timezone. Re-sync your sources after upgrading to correct existing events.
 
 = 1.0.0 =
 Initial release.
