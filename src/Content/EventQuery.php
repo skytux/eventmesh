@@ -4,13 +4,25 @@ declare(strict_types=1);
 
 namespace EventMesh\Content;
 
-use DateTimeImmutable;
 use EventMesh\Support\EventMeta;
 use EventMesh\Support\EventStatus;
+use EventMesh\Support\LocalTime;
 use WP_Query;
 
 final class EventQuery
 {
+    /**
+     * "Now" as a naive local wall-clock string, in the same form the event
+     * dates are stored - so a string comparison against `_eventmesh_starts_at`
+     * is comparing like with like. Both sides are zone-less local time, which
+     * is exactly what makes the comparison well-defined now that no offset is
+     * stored.
+     */
+    private function now(): string
+    {
+        return wp_date(LocalTime::STORAGE_FORMAT);
+    }
+
     /**
      * Query var used to opt a WP_Query into applyUpcomingFirstClauses()'s
      * reordering - set by recent() itself, and by markQueryLoopUpcomingFirst()
@@ -74,7 +86,7 @@ final class EventQuery
 
         $query = new WP_Query(array_merge($defaults, $args));
 
-        $now = (new DateTimeImmutable('now'))->format(DATE_ATOM);
+        $now = $this->now();
         $events = [];
 
         foreach ($query->posts as $post) {
@@ -150,7 +162,7 @@ final class EventQuery
 
         global $wpdb;
 
-        $now = (new DateTimeImmutable('now'))->format(DATE_ATOM);
+        $now = $this->now();
 
         $clauses['join'] .= " LEFT JOIN {$wpdb->postmeta} AS eventmesh_starts_at" .
             " ON eventmesh_starts_at.post_id = {$wpdb->posts}.ID" .
@@ -231,10 +243,10 @@ final class EventQuery
      */
     private function timeMetaQuery(string $time): ?array
     {
-        // Compared as strings against DATE_ATOM values, consistent with the
-        // existing orderby => meta_value sort — not reliable across mixed
-        // UTC offsets, but no worse than the sorting behaviour already relied on.
-        $now = (new DateTimeImmutable('now'))->format(DATE_ATOM);
+        // Compared as strings against the stored naive wall-clock values,
+        // consistent with the orderby => meta_value sort. Both sides are
+        // zone-less local time, so the string comparison is well-defined.
+        $now = $this->now();
 
         return match ($time) {
             'past' => [

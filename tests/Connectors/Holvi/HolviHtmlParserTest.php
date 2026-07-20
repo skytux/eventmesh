@@ -17,6 +17,12 @@ final class HolviHtmlParserTest extends TestCase
         parent::setUp();
 
         Functions\when('wp_parse_url')->alias('parse_url');
+
+        // Without this stub, LocalTime::siteTimezone() falls back to UTC and
+        // every assertion below would pass whether or not the timezone fix
+        // actually works - Europe/Helsinki is what makes the bug (and the
+        // fix) observable at all.
+        Functions\when('wp_timezone')->justReturn(new \DateTimeZone('Europe/Helsinki'));
     }
 
     private function parser(): HolviHtmlParser
@@ -61,6 +67,20 @@ final class HolviHtmlParserTest extends TestCase
             ],
             $event->providers()
         );
+    }
+
+    /**
+     * Real Holvi listings never state a timezone anywhere, but this fixture
+     * does ("+03:00" in its startDate) and PHP itself - not LocalTime -
+     * honors an offset a string states, regardless of which timezone is
+     * passed as the fallback. Kept as a guard against ever reintroducing an
+     * override that would fight PHP's own behavior here.
+     */
+    public function testAnExplicitOffsetInTheSourceIsHonoredAsIs(): void
+    {
+        $events = $this->parser()->parse($this->fixture('jsonld-single.html'), self::SOURCE_URL);
+
+        self::assertSame('2026-08-01T20:00:00+03:00', $events[0]->startsAt()?->format('Y-m-d\TH:i:sP'));
     }
 
     public function testParsesJsonLdGraphAndSkipsNonEventTypes(): void
@@ -110,7 +130,12 @@ final class HolviHtmlParserTest extends TestCase
         self::assertSame('Desc here', $event->description());
         self::assertSame('Markup Venue', $event->venueName());
         self::assertNotNull($event->startsAt());
-        self::assertSame('2026-10-01T18:00:00+00:00', $event->startsAt()->format('Y-m-d\TH:i:sP'));
+
+        // The fixture's <time datetime> carries no timezone, which is what
+        // real Holvi microdata actually looks like. It must be read as the
+        // site's timezone (Europe/Helsinki, stubbed above) - this is the
+        // exact bug that made every Holvi import land 2-3 hours late.
+        self::assertSame('2026-10-01T18:00:00+03:00', $event->startsAt()->format('Y-m-d\TH:i:sP'));
     }
 
     public function testMarkupExtractsCssBackgroundImage(): void

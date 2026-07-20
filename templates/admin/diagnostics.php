@@ -19,6 +19,7 @@
  *     recommendation: string|null
  * } $sync_health Background-sync health snapshot.
  * @var array<int, array{level: string, message: string, timestamp: int}> $recent_logs Recent EventMesh log entries.
+ * @var array<int, array{id: string, label: string, status: string}> $integrations Connected sibling plugins.
  */
 
 declare(strict_types=1);
@@ -132,6 +133,29 @@ $eventmesh_datetime = static fn (int $timestamp): string => \EventMesh\Support\D
             </tr>
         </tbody>
     </table>
+
+    <h2><?php esc_html_e('Connected plugins', 'eventmesh'); ?></h2>
+
+    <?php if ([] === $integrations) : ?>
+        <p><?php esc_html_e('No other plugins are connected to EventMesh.', 'eventmesh'); ?></p>
+    <?php else : ?>
+        <table class="widefat striped">
+            <thead>
+                <tr>
+                    <th><?php esc_html_e('Plugin', 'eventmesh'); ?></th>
+                    <th><?php esc_html_e('Status', 'eventmesh'); ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($integrations as $eventmesh_integration) : ?>
+                    <tr>
+                        <td><?php echo esc_html($eventmesh_integration['label']); ?></td>
+                        <td><?php echo esc_html($eventmesh_integration['status']); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endif; ?>
 
     <h2><?php esc_html_e('Recent EventMesh activity', 'eventmesh'); ?></h2>
 

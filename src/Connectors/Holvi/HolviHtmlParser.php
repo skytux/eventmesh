@@ -11,6 +11,7 @@ use DOMNode;
 use DOMXPath;
 use EventMesh\Models\Event;
 use EventMesh\Support\KnownProviders;
+use EventMesh\Support\LocalTime;
 
 final class HolviHtmlParser
 {
@@ -737,7 +738,7 @@ final class HolviHtmlParser
 
         if (1 === preg_match(self::RANGE_DATE_PATTERN, $text, $matches)) {
             $yearKnown = '' !== ($matches['year'] ?? '');
-            $year = $yearKnown ? (int) $matches['year'] : (int) (new DateTimeImmutable())->format('Y');
+            $year = $yearKnown ? (int) $matches['year'] : (int) LocalTime::now()->format('Y');
 
             $start = $this->buildDate($year, (int) $matches['startMonth'], (int) $matches['startDay'], $yearKnown);
             $end = $this->buildDate($year, (int) $matches['endMonth'], (int) $matches['endDay'], $yearKnown);
@@ -749,7 +750,7 @@ final class HolviHtmlParser
 
         if (1 === preg_match(self::SINGLE_DATE_PATTERN, $text, $matches)) {
             $yearKnown = '' !== ($matches['year'] ?? '');
-            $year = $yearKnown ? (int) $matches['year'] : (int) (new DateTimeImmutable())->format('Y');
+            $year = $yearKnown ? (int) $matches['year'] : (int) LocalTime::now()->format('Y');
 
             $date = $this->buildDate($year, (int) $matches['month'], (int) $matches['day'], $yearKnown);
 
@@ -895,19 +896,22 @@ final class HolviHtmlParser
         return $none;
     }
 
+    /**
+     * A date scraped out of Finnish prose ("la 12.8. klo 21") states no
+     * timezone, and means the venue's local time. It is therefore built in the
+     * site's zone rather than the UTC default WordPress leaves PHP sitting in -
+     * built as UTC it is stored two or three hours late depending on summer
+     * time, which is what every imported Holvi event was doing.
+     */
     private function buildDate(int $year, int $month, int $day, bool $yearKnown): ?DateTimeImmutable
     {
-        if (! checkdate($month, $day, $year)) {
+        $date = LocalTime::fromDate($year, $month, $day);
+
+        if (null === $date) {
             return null;
         }
 
-        try {
-            $date = new DateTimeImmutable(sprintf('%04d-%02d-%02d', $year, $month, $day));
-        } catch (\Exception) {
-            return null;
-        }
-
-        if (! $yearKnown && $date < new DateTimeImmutable('today')) {
+        if (! $yearKnown && $date < LocalTime::now('today')) {
             $date = $date->modify('+1 year');
         }
 
@@ -1039,17 +1043,14 @@ final class HolviHtmlParser
         return trim($node->getAttribute($attribute));
     }
 
+    /**
+     * A structured date from JSON-LD or microdata - typically a bare
+     * "2026-10-01T18:00" with no timezone of its own, which LocalTime reads
+     * as the site's local time.
+     */
     private function dateValue(string $value): ?DateTimeImmutable
     {
-        if ('' === trim($value)) {
-            return null;
-        }
-
-        try {
-            return new DateTimeImmutable($value);
-        } catch (\Exception) {
-            return null;
-        }
+        return LocalTime::parse($value);
     }
 
     private function imageValue(mixed $value, string $sourceUrl): string

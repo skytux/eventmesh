@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EventMesh\Models;
 
 use DateTimeImmutable;
+use EventMesh\Support\LocalTime;
 
 final class Event
 {
@@ -136,9 +137,9 @@ final class Event
             'source_id' => $this->sourceId,
             'external_id' => $this->externalId,
             'title' => $this->title,
-            'starts_at' => $this->startsAt?->format(DATE_ATOM) ?? '',
+            'starts_at' => LocalTime::store($this->startsAt),
             'starts_at_year_known' => $this->startsAtYearKnown ? '1' : '',
-            'ends_at' => $this->endsAt?->format(DATE_ATOM) ?? '',
+            'ends_at' => LocalTime::store($this->endsAt),
             'url' => $this->url,
             'description' => $this->description,
             'image_url' => $this->imageUrl,

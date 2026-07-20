@@ -348,13 +348,13 @@ final class EventPostType
         echo '</select></label></p>';
     }
 
+    /**
+     * LocalTime::parse() already reads the stored value in the site's
+     * timezone, which is exactly what a datetime-local field expects.
+     */
     private function toDateTimeLocal(string $stored): string
     {
-        try {
-            return (new \DateTimeImmutable($stored))->format('Y-m-d\TH:i');
-        } catch (\Exception) {
-            return '';
-        }
+        return \EventMesh\Support\LocalTime::parse($stored)?->format('Y-m-d\TH:i') ?? '';
     }
 
     public function saveMetaBox(int $postId, \WP_Post $post): void
@@ -494,13 +494,11 @@ final class EventPostType
         $value = '';
 
         if ('' !== $raw) {
-            try {
-                // Normalize the datetime-local value to the same DATE_ATOM the
-                // scraped dates use, so comparisons/formatting behave alike.
-                $value = (new \DateTimeImmutable($raw))->format(DATE_ATOM);
-            } catch (\Exception) {
-                $value = '';
-            }
+            // Stored in the same naive wall-clock form as the scraped dates -
+            // a datetime-local input carries no timezone, and neither should
+            // what we store. The override reads back verbatim, so 18:00 typed
+            // is 18:00 shown.
+            $value = \EventMesh\Support\LocalTime::store(\EventMesh\Support\LocalTime::parse($raw));
         }
 
         update_post_meta($postId, '_eventmesh_manual_' . $baseKey, $value);

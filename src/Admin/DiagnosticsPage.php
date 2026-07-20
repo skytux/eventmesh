@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace EventMesh\Admin;
 
+use EventMesh\Support\Integrations;
 use EventMesh\Support\Logger;
 
 final class DiagnosticsPage
@@ -27,6 +28,7 @@ final class DiagnosticsPage
                 'wordpress_version' => get_bloginfo('version'),
                 'sync_health' => $this->syncHealth(),
                 'recent_logs' => $this->logger->recent(),
+                'integrations' => Integrations::all(),
             ]
         );
     }

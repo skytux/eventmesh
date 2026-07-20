@@ -10,6 +10,7 @@ use EventMesh\Content\EventQuery;
 use EventMesh\Support\EventMeta;
 use EventMesh\Support\EventStatus;
 use EventMesh\Support\KnownProviders;
+use EventMesh\Support\LocalTime;
 use EventMesh\Support\ProviderEmbedMarkup;
 
 final class EventListBlock
@@ -200,7 +201,11 @@ final class EventListBlock
             return false;
         }
 
-        return $startsAt < (new \DateTimeImmutable('now'))->format(\DATE_ATOM);
+        // Both sides are naive local wall-clock strings, compared as text:
+        // the stored value carries no zone, so "now" must be the local
+        // wall-clock now (not a UTC instant), or the comparison drifts by the
+        // offset around midnight.
+        return $startsAt < wp_date(LocalTime::STORAGE_FORMAT);
     }
 
     private function isSoldOut(int $postId): bool
@@ -426,6 +431,13 @@ final class EventListBlock
         return [$start, $end, $yearKnown];
     }
 
+    /**
+     * A stored event date is a naive wall-clock string. It is parsed in UTC
+     * purely as a stable carrier for those wall-clock components - never to
+     * say the event is in UTC - so that formatting it back in UTC (see the
+     * *Text helpers) reproduces exactly what was stored, with no offset ever
+     * applied.
+     */
     private function parseMetaDate(string $raw): ?\DateTimeImmutable
     {
         if ('' === $raw) {
@@ -433,7 +445,7 @@ final class EventListBlock
         }
 
         try {
-            return new \DateTimeImmutable($raw);
+            return new \DateTimeImmutable($raw, new \DateTimeZone('UTC'));
         } catch (\Exception) {
             return null;
         }
@@ -450,7 +462,7 @@ final class EventListBlock
             return null;
         }
 
-        return date_i18n($yearKnown ? 'D j F Y' : 'D j F', $start->getTimestamp());
+        return wp_date($yearKnown ? 'D j F Y' : 'D j F', $start->getTimestamp(), new \DateTimeZone('UTC'));
     }
 
     private function endDateText(int $postId): ?string
@@ -461,7 +473,7 @@ final class EventListBlock
             return null;
         }
 
-        return date_i18n($yearKnown ? 'D j F Y' : 'D j F', $end->getTimestamp());
+        return wp_date($yearKnown ? 'D j F Y' : 'D j F', $end->getTimestamp(), new \DateTimeZone('UTC'));
     }
 
     /**
@@ -497,7 +509,7 @@ final class EventListBlock
             return null;
         }
 
-        return date_i18n('H:i', $start->getTimestamp());
+        return wp_date('H:i', $start->getTimestamp(), new \DateTimeZone('UTC'));
     }
 
     private function endTimeText(int $postId): ?string
@@ -508,7 +520,7 @@ final class EventListBlock
             return null;
         }
 
-        return date_i18n('H:i', $end->getTimestamp());
+        return wp_date('H:i', $end->getTimestamp(), new \DateTimeZone('UTC'));
     }
 
     /**
