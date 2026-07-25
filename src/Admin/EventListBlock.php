@@ -16,6 +16,14 @@ use EventMesh\Support\ProviderEmbedMarkup;
 final class EventListBlock
 {
     /**
+     * Widest fixed featured-image box still treated as a thumbnail by
+     * rightSizeEventThumbnails(). Matches WordPress's own default "thumbnail"
+     * size, so a block asking for no more than this can be served by it
+     * without ever being scaled up.
+     */
+    private const THUMBNAIL_MAX_WIDTH = 150;
+
+    /**
      * Tracks whether eventmesh/past-events-marker has already rendered its
      * heading for the Query Loop currently being rendered - reset by
      * resetPastEventsMarker() right as each Query Loop's own query is built
@@ -94,6 +102,59 @@ final class EventListBlock
         add_filter('query_loop_block_query_vars', [$this->eventQuery, 'markQueryLoopUpcomingFirst']);
         add_filter('query_loop_block_query_vars', [$this, 'resetPastEventsMarker']);
         add_filter('pre_render_block', [$this, 'scopeQueryLoopTime'], 10, 2);
+        add_filter('render_block_data', [$this, 'rightSizeEventThumbnails']);
+    }
+
+    /**
+     * Serves an event's featured image at a size close to the box it is drawn
+     * in, when the block asks for a small fixed one.
+     *
+     * core/post-featured-image defaults sizeSlug to "post-thumbnail", which
+     * falls back to the *full* upload when a theme hasn't registered that
+     * size. Event images are sideloaded at whatever resolution the ticket
+     * provider published, so a list of 20 events was capable of downloading 20
+     * full-resolution photographs to fill 20 boxes 80 pixels wide.
+     *
+     * Applied at render time rather than only in the block pattern because the
+     * pattern is copied into a page once, at insert: fixing the markup alone
+     * would leave every already-built events page paying the old cost forever.
+     * Only fills in a size where the block hasn't chosen one, so an explicit
+     * editorial choice is always left alone.
+     *
+     * @param array<string, mixed> $parsedBlock
+     *
+     * @return array<string, mixed>
+     */
+    public function rightSizeEventThumbnails(array $parsedBlock): array
+    {
+        if ('core/post-featured-image' !== ($parsedBlock['blockName'] ?? '')) {
+            return $parsedBlock;
+        }
+
+        // Only ever touch our own posts. The post-template block sets up the
+        // global post before rendering each row, so this reads the event
+        // currently being drawn; anywhere that isn't set up, we decline rather
+        // than guess and quietly restyle some other plugin's or theme's image.
+        if (EventPostType::NAME !== get_post_type()) {
+            return $parsedBlock;
+        }
+
+        if (isset($parsedBlock['attrs']['sizeSlug'])) {
+            return $parsedBlock;
+        }
+
+        $width = (int) ($parsedBlock['attrs']['width'] ?? 0);
+
+        // Only for the demonstrably small ones. A block with no fixed width
+        // may well be a full-bleed hero image, where downgrading the size
+        // would be a visible regression rather than a saving.
+        if ($width <= 0 || $width > self::THUMBNAIL_MAX_WIDTH) {
+            return $parsedBlock;
+        }
+
+        $parsedBlock['attrs']['sizeSlug'] = 'thumbnail';
+
+        return $parsedBlock;
     }
 
     /**
@@ -858,7 +919,7 @@ final class EventListBlock
 
 <!-- wp:column {"verticalAlignment":"top","width":"15%"} -->
 <div class="wp-block-column is-vertically-aligned-top" style="flex-basis:15%">
-<!-- wp:post-featured-image {"width":"80px","height":"80px","isLink":true} /-->
+<!-- wp:post-featured-image {"sizeSlug":"thumbnail","width":"80px","height":"80px","isLink":true} /-->
 </div>
 <!-- /wp:column -->
 
@@ -920,7 +981,7 @@ final class EventListBlock
 
 <!-- wp:column {"verticalAlignment":"top","width":"15%"} -->
 <div class="wp-block-column is-vertically-aligned-top" style="flex-basis:15%">
-<!-- wp:post-featured-image {"width":"80px","height":"80px","isLink":true} /-->
+<!-- wp:post-featured-image {"sizeSlug":"thumbnail","width":"80px","height":"80px","isLink":true} /-->
 </div>
 <!-- /wp:column -->
 

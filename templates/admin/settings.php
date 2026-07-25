@@ -6,6 +6,7 @@
  * @var string $sync_interval Currently configured background sync interval key.
  * @var array<string, string> $sync_intervals Available interval keys mapped to labels.
  * @var bool $delete_data_on_uninstall Whether uninstalling the plugin should also delete its data.
+ * @var bool $embed_facade Whether provider embeds show a click-to-play button instead of loading.
  * @var bool $defer_embeds Whether provider embeds load only when scrolled into view.
  */
 
@@ -64,12 +65,20 @@ if (! defined('ABSPATH')) {
                     </th>
                     <td>
                         <label>
+                            <input type="checkbox" name="eventmesh_embed_facade" value="1" <?php checked($embed_facade, true); ?> />
+                            <?php esc_html_e('Show a play button and load the player only when clicked', 'eventmesh'); ?>
+                        </label>
+                        <p class="description">
+                            <?php // phpcs:ignore Generic.Files.LineLength.TooLong -- single gettext literal; splitting it breaks extraction. ?>
+                            <?php esc_html_e('Recommended. A page listing many events downloads nothing from Spotify/SoundCloud/Mixcloud until a visitor actually asks to hear something, which is by far the biggest thing you can do for its page speed score. Turn this off to have the players appear ready to play on arrival.', 'eventmesh'); ?>
+                        </p>
+                        <label>
                             <input type="checkbox" name="eventmesh_defer_embeds" value="1" <?php checked($defer_embeds, true); ?> />
                             <?php esc_html_e('Load embedded players only when scrolled into view', 'eventmesh'); ?>
                         </label>
                         <p class="description">
                             <?php // phpcs:ignore Generic.Files.LineLength.TooLong -- single gettext literal; splitting it breaks extraction. ?>
-                            <?php esc_html_e('Defers each Spotify/SoundCloud/Mixcloud player until the visitor scrolls to it, so a page with many events loads faster. Players without JavaScript fall back to loading normally.', 'eventmesh'); ?>
+                            <?php esc_html_e('Only applies when the play button above is off. Players still load on their own, just not until the visitor scrolls to them. Players without JavaScript fall back to loading normally.', 'eventmesh'); ?>
                         </p>
                     </td>
                 </tr>

@@ -23,6 +23,7 @@ final class SettingsPage
                 'sync_interval' => $this->admin->configuredSyncInterval(),
                 'sync_intervals' => $this->admin->availableSyncIntervals(),
                 'delete_data_on_uninstall' => '1' === (string) get_option('eventmesh_delete_data_on_uninstall', '0'),
+                'embed_facade' => '1' === (string) get_option('eventmesh_embed_facade', '1'),
                 'defer_embeds' => '1' === (string) get_option('eventmesh_defer_embeds', '0'),
             ]
         );
@@ -48,6 +49,10 @@ final class SettingsPage
             ? '1' === (string) $_POST['eventmesh_delete_data_on_uninstall']
             : false;
 
+        $embedFacade = isset($_POST['eventmesh_embed_facade'])
+            ? '1' === (string) $_POST['eventmesh_embed_facade']
+            : false;
+
         $deferEmbeds = isset($_POST['eventmesh_defer_embeds'])
             ? '1' === (string) $_POST['eventmesh_defer_embeds']
             : false;
@@ -59,6 +64,7 @@ final class SettingsPage
         update_option('eventmesh_enable_background_sync', $backgroundSyncEnabled ? '1' : '0');
         update_option('eventmesh_sync_interval', $syncInterval);
         update_option('eventmesh_delete_data_on_uninstall', $deleteDataOnUninstall ? '1' : '0');
+        update_option('eventmesh_embed_facade', $embedFacade ? '1' : '0');
         update_option('eventmesh_defer_embeds', $deferEmbeds ? '1' : '0');
 
         wp_safe_redirect(

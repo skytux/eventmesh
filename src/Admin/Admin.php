@@ -260,30 +260,44 @@ final class Admin
     {
         $path = EVENTMESH_PLUGIN_DIR . 'assets/css/frontend.css';
 
+        if (is_readable($path)) {
+            $css = (string) file_get_contents($path);
+
+            // Printed inline rather than linked as a file. The whole stylesheet
+            // is a couple of KB, so a separate <link> costs a render-blocking
+            // round trip that dwarfs the bytes it saves - and it was being
+            // requested on every page of the site, including the ones with no
+            // events on them at all. Registered with no source so WordPress
+            // emits only the <style> tag.
+            if ('' !== trim($css)) {
+                wp_register_style('eventmesh-frontend', false, [], (string) filemtime($path));
+                wp_enqueue_style('eventmesh-frontend');
+                wp_add_inline_style('eventmesh-frontend', $css);
+            }
+        }
+
+        // Registered here (not enqueued) so ProviderEmbedMarkup can enqueue
+        // whichever one it uses on demand, only on pages that actually render
+        // an embed that needs it.
+        $this->registerFrontendScript('eventmesh-embed-lazy', 'assets/js/embed-lazy.js');
+        $this->registerFrontendScript('eventmesh-embed-facade', 'assets/js/embed-facade.js');
+    }
+
+    private function registerFrontendScript(string $handle, string $relativePath): void
+    {
+        $path = EVENTMESH_PLUGIN_DIR . $relativePath;
+
         if (! is_readable($path)) {
             return;
         }
 
-        wp_enqueue_style(
-            'eventmesh-frontend',
-            EVENTMESH_PLUGIN_URL . 'assets/css/frontend.css',
+        wp_register_script(
+            $handle,
+            EVENTMESH_PLUGIN_URL . $relativePath,
             [],
-            (string) filemtime($path)
+            (string) filemtime($path),
+            ['in_footer' => true, 'strategy' => 'defer']
         );
-
-        // Registered here (not enqueued) so ProviderEmbedMarkup can enqueue it
-        // on demand, only on pages that actually render a deferred embed.
-        $embedScript = EVENTMESH_PLUGIN_DIR . 'assets/js/embed-lazy.js';
-
-        if (is_readable($embedScript)) {
-            wp_register_script(
-                'eventmesh-embed-lazy',
-                EVENTMESH_PLUGIN_URL . 'assets/js/embed-lazy.js',
-                [],
-                (string) filemtime($embedScript),
-                ['in_footer' => true, 'strategy' => 'defer']
-            );
-        }
     }
 
     public function renderStatusShortcode(array $attributes = []): string
