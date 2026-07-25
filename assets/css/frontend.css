@@ -102,17 +102,14 @@
 }
 
 /*
- * Hover lifts the pill rather than filling it, so the background behind it is
- * never obscured.
+ * Hover drops the shadow rather than filling the pill, so the background
+ * behind it is never obscured. Held through :active too - a press is also a
+ * hover, and letting the shadow flash back mid-click would fight the effect.
  */
-.eventmesh-embed-facade:hover .eventmesh-embed-facade__pill {
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.34);
-    transform: translateY(-1px);
-}
-
+.eventmesh-embed-facade:hover .eventmesh-embed-facade__pill,
 .eventmesh-embed-facade:active .eventmesh-embed-facade__pill {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    transform: translateY(0);
+    box-shadow: none;
+    transform: translateY(1px);
 }
 
 /* Focus ring on the pill, not the invisible 70px box around it. */
@@ -131,7 +128,8 @@
         transition: none;
     }
 
-    .eventmesh-embed-facade:hover .eventmesh-embed-facade__pill {
+    .eventmesh-embed-facade:hover .eventmesh-embed-facade__pill,
+    .eventmesh-embed-facade:active .eventmesh-embed-facade__pill {
         transform: none;
     }
 }
