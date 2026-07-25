@@ -7,6 +7,10 @@
     templates/, config/, assets/) - no vendor/, tests/, tooling configs, or
     VCS files.
 
+    Output lands in dist/, which .gitignore already excludes, so a build can
+    never be committed by accident and the repo root stays free of artifacts.
+    Pass -OutputPath to write somewhere else.
+
     Zip entries are written with forward-slash path separators explicitly,
     rather than relying on Compress-Archive or ZipFile.CreateFromDirectory.
     Windows PowerShell 5.1's System.IO.Compression (.NET Framework) does not
@@ -17,13 +21,20 @@
 #>
 
 param(
-    [string]$OutputPath = (Join-Path $PSScriptRoot '..\eventmesh.zip')
+    [string]$OutputPath = (Join-Path $PSScriptRoot '..\dist\eventmesh.zip')
 )
 
 $ErrorActionPreference = 'Stop'
 
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot '..')
 $outputPath = [System.IO.Path]::GetFullPath($OutputPath)
+
+# The output directory is not necessarily present - dist/ is gitignored, so a
+# fresh clone has no such folder for the zip stream to be created in.
+$outputDir = [System.IO.Path]::GetDirectoryName($outputPath)
+if (-not (Test-Path $outputDir)) {
+    New-Item -ItemType Directory -Force -Path $outputDir | Out-Null
+}
 
 $stagingRoot = Join-Path $env:TEMP 'eventmesh-build'
 $stagingDir = Join-Path $stagingRoot 'eventmesh'
