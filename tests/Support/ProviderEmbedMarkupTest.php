@@ -22,6 +22,7 @@ final class ProviderEmbedMarkupTest extends TestCase
         Functions\when('__')->returnArg(1);
         Functions\when('esc_attr')->returnArg(1);
         Functions\when('esc_html')->returnArg(1);
+        Functions\when('wp_parse_url')->alias(static fn (string $url) => parse_url($url));
     }
 
     /**
@@ -86,34 +87,97 @@ final class ProviderEmbedMarkupTest extends TestCase
         $this->withOptions('1', '0');
         $this->captureEnqueuedHandle();
 
-        $html = ProviderEmbedMarkup::render(self::IFRAME, 'Hear the set');
+        $html = ProviderEmbedMarkup::render(self::IFRAME, ['playLabel' => 'Hear the set']);
 
         self::assertStringContainsString('>Hear the set</span>', $html);
     }
 
     /**
+     * @param array<string, mixed> $attributes
+     *
      * @dataProvider noLabelProvider
      */
-    public function testTheFacadeButtonFallsBackToTheDefaultLabel(?string $given): void
+    public function testTheFacadeButtonFallsBackToTheDefaultLabel(array $attributes): void
     {
         $this->withOptions('1', '0');
         $this->captureEnqueuedHandle();
 
-        $html = ProviderEmbedMarkup::render(self::IFRAME, $given);
+        $html = ProviderEmbedMarkup::render(self::IFRAME, $attributes);
 
         self::assertStringContainsString('>Listen to this DJ</span>', $html);
     }
 
     /**
-     * @return array<string, array{0: string|null}>
+     * @return array<string, array{0: array<string, mixed>}>
      */
     public static function noLabelProvider(): array
     {
         return [
-            'rendered outside a block' => [null],
-            'text cleared in the editor' => [''],
-            'whitespace only' => ['   '],
+            'rendered outside a block' => [[]],
+            'text cleared in the editor' => [['playLabel' => '']],
+            'whitespace only' => [['playLabel' => '   ']],
         ];
+    }
+
+    /**
+     * The whole point of the suffix: "Listen to this DJ" + " on " + "Spotify".
+     */
+    public function testComposesPrefixLabelSuffixAndPlatformName(): void
+    {
+        $this->withOptions('1', '0');
+        $this->captureEnqueuedHandle();
+
+        $html = ProviderEmbedMarkup::render(
+            self::IFRAME,
+            ['suffix' => ' on ', 'showPlatform' => true]
+        );
+
+        self::assertStringContainsString('>Listen to this DJ on Spotify</span>', $html);
+    }
+
+    public function testUsesPrefixAndSuffixSpacingExactlyAsTyped(): void
+    {
+        $this->withOptions('1', '0');
+        $this->captureEnqueuedHandle();
+
+        $html = ProviderEmbedMarkup::render(
+            self::IFRAME,
+            ['prefix' => 'Now: ', 'playLabel' => 'Hear the set', 'suffix' => ' now']
+        );
+
+        self::assertStringContainsString('>Now: Hear the set now</span>', $html);
+    }
+
+    /**
+     * The suffix is independent of the platform name: it is still written out
+     * as typed, trailing space and all, when the platform isn't asked for.
+     */
+    public function testLeavesThePlatformNameOffUntilItIsAskedFor(): void
+    {
+        $this->withOptions('1', '0');
+        $this->captureEnqueuedHandle();
+
+        $html = ProviderEmbedMarkup::render(self::IFRAME, ['suffix' => ' on ']);
+
+        self::assertStringContainsString('>Listen to this DJ on </span>', $html);
+        self::assertStringNotContainsString('Spotify</span>', $html);
+    }
+
+    /**
+     * A joining suffix with nothing after it reads as a sentence cut off
+     * mid-way ("Listen to this DJ on"), so it goes when the platform does.
+     */
+    public function testDropsTheJoiningSuffixWhenThePlatformCannotBeNamed(): void
+    {
+        $this->withOptions('1', '0');
+        $this->captureEnqueuedHandle();
+
+        $html = ProviderEmbedMarkup::render(
+            '<iframe title="Embedded media player" src="https://players.example.com/x"></iframe>',
+            ['suffix' => ' on ', 'showPlatform' => true]
+        );
+
+        self::assertStringContainsString('>Listen to this DJ</span>', $html);
     }
 
     /**
@@ -126,7 +190,7 @@ final class ProviderEmbedMarkupTest extends TestCase
         $this->withOptions('1', '0');
         $this->captureEnqueuedHandle();
 
-        $html = ProviderEmbedMarkup::render(self::IFRAME, 'Hear the set');
+        $html = ProviderEmbedMarkup::render(self::IFRAME, ['playLabel' => 'Hear the set']);
 
         self::assertStringNotContainsString('aria-label', $html);
     }

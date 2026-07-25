@@ -13,6 +13,18 @@
     "playLabel": {
       "type": "string",
       "default": "Listen to this DJ"
+    },
+    "prefix": {
+      "type": "string",
+      "default": ""
+    },
+    "suffix": {
+      "type": "string",
+      "default": ""
+    },
+    "showPlatform": {
+      "type": "boolean",
+      "default": false
     }
   },
   "supports": {

@@ -458,19 +458,7 @@ final class HolviHtmlParser
 
     private function providerForUrl(string $url): ?string
     {
-        $host = strtolower((string) (wp_parse_url($url)['host'] ?? ''));
-
-        if ('' === $host) {
-            return null;
-        }
-
-        foreach (KnownProviders::domains() as $domain => $provider) {
-            if ($host === $domain || str_ends_with($host, '.' . $domain)) {
-                return $provider;
-            }
-        }
-
-        return null;
+        return KnownProviders::keyForUrl($url);
     }
 
     /**

@@ -54,27 +54,27 @@
 }
 
 /*
- * Click-to-play facade. Sized to exactly the same 70px box as the player it
- * stands in for, so swapping one for the other on click shifts nothing.
- * Deliberately styled from currentColor and an outline alone: it has to sit
- * inside any theme, light or dark, without being told what the surrounding
- * palette is - and it must stay fully transparent, because whatever the
- * theme puts behind the embed (a background image, a gradient) has to show
- * through it exactly as it shows through the player it replaces. That rules
- * out any background fill here, including a faint one.
+ * Click-to-play facade. The button itself is an invisible 70px box matching
+ * the player it stands in for exactly, so swapping one for the other on click
+ * shifts nothing and the whole area stays clickable. Everything visible is
+ * drawn on the pill inside it, which hugs its own text.
+ *
+ * Styled from currentColor throughout: it has to sit inside any theme, light
+ * or dark, without being told what the surrounding palette is. It also stays
+ * fully transparent, because whatever the theme puts behind the embed (a
+ * background image, a gradient) has to show through it exactly as it shows
+ * through the player it replaces - which rules out any background fill,
+ * including a faint one.
  */
 .eventmesh-embed-facade {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.6em;
     box-sizing: border-box;
     width: 100%;
     height: 70px;
     padding: 0 1em;
     border: 0;
-    box-shadow: inset 0 0 0 1px currentColor;
-    border-radius: 4px;
     background: none;
     color: inherit;
     font: inherit;
@@ -83,16 +83,57 @@
     cursor: pointer;
 }
 
-/* Hover feedback thickens the outline rather than filling the button, so the
-   background behind it is never obscured. */
-.eventmesh-embed-facade:hover {
-    box-shadow: inset 0 0 0 2px currentColor;
+.eventmesh-embed-facade__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55em;
+    max-width: 100%;
+    padding: 0.5em 1.1em;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    /*
+     * A plain drop shadow, not a colored one: currentColor could be anything,
+     * and a shadow tinted with it would glow rather than lift. Kept soft
+     * enough to read as depth on a photographic background without darkening
+     * what's behind the pill.
+     */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.28);
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
 }
 
-/* Focus ring drawn outside the box, so it reads against any backdrop. */
+/*
+ * Hover lifts the pill rather than filling it, so the background behind it is
+ * never obscured.
+ */
+.eventmesh-embed-facade:hover .eventmesh-embed-facade__pill {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.34);
+    transform: translateY(-1px);
+}
+
+.eventmesh-embed-facade:active .eventmesh-embed-facade__pill {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    transform: translateY(0);
+}
+
+/* Focus ring on the pill, not the invisible 70px box around it. */
 .eventmesh-embed-facade:focus-visible {
+    outline: none;
+}
+
+.eventmesh-embed-facade:focus-visible .eventmesh-embed-facade__pill {
     outline: 2px solid currentColor;
     outline-offset: 2px;
+}
+
+/* Respects a visitor who has asked the OS for less motion. */
+@media (prefers-reduced-motion: reduce) {
+    .eventmesh-embed-facade__pill {
+        transition: none;
+    }
+
+    .eventmesh-embed-facade:hover .eventmesh-embed-facade__pill {
+        transform: none;
+    }
 }
 
 /* A CSS triangle keeps the play glyph an image-free, request-free shape. */
@@ -107,8 +148,8 @@
 
 /*
  * min-width:0 lets the label shrink below its text width, which a flex item
- * otherwise refuses to do - without it, a long label pushes the icon off
- * centre and out of the button instead of ellipsising.
+ * otherwise refuses to do - without it, a long label pushes the icon out of
+ * the pill instead of ellipsising inside it.
  */
 .eventmesh-embed-facade__label {
     min-width: 0;
