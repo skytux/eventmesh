@@ -44,21 +44,24 @@
 
 /*
  * A deferred embed (data-src, no src yet) is an empty frame until embed-lazy.js
- * promotes it. Give it a faint placeholder and reserve its height so there's no
- * blank flash or layout shift while it waits to scroll into view.
+ * promotes it. Reserve its height so there's no layout shift while it waits to
+ * scroll into view. No background fill: an iframe is transparent by default,
+ * and tinting it would hide whatever the theme has placed behind the embed.
  */
 .eventmesh-provider-embed iframe[data-src] {
     min-height: 70px;
-    background: rgba(127, 127, 127, 0.08);
     border: 0;
 }
 
 /*
  * Click-to-play facade. Sized to exactly the same 70px box as the player it
  * stands in for, so swapping one for the other on click shifts nothing.
- * Deliberately styled from currentColor and transparency rather than fixed
- * colors: it has to sit inside any theme, light or dark, without being told
- * what the surrounding palette is.
+ * Deliberately styled from currentColor and an outline alone: it has to sit
+ * inside any theme, light or dark, without being told what the surrounding
+ * palette is - and it must stay fully transparent, because whatever the
+ * theme puts behind the embed (a background image, a gradient) has to show
+ * through it exactly as it shows through the player it replaces. That rules
+ * out any background fill here, including a faint one.
  */
 .eventmesh-embed-facade {
     display: flex;
@@ -71,7 +74,7 @@
     border: 0;
     box-shadow: inset 0 0 0 1px currentColor;
     border-radius: 4px;
-    background: rgba(127, 127, 127, 0.08);
+    background: none;
     color: inherit;
     font: inherit;
     font-size: 0.85em;
@@ -79,9 +82,16 @@
     cursor: pointer;
 }
 
-.eventmesh-embed-facade:hover,
+/* Hover feedback thickens the outline rather than filling the button, so the
+   background behind it is never obscured. */
+.eventmesh-embed-facade:hover {
+    box-shadow: inset 0 0 0 2px currentColor;
+}
+
+/* Focus ring drawn outside the box, so it reads against any backdrop. */
 .eventmesh-embed-facade:focus-visible {
-    background: rgba(127, 127, 127, 0.16);
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
 }
 
 /* A CSS triangle keeps the play glyph an image-free, request-free shape. */
