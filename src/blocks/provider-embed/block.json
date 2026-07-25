@@ -9,6 +9,12 @@
   "description": "A compact embedded player (Spotify, SoundCloud, or Mixcloud) for the current event, when a matching provider link was found and cached during sync. Rendered directly in PHP, not via Block Bindings.",
   "keywords": ["spotify", "soundcloud", "mixcloud", "player", "eventmesh"],
   "usesContext": ["postId"],
+  "attributes": {
+    "playLabel": {
+      "type": "string",
+      "default": "Listen to this DJ"
+    }
+  },
   "supports": {
     "html": false,
     "color": {
