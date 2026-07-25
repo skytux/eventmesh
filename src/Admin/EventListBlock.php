@@ -750,7 +750,7 @@ final class EventListBlock
         return sprintf(
             '<div %s><div class="eventmesh-provider-embed">%s</div></div>',
             get_block_wrapper_attributes(),
-            ProviderEmbedMarkup::render($html)
+            ProviderEmbedMarkup::render($html, (string) ($attributes['playLabel'] ?? ''))
         );
     }
 

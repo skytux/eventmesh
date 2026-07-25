@@ -31,7 +31,11 @@ namespace EventMesh\Support;
  */
 final class ProviderEmbedMarkup
 {
-    public static function render(string $storedHtml): string
+    /**
+     * @param string      $storedHtml The stored provider iframe.
+     * @param string|null $playLabel  Facade button text; null uses the default.
+     */
+    public static function render(string $storedHtml, ?string $playLabel = null): string
     {
         $sanitized = EmbedHtmlSanitizer::sanitize($storedHtml);
 
@@ -40,7 +44,7 @@ final class ProviderEmbedMarkup
         }
 
         if ('1' === (string) get_option('eventmesh_embed_facade', '1')) {
-            return self::renderFacade($sanitized);
+            return self::renderFacade($sanitized, $playLabel);
         }
 
         if ('1' !== (string) get_option('eventmesh_defer_embeds', '0')) {
@@ -58,7 +62,7 @@ final class ProviderEmbedMarkup
      * to move one attribute and no markup is ever assembled from a string at
      * runtime.
      */
-    private static function renderFacade(string $sanitized): string
+    private static function renderFacade(string $sanitized, ?string $playLabel): string
     {
         $deferred = self::toDataSrc($sanitized);
 
@@ -72,17 +76,17 @@ final class ProviderEmbedMarkup
             wp_enqueue_script('eventmesh-embed-facade');
         }
 
-        $label = self::playLabel($sanitized);
-
+        // No aria-label: the visible text is the button's accessible name, so
+        // adding one would only risk the two disagreeing. The player's own
+        // title attribute still identifies it once it loads.
         return sprintf(
-            '<button type="button" class="eventmesh-embed-facade" aria-label="%s">' .
+            '<button type="button" class="eventmesh-embed-facade">' .
             '<span class="eventmesh-embed-facade__icon" aria-hidden="true"></span>' .
             '<span class="eventmesh-embed-facade__label">%s</span>' .
             '</button>' .
             '<div class="eventmesh-embed-frame" hidden>%s</div>' .
             '<noscript>%s</noscript>',
-            esc_attr($label),
-            esc_html($label),
+            esc_html(self::playLabel($playLabel)),
             $deferred,
             $sanitized
         );
@@ -109,16 +113,19 @@ final class ProviderEmbedMarkup
     }
 
     /**
-     * Button text, reusing the provider name EmbedHtmlSanitizer already put in
-     * the iframe's title attribute so the two can never disagree.
+     * Visible button text: whatever the block was given, falling back to the
+     * default for embeds rendered outside a block (the event-list template) or
+     * with the text cleared.
+     *
+     * Spelled out as a literal rather than shared with the block's own default
+     * through a constant, because translation tooling can only extract a
+     * literal here. The matching value lives in provider-embed/block.json;
+     * change one and change the other.
      */
-    private static function playLabel(string $sanitized): string
+    private static function playLabel(?string $playLabel): string
     {
-        if (preg_match('/\stitle="([^"]*)"/i', $sanitized, $matches) && '' !== $matches[1]) {
-            /* translators: %s: the embedded player's name, e.g. "Spotify player". */
-            return sprintf(__('Play %s', 'eventmesh'), $matches[1]);
-        }
+        $label = trim((string) $playLabel);
 
-        return __('Play', 'eventmesh');
+        return '' !== $label ? $label : __('Listen to this DJ', 'eventmesh');
     }
 }

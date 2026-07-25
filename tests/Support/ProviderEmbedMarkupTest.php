@@ -81,12 +81,54 @@ final class ProviderEmbedMarkupTest extends TestCase
         self::assertSame('eventmesh-embed-facade', $enqueued[0]);
     }
 
-    public function testTheFacadeButtonNamesTheProvider(): void
+    public function testTheFacadeButtonUsesTheLabelItWasGiven(): void
     {
         $this->withOptions('1', '0');
         $this->captureEnqueuedHandle();
 
-        self::assertStringContainsString('Play Spotify player', ProviderEmbedMarkup::render(self::IFRAME));
+        $html = ProviderEmbedMarkup::render(self::IFRAME, 'Hear the set');
+
+        self::assertStringContainsString('>Hear the set</span>', $html);
+    }
+
+    /**
+     * @dataProvider noLabelProvider
+     */
+    public function testTheFacadeButtonFallsBackToTheDefaultLabel(?string $given): void
+    {
+        $this->withOptions('1', '0');
+        $this->captureEnqueuedHandle();
+
+        $html = ProviderEmbedMarkup::render(self::IFRAME, $given);
+
+        self::assertStringContainsString('>Listen to this DJ</span>', $html);
+    }
+
+    /**
+     * @return array<string, array{0: string|null}>
+     */
+    public static function noLabelProvider(): array
+    {
+        return [
+            'rendered outside a block' => [null],
+            'text cleared in the editor' => [''],
+            'whitespace only' => ['   '],
+        ];
+    }
+
+    /**
+     * The visible text is the button's accessible name, so there must be no
+     * aria-label competing with it - a stale one would silently override
+     * whatever the editor typed for screen reader users.
+     */
+    public function testTheFacadeButtonHasNoCompetingAriaLabel(): void
+    {
+        $this->withOptions('1', '0');
+        $this->captureEnqueuedHandle();
+
+        $html = ProviderEmbedMarkup::render(self::IFRAME, 'Hear the set');
+
+        self::assertStringNotContainsString('aria-label', $html);
     }
 
     public function testFacadeTakesPrecedenceOverScrollDeferral(): void
