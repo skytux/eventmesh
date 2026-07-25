@@ -4,7 +4,7 @@ Tags: events, sync, holvi, gutenberg, event list
 Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -128,6 +128,12 @@ No. The only outgoing requests are the ones described under External services, a
 
 == Changelog ==
 
+= 1.2.0 =
+* Provider embeds now show a play button instead of loading on their own — nothing is downloaded from Spotify/SoundCloud/Mixcloud until a visitor clicks one. On a page listing many events this is a large page-speed improvement. A new Settings checkbox turns it off for always-live players.
+* The play button's text is editable on the provider embed block, with optional prefix and suffix and an option to end it with the platform's name, e.g. "Listen to this DJ on Spotify".
+* Event featured images are served at thumbnail size where the block asks for a small fixed size, instead of at full upload resolution. Applies to existing event pages, not only newly inserted patterns.
+* The front-end stylesheet is printed inline rather than fetched as a separate render-blocking request on every page of the site.
+
 = 1.1.0 =
 * Scraped event times are now stored and shown as the source's own local wall-clock, with no timezone attached — fixing imported events landing two or three hours off.
 * Log and sync timestamps now display in the site's configured timezone rather than the server clock.
@@ -150,6 +156,9 @@ No. The only outgoing requests are the ones described under External services, a
 * Built-in dummy/test source (enable in Sources) for demos.
 
 == Upgrade Notice ==
+
+= 1.2.0 =
+Embedded players no longer load by themselves — visitors click a play button first, which markedly speeds up pages listing many events. Turn it off under Settings if you want the players live on arrival.
 
 = 1.1.0 =
 Fixes imported event times being hours off, and log times showing in the server's timezone. Re-sync your sources after upgrading to correct existing events.
