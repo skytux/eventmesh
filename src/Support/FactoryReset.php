@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EventMesh\Support;
 
 use EventMesh\Content\EventPostType;
+use EventMesh\Translation\TranslationCleanup;
 use WP_Query;
 
 /**
@@ -26,6 +27,10 @@ final class FactoryReset
         self::deleteTransients();
 
         wp_clear_scheduled_hook('eventmesh/background_sync');
+
+        // Translation options (including the API key) and the queued run.
+        // Translation meta went with the deleted events.
+        TranslationCleanup::deleteSettings();
 
         return [
             'deleted_events' => $deletedEvents,

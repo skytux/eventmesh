@@ -27,7 +27,36 @@ Requires WordPress 6.8+ and PHP 8.2+.
 - **Per-event visibility** — **Hide** drops an event from listings, **Disable** also 404s its page, and **Keep published if removed from the source** pins an event so it survives after the source delists it.
 - **Provider links & embeds** — provider links (Spotify, YouTube, Mixcloud, Bandcamp, SoundCloud, Instagram, Facebook) found on an event page are attached and rendered as embeds.
 - **Reversible source management** — disabling a source archives its events (Draft) on the next sync; re-enabling republishes them. Uninstalling keeps your data unless you opt in to deletion.
+- **Automatic translation (optional)** — translates each event's title and text with a language model on a server you choose, for visitors viewing the site in another language. See [Automatic translation](#automatic-translation).
 - **Connector-agnostic** — new sources can be added as self-contained connectors without touching the core plugin.
+
+## Automatic translation
+
+Off by default, and the plugin ships with no server, model or key. To use it:
+
+1. Go to **EventMesh → Settings → Automatic translation**.
+2. Enter the **API URL** of any OpenAI-compatible chat API (the base URL; EventMesh adds `/chat/completions`), the **model** name and the **API key**. The key is stored encrypted (sodium, with a key derived from the site's auth salt) and is never shown again; leave the field empty to keep it, or use **Remove key**.
+3. Tick the languages to translate into. The default is Polylang's languages, or the site language without Polylang. An event is never translated into its own language.
+4. Tick **Translate events automatically**, save, and use **Test connection**. **Translate now** queues every published event and starts at once.
+
+What is sent to the server: only each event's **title and text** (the description), once to detect the original language and then for each target language. No visitor data and no other site data are sent. The key and the event text are never written to the log; the log records only short error kinds such as `http_401`.
+
+How it runs:
+
+- Each synced (or edited) event is queued; a WP-Cron job works on the queue in runs of about 40 seconds and schedules itself again while work remains. Long text is split into pieces.
+- An event is translated again only when its title or text changes.
+- Each translation is checked before it is saved: the same numbers, links, email addresses, HTML tags and block markers as the original, and not empty. A translation that fails the check is not saved; after 3 failed attempts on the same text it is given up until the text changes (the count shows on the event).
+- Visitors see a translation when the page language (Polylang's current language, or the site locale) differs from the event's original language and the translation was made from the event's current text. Automatic translations carry the line *Automatically translated* (CSS class `eventmesh-auto-translated`).
+- The **Translations** box on the event edit screen shows each translation. Changing one there marks it as edited: background translation never overwrites it. **Back to automatic** hands it back.
+
+The settings can also be set from a one-off PHP script after loading WordPress:
+
+```php
+require 'wp-load.php';
+\EventMesh\Translation\LlmSettings::save('https://llm.example/v1', 'model-name', 'api-key');
+```
+
+Deleting the plugin removes these settings and the stored translations.
 
 ## Blocks
 
@@ -108,6 +137,9 @@ php tools/make-mo.php              # compile languages/*.po into .mo
 CI (GitHub Actions) runs PHPUnit and PHPCS on every push and pull request.
 
 ## Changelog
+
+### 1.4.0
+- Optional automatic translation of event titles and text with a language model on a server you choose (OpenAI-compatible chat API): encrypted API key, background queue, safety check before saving, per-event editable translations, "Automatically translated" label. Off by default.
 
 ### 1.3.0
 - Finnish translation; texts follow the site or page language (e.g. Polylang).

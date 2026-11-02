@@ -54,6 +54,26 @@ final class Admin
         );
 
         add_action(
+            'admin_post_eventmesh_llm_remove_key',
+            [$this->container->get(SettingsPage::class), 'removeLlmKey']
+        );
+
+        add_action(
+            'admin_post_eventmesh_translate_now',
+            [$this->container->get(SettingsPage::class), 'translateNow']
+        );
+
+        add_action(
+            'admin_post_eventmesh_llm_test',
+            [$this->container->get(SettingsPage::class), 'testLlmConnection']
+        );
+
+        add_action(
+            'admin_notices',
+            [$this->container->get(SettingsPage::class), 'renderKeyNotice']
+        );
+
+        add_action(
             'admin_post_eventmesh_save_sources',
             [$this->container->get(SourcesPage::class), 'save']
         );

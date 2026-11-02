@@ -10,6 +10,7 @@ use EventMesh\Admin\DiagnosticsPage;
 use EventMesh\Admin\EventListBlock;
 use EventMesh\Admin\SettingsPage;
 use EventMesh\Admin\SourcesPage;
+use EventMesh\Admin\TranslationMetaBox;
 use EventMesh\Admin\View;
 use EventMesh\Connectors\Holvi\HolviHtmlParser;
 use EventMesh\Content\EventPostType;
@@ -26,6 +27,8 @@ use EventMesh\Services\SyncRunner;
 use EventMesh\Sync\EventSynchronizer;
 use EventMesh\Support\BlockAppearanceTools;
 use EventMesh\Support\Logger;
+use EventMesh\Translation\TranslationDisplay;
+use EventMesh\Translation\TranslationQueue;
 
 final class Kernel
 {
@@ -58,6 +61,10 @@ final class Kernel
 
         $blockAppearanceTools = $this->container->get(BlockAppearanceTools::class);
         $blockAppearanceTools->boot();
+
+        $this->container->get(TranslationQueue::class)->boot();
+        $this->container->get(TranslationDisplay::class)->boot();
+        $this->container->get(TranslationMetaBox::class)->boot();
 
         do_action(
             'eventmesh/register_connectors',
@@ -147,7 +154,28 @@ final class Kernel
 
         $this->container->singleton(
             EventQuery::class,
-            fn () => new EventQuery()
+            fn (Container $container) => new EventQuery(
+                $container->get(TranslationDisplay::class)
+            )
+        );
+
+        $this->container->singleton(
+            TranslationDisplay::class,
+            fn () => new TranslationDisplay()
+        );
+
+        $this->container->singleton(
+            TranslationQueue::class,
+            fn (Container $container) => new TranslationQueue(
+                $container->get(Logger::class)
+            )
+        );
+
+        $this->container->singleton(
+            TranslationMetaBox::class,
+            fn (Container $container) => new TranslationMetaBox(
+                $container->get(TranslationQueue::class)
+            )
         );
 
         $this->container->singleton(
@@ -263,7 +291,8 @@ final class Kernel
             SettingsPage::class,
             fn (Container $container) => new SettingsPage(
                 $container->get(View::class),
-                $container->get(Admin::class)
+                $container->get(Admin::class),
+                $container->get(TranslationQueue::class)
             )
         );
 

@@ -4,7 +4,7 @@ Tags: events, sync, holvi, gutenberg, event list
 Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 1.3.0
+Stable tag: 1.4.0
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -25,6 +25,7 @@ EventMesh pulls event listings from external sources into real WordPress posts (
 * **Keep events the source dropped** — pin an event to stay published even after it disappears from its source (instead of being archived on the next sync); its details freeze at the last sync.
 * **Sold out and canceled handling** — sold-out events show a non-clickable Sold out state, events with CANCELED in the title are struck through, and past events sort below upcoming ones under a divider.
 * **Reversible source management** — disable a source and its events are archived (moved to Draft) on the next sync; re-enable it and they are republished. Uninstalling keeps your data unless you opt in to deletion.
+* **Automatic translation (optional)** — translates each event's title and text with a language model on a server you choose (any OpenAI-compatible chat API), for visitors who view the site in another language (e.g. with Polylang). Off by default. Translations can be edited by hand on the event; edited ones are never overwritten.
 * **Connector-agnostic architecture** — new sources can be added as connectors without touching the core plugin.
 
 **A note on data ownership:** synced events are ordinary posts. You can edit them, feature them, or build on them with any block — EventMesh only updates the fields it manages on the next sync.
@@ -41,6 +42,9 @@ When a synced event links to an artist page or track on one of these providers (
 
 **Event images**
 When a source lists an image for an event, the plugin downloads that image from the URL the source provided (which may be a CDN) into your media library, so events display images hosted on your own site.
+
+**Language model server for automatic translation (only if you set one up)**
+Automatic translation is off by default and the plugin ships with no server. When you switch it on under EventMesh → Settings and enter an API URL, model and API key, the plugin sends each event's title and text (the description) to that server to detect their language and translate them, and receives the translations back. Nothing else is sent: no visitor data, no other site data. The API key is stored encrypted in your database. Which service this is, and its terms and privacy policy, depend on the server you enter.
 
 == How EventMesh reads a Holvi page ==
 
@@ -128,6 +132,12 @@ No. The only outgoing requests are the ones described under External services, a
 
 == Changelog ==
 
+= 1.4.0 =
+* Optional automatic translation of event titles and text with a language model on a server you choose (OpenAI-compatible chat API). Set up under EventMesh → Settings: API URL, model, API key (stored encrypted), target languages, "Translate now" and "Test connection". Off by default; no server is built in.
+* The original language of each event is detected by the model. Translations run in the background after each sync, only when an event's text has changed, and are checked before saving (numbers, links, email addresses, HTML tags and blocks must match).
+* Visitors who view the site in another language (Polylang or the site language) see the translation, marked "Automatically translated". The event's own title and text stay the original.
+* A Translations box on the event edit screen shows each translation; editing one keeps it as your own version until you choose "Back to automatic".
+
 = 1.3.0 =
 * Finnish translation; texts follow the site or page language (e.g. Polylang).
 
@@ -159,6 +169,9 @@ No. The only outgoing requests are the ones described under External services, a
 * Built-in dummy/test source (enable in Sources) for demos.
 
 == Upgrade Notice ==
+
+= 1.4.0 =
+Adds optional automatic translation of events with a language model server you choose. Off until you set it up under Settings.
 
 = 1.2.0 =
 Embedded players no longer load by themselves — visitors click a play button first, which markedly speeds up pages listing many events. Turn it off under Settings if you want the players live on arrival.
