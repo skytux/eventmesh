@@ -23,3 +23,8 @@ EventMesh\Support\Autoloader::register();
 if ('1' === (string) get_option('eventmesh_delete_data_on_uninstall', '0')) {
     EventMesh\Support\FactoryReset::run();
 }
+
+// Automatic translation settings (including the encrypted API key) and the
+// translations stored on events are always removed, whatever the setting
+// above says.
+EventMesh\Translation\TranslationCleanup::run();

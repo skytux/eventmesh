@@ -170,3 +170,9 @@
 .eventmesh-embed-frame:focus {
     outline: none;
 }
+
+/* The "Automatically translated" line under machine-translated event text. */
+.eventmesh-auto-translated {
+    font-size: 0.8em;
+    opacity: 0.75;
+}

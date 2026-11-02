@@ -33,6 +33,9 @@ if (! defined('ABSPATH')) {
             <?php if (! empty($event['excerpt'])) : ?>
                 <p><?php echo esc_html((string) $event['excerpt']); ?></p>
             <?php endif; ?>
+            <?php if (! empty($event['auto_translated'])) : ?>
+                <p class="eventmesh-auto-translated"><?php esc_html_e('Automatically translated', 'eventmesh'); ?></p>
+            <?php endif; ?>
             <?php if (! empty($event['source_url'])) : ?>
                 <p>
                     <a

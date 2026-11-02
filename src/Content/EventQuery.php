@@ -7,10 +7,21 @@ namespace EventMesh\Content;
 use EventMesh\Support\EventMeta;
 use EventMesh\Support\EventStatus;
 use EventMesh\Support\LocalTime;
+use EventMesh\Translation\TranslationDisplay;
+use EventMesh\Translation\TranslationStore;
 use WP_Query;
 
 final class EventQuery
 {
+    /**
+     * Optional so the class still works on its own (tests, early callers);
+     * the Kernel always passes it.
+     */
+    public function __construct(
+        private readonly ?TranslationDisplay $translationDisplay = null
+    ) {
+    }
+
     /**
      * "Now" as a naive local wall-clock string, in the same form the event
      * dates are stored - so a string comparison against `_eventmesh_starts_at`
@@ -96,11 +107,17 @@ final class EventQuery
             // edit-screen value wins over the scraped one on the front end.
             $startsAt = EventMeta::resolve($postId, 'starts_at');
 
+            // The page-language translation when one applies (see
+            // TranslationDisplay), else the original. is_canceled below keeps
+            // reading the original title.
+            $translation = $this->translationDisplay?->forEvent($post);
+
             $events[] = [
                 'id' => $postId,
-                'title' => $post->post_title,
-                'content' => $post->post_content,
-                'excerpt' => $post->post_excerpt,
+                'title' => '' !== ($translation['title'] ?? '') ? $translation['title'] : $post->post_title,
+                'content' => '' !== ($translation['content'] ?? '') ? $translation['content'] : $post->post_content,
+                'excerpt' => '' !== ($translation['excerpt'] ?? '') ? $translation['excerpt'] : $post->post_excerpt,
+                'auto_translated' => null !== $translation && TranslationStore::STATUS_AUTO === $translation['status'],
                 'url' => get_permalink($post),
                 'image' => get_the_post_thumbnail_url($post, 'large'),
                 'image_id' => (int) get_post_thumbnail_id($post),

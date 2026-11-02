@@ -8,6 +8,19 @@
  * @var bool $delete_data_on_uninstall Whether uninstalling the plugin should also delete its data.
  * @var bool $embed_facade Whether provider embeds show a click-to-play button instead of loading.
  * @var bool $defer_embeds Whether provider embeds load only when scrolled into view.
+ * @var bool $translation_enabled Whether automatic translation is switched on.
+ * @var bool $translation_ready Whether it is on and the URL, model and key are all set.
+ * @var string $llm_url Saved API base URL.
+ * @var string $llm_model Saved model name.
+ * @var bool $llm_has_key Whether an API key is saved (it is never shown).
+ * @var bool $llm_key_unreadable Whether the saved key can no longer be decrypted.
+ * @var array<int, string> $translation_languages Language codes offered as targets.
+ * @var array<int, string> $translation_targets Language codes currently chosen.
+ * @var int $translation_queue_length Events waiting for translation.
+ * @var array<string, mixed> $translation_status Summary of the last translation run.
+ * @var string $remove_key_url Nonced link that removes the saved key.
+ * @var string $translate_now_url Nonced link that runs the queue now.
+ * @var string $test_connection_url Nonced link that tests the connection.
  */
 
 declare(strict_types=1);
@@ -82,6 +95,144 @@ if (! defined('ABSPATH')) {
                         </p>
                     </td>
                 </tr>
+            </tbody>
+        </table>
+
+        <h2 id="eventmesh-translation"><?php esc_html_e('Automatic translation', 'eventmesh'); ?></h2>
+        <p class="description">
+            <?php // phpcs:ignore Generic.Files.LineLength.TooLong -- single gettext literal; splitting it breaks extraction. ?>
+            <?php esc_html_e('Translates the title and text of each event with a language model on a server you choose (any service with an OpenAI-compatible chat completions API). Only the event title and text are sent. Translations are shown to visitors who view the site in another language.', 'eventmesh'); ?>
+        </p>
+        <table class="form-table" role="presentation">
+            <tbody>
+                <tr>
+                    <th scope="row">
+                        <?php esc_html_e('Automatic translation', 'eventmesh'); ?>
+                    </th>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="eventmesh_translation_enabled" value="1" <?php checked($translation_enabled, true); ?> />
+                            <?php esc_html_e('Translate events automatically', 'eventmesh'); ?>
+                        </label>
+                        <p class="description">
+                            <?php esc_html_e('Runs only when the API URL, model and key below are all set.', 'eventmesh'); ?>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="eventmesh_llm_url"><?php esc_html_e('API URL', 'eventmesh'); ?></label>
+                    </th>
+                    <td>
+                        <input type="url" class="regular-text" id="eventmesh_llm_url" name="eventmesh_llm_url" value="<?php echo esc_attr($llm_url); ?>" />
+                        <p class="description">
+                            <?php esc_html_e('The base URL, without /chat/completions at the end.', 'eventmesh'); ?>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="eventmesh_llm_model"><?php esc_html_e('Model', 'eventmesh'); ?></label>
+                    </th>
+                    <td>
+                        <input type="text" class="regular-text" id="eventmesh_llm_model" name="eventmesh_llm_model" value="<?php echo esc_attr($llm_model); ?>" />
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="eventmesh_llm_key"><?php esc_html_e('API key', 'eventmesh'); ?></label>
+                    </th>
+                    <td>
+                        <input type="password" class="regular-text" id="eventmesh_llm_key" name="eventmesh_llm_key" value="" autocomplete="new-password" />
+                        <p class="description">
+                            <?php if ($llm_key_unreadable) : ?>
+                                <?php esc_html_e('The saved key can no longer be read (the site\'s security keys have changed). Enter it again.', 'eventmesh'); ?>
+                            <?php elseif ($llm_has_key) : ?>
+                                <?php esc_html_e('A key is saved. Leave empty to keep the saved key.', 'eventmesh'); ?>
+                                <a href="<?php echo esc_url($remove_key_url); ?>"><?php esc_html_e('Remove key', 'eventmesh'); ?></a>
+                            <?php else : ?>
+                                <?php esc_html_e('No key saved.', 'eventmesh'); ?>
+                            <?php endif; ?>
+                        </p>
+                        <p class="description">
+                            <?php esc_html_e('The key is stored encrypted and is never shown again.', 'eventmesh'); ?>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <?php esc_html_e('Translate into', 'eventmesh'); ?>
+                    </th>
+                    <td>
+                        <?php foreach ($translation_languages as $translation_language) : ?>
+                            <label style="margin-right:1em">
+                                <input type="checkbox" name="eventmesh_translation_languages[]" value="<?php echo esc_attr($translation_language); ?>" <?php checked(in_array($translation_language, $translation_targets, true), true); ?> />
+                                <?php echo esc_html(strtoupper($translation_language)); ?>
+                            </label>
+                        <?php endforeach; ?>
+                        <p class="description">
+                            <?php esc_html_e('An event is never translated into its own original language.', 'eventmesh'); ?>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <?php esc_html_e('Status', 'eventmesh'); ?>
+                    </th>
+                    <td>
+                        <p>
+                            <?php
+                            echo esc_html(
+                                sprintf(
+                                    /* translators: %d: number of events */
+                                    __('Events waiting for translation: %d', 'eventmesh'),
+                                    $translation_queue_length
+                                )
+                            );
+                            ?>
+                        </p>
+                        <?php if (! empty($translation_status['time'])) : ?>
+                            <p>
+                                <?php
+                                echo esc_html(
+                                    sprintf(
+                                        /* translators: 1: date and time, 2: translations made, 3: translations that failed the check */
+                                        __('Last run: %1$s. Translated %2$d, failed the check %3$d.', 'eventmesh'),
+                                        wp_date((string) get_option('date_format') . ' ' . (string) get_option('time_format'), (int) $translation_status['time']),
+                                        (int) ($translation_status['translated'] ?? 0),
+                                        (int) ($translation_status['failed'] ?? 0)
+                                    )
+                                );
+                                ?>
+                                <?php if (! empty($translation_status['error'])) : ?>
+                                    <?php
+                                    echo esc_html(
+                                        sprintf(
+                                            /* translators: %s: short error kind, e.g. http_401 or network */
+                                            __('Last error: %s', 'eventmesh'),
+                                            (string) $translation_status['error']
+                                        )
+                                    );
+                                    ?>
+                                <?php endif; ?>
+                            </p>
+                        <?php endif; ?>
+                        <p>
+                            <?php if ($translation_ready) : ?>
+                                <a class="button" href="<?php echo esc_url($translate_now_url); ?>"><?php esc_html_e('Translate now', 'eventmesh'); ?></a>
+                            <?php endif; ?>
+                            <a class="button" href="<?php echo esc_url($test_connection_url); ?>"><?php esc_html_e('Test connection', 'eventmesh'); ?></a>
+                        </p>
+                        <p class="description">
+                            <?php esc_html_e('Save the settings first; both buttons use the saved settings.', 'eventmesh'); ?>
+                        </p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="form-table" role="presentation">
+            <tbody>
                 <tr>
                     <th scope="row">
                         <?php esc_html_e('Uninstalling', 'eventmesh'); ?>
