@@ -100,9 +100,19 @@ composer install
 vendor/bin/phpunit                 # test suite
 vendor/bin/phpcs src               # WordPress Coding Standards
 pwsh scripts/build-zip.ps1         # build a distributable eventmesh.zip
+php tools/build-zip.php            # Linux: build dist/eventmesh-<version>.zip (same files)
+php tools/make-pot.php             # extract strings into languages/eventmesh.pot
+php tools/make-mo.php              # compile languages/*.po into .mo
 ```
 
 CI (GitHub Actions) runs PHPUnit and PHPCS on every push and pull request.
+
+## Changelog
+
+### 1.3.0
+- Finnish translation; texts follow the site or page language (e.g. Polylang).
+
+Earlier versions: see the changelog in [readme.txt](readme.txt).
 
 ## License
 
