@@ -165,7 +165,9 @@ final class ProviderEmbedMarkup
     {
         $label = trim((string) $playLabel);
 
-        return '' !== $label ? $label : __('Listen to this DJ', 'eventmesh');
+        // The block.json default reaches here as typed text when the editor
+        // never changed it, so it is translated like the fallback.
+        return '' !== $label && 'Listen to this DJ' !== $label ? $label : __('Listen to this DJ', 'eventmesh');
     }
 
     private static function iframeSrc(string $sanitized): string

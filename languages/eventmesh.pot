@@ -1,0 +1,782 @@
+# Copyright (C) EventMesh contributors
+# This file is distributed under the GPL-2.0 license.
+msgid ""
+msgstr ""
+"Project-Id-Version: EventMesh\n"
+"Report-Msgid-Bugs-To: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: eventmesh\n"
+
+#: templates/admin/dashboard.php:58
+msgid "(change in Settings)"
+msgstr ""
+
+#: templates/admin/diagnostics.php:94
+msgid "(overdue)"
+msgstr ""
+
+#: src/Content/EventPostType.php:70
+msgctxt "event"
+msgid "Add New"
+msgstr ""
+
+#: src/Content/EventPostType.php:71
+msgid "Add New Event"
+msgstr ""
+
+#: templates/admin/sources.php:108
+msgid "Add another source"
+msgstr ""
+
+#: templates/admin/sources.php:71
+msgid "Add one or more Holvi event URLs. Each row can be enabled or disabled independently."
+msgstr ""
+
+#: templates/admin/dashboard.php:55
+msgid "Automatic sync"
+msgstr ""
+
+#: src/Content/EventPostType.php:325
+msgid "Available"
+msgstr ""
+
+#: templates/admin/diagnostics.php:129
+msgid "Available (fallback sync runs without delaying visitors)"
+msgstr ""
+
+#: templates/admin/diagnostics.php:65 templates/admin/settings.php:31
+msgid "Background sync"
+msgstr ""
+
+#: templates/admin/diagnostics.php:54
+msgid "Background sync health"
+msgstr ""
+
+#: templates/frontend/sync-status.php:38
+msgid "Background sync:"
+msgstr ""
+
+#: src/Support/SyncStatus.php:20
+msgid "Completed"
+msgstr ""
+
+#: src/Support/SyncStatus.php:21
+msgid "Completed with errors"
+msgstr ""
+
+#: templates/admin/diagnostics.php:137
+msgid "Connected plugins"
+msgstr ""
+
+#: templates/admin/sources.php:37
+msgid "Connector"
+msgstr ""
+
+#: templates/admin/sources.php:29
+msgid "Connectors"
+msgstr ""
+
+#: src/Admin/DashboardPage.php:190
+#. translators: 1: created, 2: updated, 3: failed, 4: skipped, 5: archived, 6: date/time
+msgid "Created %1$d, updated %2$d, failed %3$d, skipped %4$d, archived %5$d — %6$s"
+msgstr ""
+
+#: src/Admin/DashboardPage.php:80
+#. translators: 1: created count, 2: updated count, 3: failed count, 4: skipped count, 5: archived count
+msgid "Created %1$d, updated %2$d, failed %3$d, skipped %4$d, archived %5$d."
+msgstr ""
+
+#: templates/frontend/sync-status.php:29
+msgid "Created %1$d, updated %2$d, failed %3$d, skipped %4$d."
+msgstr ""
+
+#: src/Content/EventPostType.php:206 src/Content/EventPostType.php:213
+msgid "Customized"
+msgstr ""
+
+#: src/Admin/EventListBlock.php:554
+#. translators: event date without year, as a PHP date() format, e.g. Finnish "D j.n."
+msgid "D j F"
+msgstr ""
+
+#: src/Admin/EventListBlock.php:552
+#. translators: event date with year, as a PHP date() format, e.g. Finnish "D j.n.Y"
+msgid "D j F Y"
+msgstr ""
+
+#: templates/admin/diagnostics.php:75
+msgid "DISABLE_WP_CRON"
+msgstr ""
+
+#: src/Admin/Admin.php:80
+msgid "Daily"
+msgstr ""
+
+#: src/Admin/Admin.php:124 src/Admin/Admin.php:125 templates/admin/dashboard.php:27
+msgid "Dashboard"
+msgstr ""
+
+#: templates/admin/settings.php:92
+msgid "Delete all EventMesh data when the plugin is deleted"
+msgstr ""
+
+#: src/Content/EventPostType.php:221
+msgid "Description"
+msgstr ""
+
+#: src/Admin/Admin.php:142 src/Admin/Admin.php:143 templates/admin/diagnostics.php:35
+msgid "Diagnostics"
+msgstr ""
+
+#: src/Content/EventPostType.php:280
+msgid "Disable (also returns 404 on its own page)"
+msgstr ""
+
+#: templates/admin/dashboard.php:57 templates/admin/dashboard.php:160 templates/admin/diagnostics.php:70 templates/frontend/sync-status.php:39
+msgid "Disabled"
+msgstr ""
+
+#: src/Admin/EventListBlock.php:906
+msgid "Displays a curated list of upcoming events."
+msgstr ""
+
+#: src/Connectors/Dummy/DummyConnector.php:27
+msgid "Dummy (testing)"
+msgstr ""
+
+#: templates/admin/sources.php:115
+msgid "Dummy (testing) — sample events"
+msgstr ""
+
+#: src/Content/EventPostType.php:177
+msgid "Each field shows the value found on the last sync; type a value below it to override what appears on the front end. Overrides are kept and never replaced by a later sync. Leave blank to use the found value."
+msgstr ""
+
+#: src/Content/EventPostType.php:73
+msgid "Edit Event"
+msgstr ""
+
+#: src/Support/EmbedHtmlSanitizer.php:80
+msgid "Embedded media player"
+msgstr ""
+
+#: templates/admin/settings.php:36
+msgid "Enable automatic background synchronization"
+msgstr ""
+
+#: templates/admin/dashboard.php:57 templates/admin/dashboard.php:159 templates/admin/diagnostics.php:69 templates/admin/sources.php:39
+#: templates/admin/sources.php:59 templates/admin/sources.php:80 templates/admin/sources.php:95 templates/admin/sources.php:153
+#: templates/frontend/sync-status.php:39
+msgid "Enabled"
+msgstr ""
+
+#: src/Content/EventPostType.php:182
+msgid "Ends at"
+msgstr ""
+
+#: src/Support/SyncStatus.php:22 templates/admin/dashboard.php:201
+msgid "Error"
+msgstr ""
+
+#: src/Content/EventPostType.php:69
+msgctxt "add new on admin bar"
+msgid "Event"
+msgstr ""
+
+#: src/Content/EventPostType.php:67
+msgctxt "post type singular name"
+msgid "Event"
+msgstr ""
+
+#: src/Content/EventPostType.php:80
+msgid "Event Archives"
+msgstr ""
+
+#: src/Content/EventPostType.php:81
+msgid "Event Attributes"
+msgstr ""
+
+#: src/Admin/Admin.php:113 src/Admin/Admin.php:114 src/Admin/EventListBlock.php:898
+msgid "EventMesh"
+msgstr ""
+
+#: src/Content/EventPostType.php:150
+msgid "EventMesh details"
+msgstr ""
+
+#: src/Admin/EventListBlock.php:905
+msgid "EventMesh events"
+msgstr ""
+
+#: src/Admin/EventListBlock.php:1051
+msgid "EventMesh events (upcoming + past)"
+msgstr ""
+
+#: templates/frontend/sync-status.php:16
+msgid "EventMesh sync status"
+msgstr ""
+
+#: src/Content/SingleEventTemplate.php:62
+msgid "EventMesh: Single event"
+msgstr ""
+
+#: src/Content/EventPostType.php:75
+msgid "Events"
+msgstr ""
+
+#: src/Content/EventPostType.php:68
+msgctxt "admin menu"
+msgid "Events"
+msgstr ""
+
+#: src/Content/EventPostType.php:66
+msgctxt "post type general name"
+msgid "Events"
+msgstr ""
+
+#: src/Content/EventPostType.php:86
+msgid "Events list"
+msgstr ""
+
+#: src/Content/EventPostType.php:85
+msgid "Events list navigation"
+msgstr ""
+
+#: src/Admin/Admin.php:76 src/Admin/Admin.php:93
+msgid "Every 15 minutes"
+msgstr ""
+
+#: src/Admin/Admin.php:77 src/Admin/Admin.php:97
+msgid "Every 30 minutes"
+msgstr ""
+
+#: templates/admin/sources.php:31
+msgid "Every installed connector is listed here. Tick a connector to sync its events; unticking it archives its events (moves them to Draft) on the next sync."
+msgstr ""
+
+#: src/Content/EventPostType.php:167
+msgid "External ID"
+msgstr ""
+
+#: templates/admin/settings.php:118
+msgid "Factory Reset"
+msgstr ""
+
+#: templates/admin/settings.php:107
+msgid "Factory reset"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:100
+#. translators: %d: number of deleted events
+msgid "Factory reset complete: removed %d event(s). All settings reset."
+msgstr ""
+
+#: src/Content/EventPostType.php:231
+msgid "Featured image"
+msgstr ""
+
+#: src/Content/EventPostType.php:228
+msgid "Featured image set"
+msgstr ""
+
+#: src/Content/EventPostType.php:84
+msgid "Filter events list"
+msgstr ""
+
+#: src/Content/EventPostType.php:249
+#. translators: %s: field name, e.g. Title
+msgid "Follow source again for %s"
+msgstr ""
+
+#: src/Content/EventPostType.php:329
+msgid "Follow the source"
+msgstr ""
+
+#: src/Content/EventPostType.php:207 src/Content/EventPostType.php:214
+msgid "Following source"
+msgstr ""
+
+#: src/Content/EventPostType.php:331
+msgid "Force available"
+msgstr ""
+
+#: src/Content/EventPostType.php:330
+msgid "Force sold out"
+msgstr ""
+
+#: src/Content/EventPostType.php:307 src/Content/EventPostType.php:335
+msgid "Found:"
+msgstr ""
+
+#: templates/admin/diagnostics.php:119
+msgid "Free"
+msgstr ""
+
+#: templates/admin/diagnostics.php:115
+#. translators: %d: number of seconds the sync lock has been held.
+msgid "Held (%ds) — a sync is running or recently died"
+msgstr ""
+
+#: src/Content/EventPostType.php:273
+msgid "Hide from event listings"
+msgstr ""
+
+#: src/Connectors/Holvi/HolviConnector.php:59
+msgid "Holvi"
+msgstr ""
+
+#: templates/admin/sources.php:69
+msgid "Holvi source URLs"
+msgstr ""
+
+#: src/Admin/Admin.php:78
+msgid "Hourly"
+msgstr ""
+
+#: templates/admin/settings.php:58
+msgid "How often background sync runs. Actual timing still depends on site traffic unless real server cron is configured."
+msgstr ""
+
+#: templates/admin/sources.php:38
+msgid "ID"
+msgstr ""
+
+#: src/Admin/DashboardPage.php:184 src/Support/SyncStatus.php:18
+msgid "Idle"
+msgstr ""
+
+#: src/Content/EventPostType.php:82
+msgid "Insert into event"
+msgstr ""
+
+#: src/Content/EventPostType.php:287
+msgid "Keep published if removed from the source"
+msgstr ""
+
+#: templates/admin/diagnostics.php:105
+msgid "Last completed sync"
+msgstr ""
+
+#: templates/admin/dashboard.php:45
+msgid "Last error"
+msgstr ""
+
+#: templates/frontend/sync-status.php:27
+msgid "Last run:"
+msgstr ""
+
+#: templates/admin/dashboard.php:41
+msgid "Last sync"
+msgstr ""
+
+#: templates/admin/diagnostics.php:101
+msgid "Last sync attempt"
+msgstr ""
+
+#: src/Content/SingleEventTemplate.php:63
+msgid "Layout for an individual event page. Fully editable as blocks."
+msgstr ""
+
+#: templates/admin/diagnostics.php:169
+msgid "Level"
+msgstr ""
+
+#: src/Support/ProviderEmbedMarkup.php:170
+msgid "Listen to this DJ"
+msgstr ""
+
+#: templates/admin/settings.php:77
+msgid "Load embedded players only when scrolled into view"
+msgstr ""
+
+#: templates/admin/diagnostics.php:170
+msgid "Message"
+msgstr ""
+
+#: templates/frontend/sync-status.php:22
+msgid "Message:"
+msgstr ""
+
+#: src/Support/EmbedHtmlSanitizer.php:71
+msgid "Mixcloud player"
+msgstr ""
+
+#: src/Support/DateTimeFormat.php:25
+msgid "Never"
+msgstr ""
+
+#: src/Content/EventPostType.php:72
+msgid "New Event"
+msgstr ""
+
+#: templates/frontend/sync-status.php:43
+msgid "Next run:"
+msgstr ""
+
+#: templates/admin/dashboard.php:62 templates/admin/diagnostics.php:85
+msgid "Next scheduled sync"
+msgstr ""
+
+#: templates/admin/sources.php:46
+msgid "No connectors are installed yet."
+msgstr ""
+
+#: src/Admin/DashboardPage.php:43 src/Admin/DashboardPage.php:48
+msgid "No connectors are registered."
+msgstr ""
+
+#: templates/frontend/events-list.php:14
+msgid "No events are available yet."
+msgstr ""
+
+#: src/Content/EventPostType.php:79
+msgid "No events found in Trash."
+msgstr ""
+
+#: src/Content/EventPostType.php:78
+msgid "No events found."
+msgstr ""
+
+#: src/Admin/DashboardPage.php:69 src/Admin/DashboardPage.php:74
+msgid "No events were found."
+msgstr ""
+
+#: src/Content/EventPostType.php:229
+msgid "No featured image"
+msgstr ""
+
+#: templates/admin/diagnostics.php:140
+msgid "No other plugins are connected to EventMesh."
+msgstr ""
+
+#: src/Admin/EventListBlock.php:1044
+msgid "No past events."
+msgstr ""
+
+#: templates/admin/dashboard.php:87 templates/admin/dashboard.php:130 templates/admin/diagnostics.php:163
+msgid "No recent log entries yet."
+msgstr ""
+
+#: templates/frontend/sync-status.php:23
+msgid "No sync has run yet."
+msgstr ""
+
+#: src/Admin/DashboardPage.php:187
+msgid "No sync yet."
+msgstr ""
+
+#: src/Admin/EventListBlock.php:1043
+msgid "No upcoming events."
+msgstr ""
+
+#: templates/admin/dashboard.php:49 templates/admin/dashboard.php:171
+msgid "None"
+msgstr ""
+
+#: src/Content/EventPostType.php:290
+msgid "Normally an event that no longer appears in its source is moved to Draft on the next sync. Tick this to keep it published; its details stay frozen at the last sync."
+msgstr ""
+
+#: templates/admin/diagnostics.php:130
+msgid "Not available (fallback sync runs inline on a visitor request)"
+msgstr ""
+
+#: src/Admin/DashboardPage.php:203 templates/admin/diagnostics.php:89
+msgid "Not scheduled"
+msgstr ""
+
+#: templates/admin/settings.php:95
+msgid "Off by default: deleting the plugin keeps every synced event and setting so reinstalling picks up where you left off."
+msgstr ""
+
+#: templates/admin/settings.php:81
+msgid "Only applies when the play button above is off. Players still load on their own, just not until the visitor scrolls to them. Players without JavaScript fall back to loading normally."
+msgstr ""
+
+#: templates/admin/diagnostics.php:40
+msgid "PHP"
+msgstr ""
+
+#: src/Content/EventPostType.php:77
+msgid "Parent Events:"
+msgstr ""
+
+#: src/Admin/EventListBlock.php:256 templates/frontend/events-card.php:22 templates/frontend/events-list.php:23
+msgid "Past Events"
+msgstr ""
+
+#: src/Admin/EventListBlock.php:1041
+msgid "Past events"
+msgstr ""
+
+#: templates/admin/diagnostics.php:48 templates/admin/diagnostics.php:145
+msgid "Plugin"
+msgstr ""
+
+#: src/Content/EventPostType.php:179
+msgid "Price"
+msgstr ""
+
+#: templates/admin/settings.php:64
+msgid "Provider embeds"
+msgstr ""
+
+#: src/Content/EventPostType.php:185
+msgid "Provider links"
+msgstr ""
+
+#: templates/admin/dashboard.php:66
+msgid "Published events"
+msgstr ""
+
+#: templates/admin/diagnostics.php:160
+msgid "Recent EventMesh activity"
+msgstr ""
+
+#: templates/admin/dashboard.php:84
+msgid "Recent activity"
+msgstr ""
+
+#: templates/admin/settings.php:73
+msgid "Recommended. A page listing many events downloads nothing from Spotify/SoundCloud/Mixcloud until a visitor actually asks to hear something, which is by far the biggest thing you can do for its page speed score. Turn this off to have the players appear ready to play on arrival."
+msgstr ""
+
+#: src/Content/EventPostType.php:169
+msgid "Remote URL"
+msgstr ""
+
+#: templates/admin/sources.php:85 templates/admin/sources.php:100 templates/admin/sources.php:153
+msgid "Remove"
+msgstr ""
+
+#: templates/admin/settings.php:109
+msgid "Removes every synced event and resets all EventMesh settings to their defaults. The plugin itself stays installed and active. This cannot be undone."
+msgstr ""
+
+#: src/Support/SyncStatus.php:19
+msgid "Running"
+msgstr ""
+
+#: templates/admin/settings.php:102
+msgid "Save Settings"
+msgstr ""
+
+#: templates/admin/sources.php:129
+msgid "Save sources"
+msgstr ""
+
+#: src/Content/EventPostType.php:76
+msgid "Search Events"
+msgstr ""
+
+#: src/Admin/Admin.php:151 src/Admin/Admin.php:152 templates/admin/settings.php:21
+msgid "Settings"
+msgstr ""
+
+#: templates/admin/settings.php:69
+msgid "Show a play button and load the player only when clicked"
+msgstr ""
+
+#: src/Admin/EventListBlock.php:1042
+msgid "Show more"
+msgstr ""
+
+#: src/Admin/EventListBlock.php:663 src/Content/EventPostType.php:324 src/Content/EventPostType.php:334 templates/frontend/events-card.php:31
+#: templates/frontend/events-card.php:43 templates/frontend/events-list.php:34 templates/frontend/events-list.php:55
+msgid "Sold out"
+msgstr ""
+
+#: src/Support/EmbedHtmlSanitizer.php:70
+msgid "SoundCloud player"
+msgstr ""
+
+#: src/Content/EventPostType.php:165
+msgid "Source"
+msgstr ""
+
+#: src/Admin/Admin.php:133 src/Admin/Admin.php:134 templates/admin/sources.php:23
+msgid "Sources"
+msgstr ""
+
+#: src/Support/EmbedHtmlSanitizer.php:69
+msgid "Spotify player"
+msgstr ""
+
+#: src/Content/EventPostType.php:181
+msgid "Starts at"
+msgstr ""
+
+#: templates/frontend/events-list.php:40
+msgid "Starts:"
+msgstr ""
+
+#: templates/admin/dashboard.php:34 templates/admin/diagnostics.php:146
+msgid "Status"
+msgstr ""
+
+#: templates/frontend/sync-status.php:18
+msgid "Status:"
+msgstr ""
+
+#: src/Admin/DashboardPage.php:52
+msgid "Sync in progress…"
+msgstr ""
+
+#: templates/admin/settings.php:46
+msgid "Sync interval"
+msgstr ""
+
+#: templates/admin/diagnostics.php:109
+msgid "Sync lock"
+msgstr ""
+
+#: templates/admin/dashboard.php:80
+msgid "Sync now"
+msgstr ""
+
+#: templates/admin/dashboard.php:29
+msgid "Sync status"
+msgstr ""
+
+#: src/Content/EventPostType.php:216
+msgid "Synced content"
+msgstr ""
+
+#: src/Admin/DiagnosticsPage.php:97
+msgid "The background sync is overdue even though DISABLE_WP_CRON is set, so nothing is triggering wp-cron.php. Confirm your system cron (or external scheduler) is calling your-site/wp-cron.php on the interval you expect."
+msgstr ""
+
+#: src/Admin/DiagnosticsPage.php:93
+msgid "The background sync is overdue. WordPress runs it via a loopback request, which this host appears to block. Add define('DISABLE_WP_CRON', true); to wp-config.php and trigger wp-cron.php from a system cron (or external scheduler) instead."
+msgstr ""
+
+#: templates/admin/sources.php:117
+msgid "The dummy connector has no URLs. When enabled above, it generates these sample events on each sync — no network calls:"
+msgstr ""
+
+#: src/Admin/View.php:20
+msgid "The requested EventMesh admin view could not be loaded."
+msgstr ""
+
+#: templates/admin/dashboard.php:202
+msgid "The sync request failed. Reload and try again."
+msgstr ""
+
+#: src/Content/EventPostType.php:218
+msgid "The title, description, and featured image follow the source until you edit them, then your version is kept on every sync. Tick a box to discard your version and follow the source again when you save."
+msgstr ""
+
+#: templates/admin/settings.php:114
+msgid "This will permanently delete all synced events and reset every EventMesh setting. Continue?"
+msgstr ""
+
+#: src/Admin/EventListBlock.php:720 templates/frontend/events-card.php:43 templates/frontend/events-list.php:55
+msgid "Tickets"
+msgstr ""
+
+#: templates/admin/diagnostics.php:168
+msgid "Time"
+msgstr ""
+
+#: src/Content/EventPostType.php:220
+msgid "Title"
+msgstr ""
+
+#: src/Admin/Admin.php:79
+msgid "Twice daily"
+msgstr ""
+
+#: src/Admin/EventListBlock.php:1052
+msgid "Two separate, independently styleable Query Loops - one for upcoming events, one for past - each under its own heading, built from ordinary blocks so the layout can be freely rearranged, restyled, or removed."
+msgstr ""
+
+#: templates/admin/settings.php:87
+msgid "Uninstalling"
+msgstr ""
+
+#: src/Admin/EventListBlock.php:1040
+msgid "Upcoming events"
+msgstr ""
+
+#: src/Content/EventPostType.php:83
+msgid "Uploaded to this event"
+msgstr ""
+
+#: src/Content/EventPostType.php:180
+msgid "Venue"
+msgstr ""
+
+#: templates/frontend/events-list.php:43
+msgid "Venue:"
+msgstr ""
+
+#: src/Content/EventPostType.php:74
+msgid "View Event"
+msgstr ""
+
+#: src/Content/EventPostType.php:267
+msgid "Visibility"
+msgstr ""
+
+#: templates/admin/settings.php:39
+msgid "When enabled, EventMesh will try to sync sources automatically in the background."
+msgstr ""
+
+#: templates/admin/diagnostics.php:44
+msgid "WordPress"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:87
+msgid "You do not have permission to do this."
+msgstr ""
+
+#: src/Admin/Admin.php:162 src/Admin/Admin.php:197
+msgid "You do not have permission to run this action."
+msgstr ""
+
+#: src/Admin/SourcesPage.php:38
+msgid "You do not have permission to save sources."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:35
+msgid "You do not have permission to save this setting."
+msgstr ""
+
+#: src/Admin/EventListBlock.php:909
+msgid "calendar"
+msgstr ""
+
+#: src/Admin/SourcesPage.php:117
+msgid "date unknown"
+msgstr ""
+
+#: src/Admin/EventListBlock.php:909 src/Admin/EventListBlock.php:1059
+msgid "events"
+msgstr ""
+
+#: templates/admin/diagnostics.php:80
+msgid "false (WordPress spawns WP-Cron itself, via loopback)"
+msgstr ""
+
+#: templates/admin/diagnostics.php:125
+msgid "fastcgi_finish_request"
+msgstr ""
+
+#: src/Admin/EventListBlock.php:1059
+msgid "layout"
+msgstr ""
+
+#: src/Admin/EventListBlock.php:1059
+msgid "query"
+msgstr ""
+
+#: src/Admin/SourcesPage.php:126
+msgid "sold out"
+msgstr ""
+
+#: templates/admin/diagnostics.php:79
+msgid "true (WP-Cron off; needs an external trigger)"
+msgstr ""
+

@@ -247,7 +247,11 @@ final class EventListBlock
         $tag = isset($attributes['tag']) && is_string($attributes['tag']) && '' !== $attributes['tag']
             ? $attributes['tag']
             : 'h3';
+        // WordPress fills in block.json's English default ("Past Events") for
+        // a block whose text was never changed, so that value is translated
+        // here rather than printed as typed text.
         $text = isset($attributes['text']) && is_string($attributes['text']) && '' !== trim($attributes['text'])
+            && 'Past Events' !== $attributes['text']
             ? $attributes['text']
             : __('Past Events', 'eventmesh');
 
@@ -523,7 +527,7 @@ final class EventListBlock
             return null;
         }
 
-        return wp_date($yearKnown ? 'D j F Y' : 'D j F', $start->getTimestamp(), new \DateTimeZone('UTC'));
+        return wp_date($this->dateFormat($yearKnown), $start->getTimestamp(), new \DateTimeZone('UTC'));
     }
 
     private function endDateText(int $postId): ?string
@@ -534,7 +538,20 @@ final class EventListBlock
             return null;
         }
 
-        return wp_date($yearKnown ? 'D j F Y' : 'D j F', $end->getTimestamp(), new \DateTimeZone('UTC'));
+        return wp_date($this->dateFormat($yearKnown), $end->getTimestamp(), new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * The event date format, translatable so each language can use its own
+     * order and punctuation (Finnish: "la 13.6.2026").
+     */
+    private function dateFormat(bool $yearKnown): string
+    {
+        return $yearKnown
+            /* translators: event date with year, as a PHP date() format, e.g. Finnish "D j.n.Y" */
+            ? __('D j F Y', 'eventmesh')
+            /* translators: event date without year, as a PHP date() format, e.g. Finnish "D j.n." */
+            : __('D j F', 'eventmesh');
     }
 
     /**
@@ -690,7 +707,13 @@ final class EventListBlock
             }
         }
 
-        if (isset($attributes['text']) && is_string($attributes['text']) && '' !== trim($attributes['text'])) {
+        // WordPress fills in block.json's English default ("Tickets") for a
+        // button whose label was never changed, so that value is translated
+        // here rather than printed as typed text.
+        if (
+            isset($attributes['text']) && is_string($attributes['text']) && '' !== trim($attributes['text'])
+            && 'Tickets' !== $attributes['text']
+        ) {
             return $attributes['text'];
         }
 
