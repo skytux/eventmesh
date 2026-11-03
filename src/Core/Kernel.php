@@ -25,6 +25,7 @@ use EventMesh\Djs\DjSetup;
 use EventMesh\Djs\DjTable;
 use EventMesh\Djs\EventDjsFilter;
 use EventMesh\Djs\ProfileDescriptions;
+use EventMesh\Inference\EventFieldQueue;
 use EventMesh\Naming\EventNameFilters;
 use EventMesh\Naming\EventNameQueue;
 use EventMesh\Services\ConnectorManager;
@@ -81,6 +82,7 @@ final class Kernel
         $this->container->get(EventDjsFilter::class)->boot();
         $this->container->get(EventNameQueue::class)->boot();
         $this->container->get(EventNameFilters::class)->boot();
+        $this->container->get(EventFieldQueue::class)->boot();
 
         do_action(
             'eventmesh/register_connectors',
@@ -236,6 +238,13 @@ final class Kernel
         $this->container->singleton(
             EventNameFilters::class,
             fn () => new EventNameFilters()
+        );
+
+        $this->container->singleton(
+            EventFieldQueue::class,
+            fn (Container $container) => new EventFieldQueue(
+                $container->get(Logger::class)
+            )
         );
 
         $this->container->singleton(

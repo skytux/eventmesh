@@ -6,6 +6,7 @@ namespace EventMesh\Sync;
 
 use EventMesh\Content\EventPostType;
 use EventMesh\Djs\DjLinkApplier;
+use EventMesh\Inference\InferredFields;
 use EventMesh\Models\Event;
 use EventMesh\Services\EventMediaEnricher;
 use EventMesh\Services\ProviderEmbedEnricher;
@@ -394,9 +395,9 @@ final class EventSynchronizer
     {
         update_post_meta($postId, '_eventmesh_source_id', $event->sourceId());
         update_post_meta($postId, '_eventmesh_external_id', $event->externalId());
-        update_post_meta($postId, '_eventmesh_starts_at', LocalTime::store($event->startsAt()));
+        $this->writeSourceField($postId, 'starts_at', LocalTime::store($event->startsAt()));
         update_post_meta($postId, '_eventmesh_starts_at_year_known', $event->startsAtYearKnown() ? '1' : '');
-        update_post_meta($postId, '_eventmesh_ends_at', LocalTime::store($event->endsAt()));
+        $this->writeSourceField($postId, 'ends_at', LocalTime::store($event->endsAt()));
         update_post_meta($postId, '_eventmesh_url', esc_url_raw($event->url()));
         update_post_meta($postId, '_eventmesh_image_url', esc_url_raw($event->imageUrl()));
         update_post_meta($postId, '_eventmesh_sold_out', $event->soldOut() ? '1' : '');
@@ -407,6 +408,7 @@ final class EventSynchronizer
         // when this fetch actually found a venue.
         if ('' !== trim($event->venueName())) {
             update_post_meta($postId, '_eventmesh_venue_name', sanitize_text_field($event->venueName()));
+            InferredFields::forget($postId, 'venue_name');
         }
 
         // Same guard as venue: the listing page usually carries the price but
@@ -414,6 +416,26 @@ final class EventSynchronizer
         // not wipe a price a previous fetch (or a person) already set.
         if ('' !== trim($event->price())) {
             update_post_meta($postId, '_eventmesh_price', sanitize_text_field($event->price()));
+            InferredFields::forget($postId, 'price');
+        }
+    }
+
+    /**
+     * Writes a date field from the source. A value the source gives replaces
+     * whatever is stored, an inferred value included. When the source gives
+     * none, a value the language model inferred (EventFieldQueue) is kept
+     * rather than blanked.
+     */
+    private function writeSourceField(int $postId, string $field, string $value): void
+    {
+        if ('' === $value && InferredFields::isInferred($postId, $field)) {
+            return;
+        }
+
+        update_post_meta($postId, InferredFields::metaKey($field), $value);
+
+        if ('' !== $value) {
+            InferredFields::forget($postId, $field);
         }
     }
 }
