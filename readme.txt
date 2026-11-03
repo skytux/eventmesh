@@ -4,7 +4,7 @@ Tags: events, sync, holvi, gutenberg, event list
 Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 1.5.0
+Stable tag: 1.5.1
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -136,6 +136,9 @@ No. The only outgoing requests are the ones described under External services, a
 
 == Changelog ==
 
+= 1.5.1 =
+* SoundCloud players no longer show the "Play on SoundCloud" / "Listen in browser" screen on phones (show_teaser=false is added to every SoundCloud player address, also for players already saved).
+
 = 1.5.0 =
 * New Events → DJs page and DJ table: each DJ has a name, other spellings, and Spotify, SoundCloud and Mixcloud links. On first use the table is filled once from existing events: the DJ name is the part of the title after " / " (several DJs split on "&"), and an event with one DJ gives its links.
 * When an event is saved or synced, DJ names and other spellings are looked for in its title and text (whole words, case and accents ignored). The event gets the DJ's links only for services it has no link for yet, and its player is updated. A link typed on the event is never replaced. After a DJ is added, changed or deleted, all future events are checked again.
@@ -178,6 +181,9 @@ No. The only outgoing requests are the ones described under External services, a
 * Built-in dummy/test source (enable in Sources) for demos.
 
 == Upgrade Notice ==
+
+= 1.5.1 =
+SoundCloud players on phones no longer show the "Listen in browser" screen.
 
 = 1.5.0 =
 Adds a DJ table (Events → DJs) that gives events their DJ's player links, filled once from existing events on the first admin page after the update. The play button now starts the player with one click.

@@ -35,7 +35,41 @@ final class EmbedHtmlSanitizer
 
     public static function sanitize(string $html): string
     {
-        return wp_kses(self::lazyLoadIframes(self::titledIframes($html)), self::ALLOWED_TAGS);
+        return wp_kses(
+            self::lazyLoadIframes(self::titledIframes(self::soundCloudWithoutTeaser($html))),
+            self::ALLOWED_TAGS
+        );
+    }
+
+    /**
+     * Sets show_teaser=false on every SoundCloud player src. With the
+     * teaser on (SoundCloud's default), the player on iOS and Android
+     * covers itself with a "Play on SoundCloud" / "Listen in browser"
+     * screen. An src that already has show_teaser gets its value replaced.
+     * Done here, so stored embeds get it on output without a re-sync, and
+     * the facade's data-src carries it too.
+     */
+    private static function soundCloudWithoutTeaser(string $html): string
+    {
+        return (string) preg_replace_callback(
+            '/(\ssrc=)(["\'])(https:\/\/w\.soundcloud\.com\/player\/[^"\']*)\2/i',
+            static function (array $matches): string {
+                $url = (string) preg_replace(
+                    '/(\?|&amp;|&)show_teaser=[^&#]*/i',
+                    '$1show_teaser=false',
+                    $matches[3],
+                    -1,
+                    $count
+                );
+
+                if (0 === $count) {
+                    $url .= (str_contains($url, '?') ? '&' : '?') . 'show_teaser=false';
+                }
+
+                return $matches[1] . $matches[2] . $url . $matches[2];
+            },
+            $html
+        );
     }
 
     /**

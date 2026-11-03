@@ -82,6 +82,21 @@ final class ProviderEmbedMarkupTest extends TestCase
         self::assertSame('eventmesh-embed-facade', $enqueued[0]);
     }
 
+    public function testTheFacadeSoundCloudDataSrcTurnsTheTeaserOff(): void
+    {
+        $this->withOptions('1', '0');
+        $this->captureEnqueuedHandle();
+
+        $src = 'https://w.soundcloud.com/player/?url=https%3A%2F%2Fapi.soundcloud.com%2Fusers%2F1';
+
+        $html = ProviderEmbedMarkup::render('<iframe src="' . $src . '"></iframe>');
+
+        [$scripted, $noscript] = explode('<noscript>', $html, 2);
+
+        self::assertStringContainsString('data-src="' . $src . '&show_teaser=false"', $scripted);
+        self::assertStringContainsString('&show_teaser=false"', $noscript);
+    }
+
     public function testTheFacadeButtonUsesTheLabelItWasGiven(): void
     {
         $this->withOptions('1', '0');
