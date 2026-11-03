@@ -25,6 +25,8 @@ use EventMesh\Djs\DjSetup;
 use EventMesh\Djs\DjTable;
 use EventMesh\Djs\EventDjsFilter;
 use EventMesh\Djs\ProfileDescriptions;
+use EventMesh\Naming\EventNameFilters;
+use EventMesh\Naming\EventNameQueue;
 use EventMesh\Services\ConnectorManager;
 use EventMesh\Services\CronFallbackTrigger;
 use EventMesh\Services\EventMediaEnricher;
@@ -77,6 +79,8 @@ final class Kernel
         $this->container->get(DjSetup::class)->boot();
         $this->container->get(DjDescriptions::class)->boot();
         $this->container->get(EventDjsFilter::class)->boot();
+        $this->container->get(EventNameQueue::class)->boot();
+        $this->container->get(EventNameFilters::class)->boot();
 
         do_action(
             'eventmesh/register_connectors',
@@ -220,6 +224,18 @@ final class Kernel
             fn (Container $container) => new EventDjsFilter(
                 $container->get(DjRepository::class)
             )
+        );
+
+        $this->container->singleton(
+            EventNameQueue::class,
+            fn (Container $container) => new EventNameQueue(
+                $container->get(Logger::class)
+            )
+        );
+
+        $this->container->singleton(
+            EventNameFilters::class,
+            fn () => new EventNameFilters()
         );
 
         $this->container->singleton(

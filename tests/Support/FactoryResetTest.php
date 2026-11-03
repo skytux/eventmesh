@@ -54,7 +54,12 @@ final class FactoryResetTest extends TestCase
         FactoryReset::run();
 
         self::assertSame(
-            ['eventmesh/background_sync', 'eventmesh/translate_queue', 'eventmesh/dj_descriptions'],
+            [
+                'eventmesh/background_sync',
+                'eventmesh/translate_queue',
+                'eventmesh/name_queue',
+                'eventmesh/dj_descriptions',
+            ],
             $unscheduledHooks
         );
     }

@@ -139,6 +139,9 @@ CI (GitHub Actions) runs PHPUnit and PHPCS on every push and pull request.
 
 ## Changelog
 
+### 1.7.0
+- Clean event names: the language model writes each event's name without the date and the DJ names, in normal case ("Ecstatic Dance" from "ECSTATIC DANCE 14.11.2026 / ..."), also from the Finnish title, and lists the DJ names in the title. Every answer is checked against the title and rejected when it adds words. Other plugins read them through the filters `eventmesh/event_name` and `eventmesh/event_dj_names`; the event edit screen shows them.
+
 ### 1.6.0
 - DJ descriptions: every DJ in Events > DJs has a description, typed by hand or filled in automatically from the Team page (the paragraphs under the DJ's name heading) or from the DJ's SoundCloud or Mixcloud profile. A typed description is never overwritten. Set the Team page and press "Fetch descriptions now" on the DJs page. Other plugins get the DJs an event names, with their descriptions, through the filter `eventmesh/event_djs`.
 

@@ -38,7 +38,7 @@ msgstr ""
 msgid "(overdue)"
 msgstr ""
 
-#: src/Admin/TranslationMetaBox.php:67
+#: src/Admin/TranslationMetaBox.php:68 src/Admin/TranslationMetaBox.php:113
 msgid "(the text has changed; it will be checked again)"
 msgstr ""
 
@@ -103,12 +103,12 @@ msgstr ""
 msgid "Automatic translation"
 msgstr ""
 
-#: src/Admin/TranslationMetaBox.php:110
+#: src/Admin/TranslationMetaBox.php:146
 #. translators: 1: model name, 2: date and time
 msgid "Automatic translation by %1$s, %2$s."
 msgstr ""
 
-#: src/Admin/TranslationMetaBox.php:58
+#: src/Admin/TranslationMetaBox.php:59
 msgid "Automatic translation is off or not set up (EventMesh → Settings). You can still write translations here by hand."
 msgstr ""
 
@@ -128,7 +128,7 @@ msgstr ""
 msgid "Available (fallback sync runs without delaying visitors)"
 msgstr ""
 
-#: src/Admin/TranslationMetaBox.php:163
+#: src/Admin/TranslationMetaBox.php:199
 msgid "Back to automatic"
 msgstr ""
 
@@ -177,7 +177,7 @@ msgstr ""
 msgid "Connectors"
 msgstr ""
 
-#: src/Admin/TranslationMetaBox.php:145
+#: src/Admin/TranslationMetaBox.php:181
 msgid "Content"
 msgstr ""
 
@@ -219,6 +219,10 @@ msgstr ""
 
 #: templates/admin/djs.php:96 templates/admin/djs.php:159
 msgid "DJ name"
+msgstr ""
+
+#: src/Admin/TranslationMetaBox.php:119
+msgid "DJ names:"
 msgstr ""
 
 #: templates/admin/djs.php:35
@@ -305,7 +309,7 @@ msgstr ""
 msgid "Edit Event"
 msgstr ""
 
-#: src/Admin/TranslationMetaBox.php:106
+#: src/Admin/TranslationMetaBox.php:142
 msgid "Edited by hand. Automatic translation leaves it alone."
 msgstr ""
 
@@ -351,6 +355,10 @@ msgstr ""
 
 #: src/Content/EventPostType.php:83
 msgid "Event Attributes"
+msgstr ""
+
+#: src/Admin/TranslationMetaBox.php:108
+msgid "Event name:"
 msgstr ""
 
 #: src/Admin/Admin.php:153 src/Admin/Admin.php:154 src/Admin/EventListBlock.php:898
@@ -437,12 +445,12 @@ msgstr ""
 msgid "Factory reset complete: removed %d event(s). All settings reset."
 msgstr ""
 
-#: src/Admin/TranslationMetaBox.php:176
+#: src/Admin/TranslationMetaBox.php:212
 #. translators: 1: number of failed attempts, 2: short error kind
 msgid "Failed %1$d times (%2$s). Given up until the original changes."
 msgstr ""
 
-#: src/Admin/TranslationMetaBox.php:182
+#: src/Admin/TranslationMetaBox.php:218
 #. translators: 1: number of failed attempts, 2: maximum attempts, 3: short error kind
 msgid "Failed attempts: %1$d of %2$d (%3$s). Tried again later."
 msgstr ""
@@ -461,6 +469,10 @@ msgstr ""
 
 #: src/Content/EventPostType.php:86
 msgid "Filter events list"
+msgstr ""
+
+#: src/Admin/TranslationMetaBox.php:117
+msgid "Finnish name:"
 msgstr ""
 
 #: src/Content/EventPostType.php:251
@@ -667,7 +679,7 @@ msgstr ""
 msgid "No sync yet."
 msgstr ""
 
-#: src/Admin/TranslationMetaBox.php:84
+#: src/Admin/TranslationMetaBox.php:87
 msgid "No target languages other than the original."
 msgstr ""
 
@@ -691,7 +703,7 @@ msgstr ""
 msgid "Not scheduled"
 msgstr ""
 
-#: src/Admin/TranslationMetaBox.php:104
+#: src/Admin/TranslationMetaBox.php:140
 msgid "Not translated yet."
 msgstr ""
 
@@ -712,7 +724,7 @@ msgstr ""
 msgid "Only applies when the play button above is off. Players still load on their own, just not until the visitor scrolls to them. Players without JavaScript fall back to loading normally."
 msgstr ""
 
-#: src/Admin/TranslationMetaBox.php:62
+#: src/Admin/TranslationMetaBox.php:63
 msgid "Original language:"
 msgstr ""
 
@@ -933,11 +945,11 @@ msgstr ""
 msgid "The key is stored encrypted and is never shown again."
 msgstr ""
 
-#: src/Admin/TranslationMetaBox.php:126
+#: src/Admin/TranslationMetaBox.php:162
 msgid "The original has changed since this was made, so the original is shown until it is translated again."
 msgstr ""
 
-#: src/Admin/TranslationMetaBox.php:124
+#: src/Admin/TranslationMetaBox.php:160
 msgid "The original has changed since this was saved, so the original is shown. Update this translation and save, or go back to automatic."
 msgstr ""
 
@@ -969,7 +981,7 @@ msgstr ""
 msgid "Time"
 msgstr ""
 
-#: src/Admin/TranslationMetaBox.php:137 src/Content/EventPostType.php:222
+#: src/Admin/TranslationMetaBox.php:173 src/Content/EventPostType.php:222
 msgid "Title"
 msgstr ""
 
@@ -999,7 +1011,7 @@ msgstr ""
 msgid "Translates the title and text of each event with a language model on a server you choose (any service with an OpenAI-compatible chat completions API). Only the event title and text are sent. Translations are shown to visitors who view the site in another language."
 msgstr ""
 
-#: src/Admin/TranslationMetaBox.php:38
+#: src/Admin/TranslationMetaBox.php:39
 msgid "Translations"
 msgstr ""
 
@@ -1055,7 +1067,7 @@ msgstr ""
 msgid "WordPress"
 msgstr ""
 
-#: src/Admin/SettingsPage.php:249 src/Admin/SettingsPage.php:271 src/Admin/TranslationMetaBox.php:273
+#: src/Admin/SettingsPage.php:249 src/Admin/SettingsPage.php:271 src/Admin/TranslationMetaBox.php:309
 msgid "You do not have permission to do this."
 msgstr ""
 
@@ -1099,8 +1111,12 @@ msgstr ""
 msgid "layout"
 msgstr ""
 
-#: src/Admin/TranslationMetaBox.php:63
+#: src/Admin/TranslationMetaBox.php:64
 msgid "not detected yet"
+msgstr ""
+
+#: src/Admin/TranslationMetaBox.php:104
+msgid "not written yet"
 msgstr ""
 
 #: src/Admin/EventListBlock.php:1059
