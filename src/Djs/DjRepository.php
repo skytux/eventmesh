@@ -70,6 +70,8 @@ final class DjRepository
             'spotify_url' => $dj->link('spotify'),
             'soundcloud_url' => $dj->link('soundcloud'),
             'mixcloud_url' => $dj->link('mixcloud'),
+            'description' => $dj->description,
+            'description_source' => $dj->descriptionSource,
         ];
 
         $this->cache = null;
@@ -85,6 +87,26 @@ final class DjRepository
         $result = $wpdb->insert(DjTable::name(), $data);
 
         return false === $result ? 0 : (int) $wpdb->insert_id;
+    }
+
+    /**
+     * Writes only the description and its source of one DJ, so an automatic
+     * refresh cannot change a name or link typed in the meantime.
+     */
+    public function saveDescription(int $id, string $description, string $source): bool
+    {
+        global $wpdb;
+
+        $this->cache = null;
+
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- the plugin's own table.
+        $result = $wpdb->update(
+            DjTable::name(),
+            ['description' => $description, 'description_source' => $source],
+            ['id' => $id]
+        );
+
+        return false !== $result;
     }
 
     public function delete(int $id): bool
@@ -116,7 +138,9 @@ final class DjRepository
             (int) ($row['id'] ?? 0),
             (string) ($row['name'] ?? ''),
             Dj::parseAliases((string) ($row['aliases'] ?? '')),
-            $links
+            $links,
+            (string) ($row['description'] ?? ''),
+            (string) ($row['description_source'] ?? '')
         );
     }
 }

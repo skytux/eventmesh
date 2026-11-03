@@ -139,6 +139,9 @@ CI (GitHub Actions) runs PHPUnit and PHPCS on every push and pull request.
 
 ## Changelog
 
+### 1.6.0
+- DJ descriptions: every DJ in Events > DJs has a description, typed by hand or filled in automatically from the Team page (the paragraphs under the DJ's name heading) or from the DJ's SoundCloud or Mixcloud profile. A typed description is never overwritten. Set the Team page and press "Fetch descriptions now" on the DJs page. Other plugins get the DJs an event names, with their descriptions, through the filter `eventmesh/event_djs`.
+
 ### 1.5.1
 - SoundCloud players no longer show the "Play on SoundCloud" / "Listen in browser" screen on phones: `show_teaser=false` is added to every SoundCloud player address, also for players already saved.
 

@@ -17,11 +17,14 @@ use EventMesh\Connectors\Holvi\HolviHtmlParser;
 use EventMesh\Content\EventPostType;
 use EventMesh\Content\EventQuery;
 use EventMesh\Content\SingleEventTemplate;
+use EventMesh\Djs\DjDescriptions;
 use EventMesh\Djs\DjLinkApplier;
 use EventMesh\Djs\DjRepository;
 use EventMesh\Djs\DjSeeder;
 use EventMesh\Djs\DjSetup;
 use EventMesh\Djs\DjTable;
+use EventMesh\Djs\EventDjsFilter;
+use EventMesh\Djs\ProfileDescriptions;
 use EventMesh\Services\ConnectorManager;
 use EventMesh\Services\CronFallbackTrigger;
 use EventMesh\Services\EventMediaEnricher;
@@ -72,6 +75,8 @@ final class Kernel
         $this->container->get(TranslationDisplay::class)->boot();
         $this->container->get(TranslationMetaBox::class)->boot();
         $this->container->get(DjSetup::class)->boot();
+        $this->container->get(DjDescriptions::class)->boot();
+        $this->container->get(EventDjsFilter::class)->boot();
 
         do_action(
             'eventmesh/register_connectors',
@@ -191,6 +196,29 @@ final class Kernel
                 $container->get(DjTable::class),
                 $container->get(DjSeeder::class),
                 $container->get(DjLinkApplier::class)
+            )
+        );
+
+        $this->container->singleton(
+            ProfileDescriptions::class,
+            fn (Container $container) => new ProfileDescriptions(
+                $container->get(Logger::class)
+            )
+        );
+
+        $this->container->singleton(
+            DjDescriptions::class,
+            fn (Container $container) => new DjDescriptions(
+                $container->get(DjRepository::class),
+                $container->get(ProfileDescriptions::class),
+                $container->get(Logger::class)
+            )
+        );
+
+        $this->container->singleton(
+            EventDjsFilter::class,
+            fn (Container $container) => new EventDjsFilter(
+                $container->get(DjRepository::class)
             )
         );
 
@@ -335,7 +363,8 @@ final class Kernel
             fn (Container $container) => new DjsPage(
                 $container->get(View::class),
                 $container->get(DjRepository::class),
-                $container->get(DjLinkApplier::class)
+                $container->get(DjLinkApplier::class),
+                $container->get(DjDescriptions::class)
             )
         );
 

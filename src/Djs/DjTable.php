@@ -15,7 +15,7 @@ namespace EventMesh\Djs;
  */
 final class DjTable
 {
-    public const DB_VERSION = '1';
+    public const DB_VERSION = '2';
     public const VERSION_OPTION = 'eventmesh_dj_db_version';
 
     public static function name(): string
@@ -69,7 +69,9 @@ final class DjTable
      *
      * Columns: id; name (the DJ name); aliases (other spellings, one per
      * line); spotify_url, soundcloud_url, mixcloud_url (empty when the DJ has
-     * no link on that service).
+     * no link on that service); description (plain text about the DJ) and
+     * description_source (where it came from: 'manual', 'team',
+     * 'soundcloud', 'mixcloud', or '' for none). Version 2 added the last two.
      */
     private function schema(): string
     {
@@ -85,6 +87,8 @@ final class DjTable
   spotify_url text NOT NULL,
   soundcloud_url text NOT NULL,
   mixcloud_url text NOT NULL,
+  description text NOT NULL,
+  description_source varchar(20) NOT NULL DEFAULT '',
   PRIMARY KEY  (id),
   KEY name (name)
 ) {$charset};";
