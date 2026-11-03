@@ -324,6 +324,80 @@ final class EventSynchronizerTest extends TestCase
         );
     }
 
+    public function testSyncKeepsAnInferredStartWhileTheSourceGivesNone(): void
+    {
+        $this->queueQueryResults([79]);
+        Functions\when('wp_update_post')->alias(static fn (array $postarr) => (int) $postarr['ID']);
+        Functions\when('get_post_meta')->alias(
+            static fn (int $postId, string $key) => '_eventmesh_inferred_fields' === $key
+                ? ['starts_at' => 'hash', 'venue_name' => 'hash']
+                : ''
+        );
+
+        $metaWrites = [];
+        Functions\when('update_post_meta')->alias(
+            static function (int $postId, string $key, mixed $value) use (&$metaWrites) {
+                $metaWrites[$key] = $value;
+
+                return true;
+            }
+        );
+
+        $event = new Event(sourceId: 'holvi', externalId: 'ext-inferred', title: 'No Date Event');
+        $this->synchronizer()->sync($event);
+
+        self::assertArrayNotHasKey('_eventmesh_starts_at', $metaWrites, 'The inferred start survives.');
+        self::assertSame('', $metaWrites['_eventmesh_ends_at'] ?? null, 'A field never inferred is written as before.');
+        self::assertArrayNotHasKey('_eventmesh_inferred_fields', $metaWrites);
+    }
+
+    public function testASourceValueReplacesAnInferredOne(): void
+    {
+        $this->queueQueryResults([80]);
+        Functions\when('wp_update_post')->alias(static fn (array $postarr) => (int) $postarr['ID']);
+
+        $inferred = ['starts_at' => 'hash', 'venue_name' => 'hash'];
+        $metaWrites = [];
+        Functions\when('get_post_meta')->alias(
+            static function (int $postId, string $key) use (&$inferred) {
+                return '_eventmesh_inferred_fields' === $key ? $inferred : '';
+            }
+        );
+        Functions\when('update_post_meta')->alias(
+            static function (int $postId, string $key, mixed $value) use (&$metaWrites, &$inferred) {
+                $metaWrites[$key] = $value;
+
+                if ('_eventmesh_inferred_fields' === $key) {
+                    $inferred = $value;
+                }
+
+                return true;
+            }
+        );
+        Functions\when('delete_post_meta')->alias(
+            static function (int $postId, string $key) use (&$inferred): bool {
+                if ('_eventmesh_inferred_fields' === $key) {
+                    $inferred = [];
+                }
+
+                return true;
+            }
+        );
+
+        $event = new Event(
+            sourceId: 'holvi',
+            externalId: 'ext-found',
+            title: 'Dated Event',
+            startsAt: new \DateTimeImmutable('2026-11-14 18:30', new \DateTimeZone('Europe/Helsinki')),
+            venueName: 'Sydäntila'
+        );
+        $this->synchronizer()->sync($event);
+
+        self::assertSame('2026-11-14T18:30:00', $metaWrites['_eventmesh_starts_at'] ?? null);
+        self::assertSame('Sydäntila', $metaWrites['_eventmesh_venue_name'] ?? null);
+        self::assertSame([], $inferred, 'Neither field is marked inferred any more.');
+    }
+
     public function testSyncOverwritesVenueWhenTheFetchFoundOne(): void
     {
         $this->queueQueryResults([78]);

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace EventMesh\Translation;
 
+use EventMesh\Inference\EventFieldQueue;
+use EventMesh\Inference\InferredFields;
 use EventMesh\Naming\EventNameQueue;
 use EventMesh\Naming\EventNameStore;
 
@@ -11,7 +13,8 @@ use EventMesh\Naming\EventNameStore;
  * Removes everything automatic translation stores: its options (including
  * the encrypted API key), the per-event translation meta, the chunk cache
  * transients, and the scheduled queue run. The same for the event names the
- * language model writes (EventNameQueue).
+ * language model writes (EventNameQueue) and for its record of the event
+ * fields it filled in (EventFieldQueue).
  */
 final class TranslationCleanup
 {
@@ -29,6 +32,9 @@ final class TranslationCleanup
 
         delete_option(EventNameQueue::OPTION_QUEUE);
         wp_clear_scheduled_hook(EventNameQueue::HOOK);
+
+        delete_option(EventFieldQueue::OPTION_QUEUE);
+        wp_clear_scheduled_hook(EventFieldQueue::HOOK);
     }
 
     /**
@@ -46,6 +52,10 @@ final class TranslationCleanup
             // _eventmesh_name, _eventmesh_name_fi, _eventmesh_name_hash, _eventmesh_name_fail.
             EventNameStore::META_NAME,
             EventNameStore::META_DJ_NAMES,
+            // Which fields the language model filled in (the values stay).
+            InferredFields::META_FIELDS,
+            InferredFields::META_ASKED,
+            InferredFields::META_FAIL,
         ];
 
         foreach ($metaPrefixes as $prefix) {

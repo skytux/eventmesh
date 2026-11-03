@@ -139,6 +139,10 @@ CI (GitHub Actions) runs PHPUnit and PHPCS on every push and pull request.
 
 ## Changelog
 
+### 1.10.0
+- Holvi: the start time comes from the doors-open line ("18:30-19:00 Ovet auki", "Doors open 18:30"). A doors-closing time ("Ovet suljetaan klo 19:00") is never taken as the start.
+- When automatic translation (the language model) is set up, it fills the event fields the parser could not find in the text: start, end, venue name, venue address and price. It never overwrites a value the parser found, and a value the parser finds later replaces the inferred one.
+
 ### 1.9.0
 - The DJ line under each event title shows only the names, without the word "DJ" or "DJs" in front.
 
