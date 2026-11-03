@@ -233,13 +233,6 @@ msgstr ""
 msgid "DJs"
 msgstr ""
 
-#: src/Naming/EventDisplayName.php:82
-#. translators: %s: one DJ name, or a list of DJ names such as "Kai, Lumi & Ode"
-msgid "DJ %s"
-msgid_plural "DJs %s"
-msgstr[0] ""
-msgstr[1] ""
-
 #: src/Admin/Admin.php:120
 msgid "Daily"
 msgstr ""

@@ -25,24 +25,31 @@ final class EventDisplayNameTest extends TestCase
 
     public function testDjLineForOneTwoAndThreeNames(): void
     {
-        self::assertSame('DJ Kai', EventDisplayName::djLine(['Kai']));
-        self::assertSame('DJs Kai & Lumi', EventDisplayName::djLine(['Kai', 'Lumi']));
-        self::assertSame('DJs Kai, Lumi & Ode', EventDisplayName::djLine(['Kai', 'Lumi', 'Ode']));
+        self::assertSame('Kai', EventDisplayName::djLine(['Kai']));
+        self::assertSame('Kai & Lumi', EventDisplayName::djLine(['Kai', 'Lumi']));
+        self::assertSame('Kai, Lumi & Ode', EventDisplayName::djLine(['Kai', 'Lumi', 'Ode']));
+    }
+
+    public function testDjLineHasNoDjPrefix(): void
+    {
+        self::assertSame('Esimerkki', EventDisplayName::djLine(['Esimerkki']));
+        self::assertSame('Aino Testinen & Bo Kokeilu', EventDisplayName::djLine(['Aino Testinen', 'Bo Kokeilu']));
+        self::assertStringStartsNotWith('DJ', EventDisplayName::djLine(['Kai', 'Lumi', 'Ode']));
     }
 
     public function testDjLineIsEmptyWithoutNamesAndSkipsBlanksAndRepeats(): void
     {
         self::assertSame('', EventDisplayName::djLine([]));
         self::assertSame('', EventDisplayName::djLine(['', '  ', 7]));
-        self::assertSame('DJ Kai', EventDisplayName::djLine(['Kai', ' Kai ', '']));
+        self::assertSame('Kai', EventDisplayName::djLine(['Kai', ' Kai ', '']));
     }
 
     public function testDjLineHtmlIsABlockSpanAndEscaped(): void
     {
         self::assertSame('', EventDisplayName::djLineHtml(''));
         self::assertSame(
-            '<span class="eventmesh-dj-line">DJs A &amp; &lt;B&gt;</span>',
-            EventDisplayName::djLineHtml('DJs A & <B>')
+            '<span class="eventmesh-dj-line">A &amp; &lt;B&gt;</span>',
+            EventDisplayName::djLineHtml('A & <B>')
         );
     }
 
@@ -52,7 +59,7 @@ final class EventDisplayNameTest extends TestCase
         Filters\expectApplied('eventmesh/event_dj_names')->once()->with([], 42)->andReturn(['Kai', 'Lumi']);
 
         self::assertSame(
-            ['name' => 'Ecstatic Dance', 'dj_line' => 'DJs Kai & Lumi'],
+            ['name' => 'Ecstatic Dance', 'dj_line' => 'Kai & Lumi'],
             EventDisplayName::forEvent(42)
         );
     }
