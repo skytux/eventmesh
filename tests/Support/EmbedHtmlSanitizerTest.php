@@ -73,6 +73,54 @@ final class EmbedHtmlSanitizerTest extends TestCase
         self::assertStringNotContainsString('SoundCloud player', $result);
     }
 
+    public function testSanitizeTurnsTheSoundCloudTeaserOff(): void
+    {
+        Functions\when('wp_kses')->returnArg(1);
+
+        $src = 'https://w.soundcloud.com/player/?url=https%3A%2F%2Fapi.soundcloud.com%2Fusers%2F1&amp;visual=true';
+
+        $result = EmbedHtmlSanitizer::sanitize('<iframe src="' . $src . '"></iframe>');
+
+        self::assertStringContainsString('src="' . $src . '&show_teaser=false"', $result);
+    }
+
+    public function testSanitizeReplacesAnExistingSoundCloudTeaserValue(): void
+    {
+        Functions\when('wp_kses')->returnArg(1);
+
+        $result = EmbedHtmlSanitizer::sanitize(
+            '<iframe src="https://w.soundcloud.com/player/?url=x&amp;show_teaser=true&amp;visual=true"></iframe>'
+        );
+
+        self::assertStringContainsString(
+            'src="https://w.soundcloud.com/player/?url=x&amp;show_teaser=false&amp;visual=true"',
+            $result
+        );
+        self::assertSame(1, substr_count($result, 'show_teaser='));
+    }
+
+    public function testSanitizeAddsTheTeaserParameterAsTheFirstOneWhenTheSrcHasNoQuery(): void
+    {
+        Functions\when('wp_kses')->returnArg(1);
+
+        $result = EmbedHtmlSanitizer::sanitize('<iframe src="https://w.soundcloud.com/player/"></iframe>');
+
+        self::assertStringContainsString('src="https://w.soundcloud.com/player/?show_teaser=false"', $result);
+    }
+
+    public function testSanitizeLeavesOtherProvidersSrcAlone(): void
+    {
+        Functions\when('wp_kses')->returnArg(1);
+
+        $spotify = EmbedHtmlSanitizer::sanitize('<iframe src="https://open.spotify.com/embed/track/abc?x=1"></iframe>');
+        $mixcloud = EmbedHtmlSanitizer::sanitize(
+            '<iframe src="https://player-widget.mixcloud.com/widget/iframe/?feed=%2Fa%2F"></iframe>'
+        );
+
+        self::assertStringContainsString('src="https://open.spotify.com/embed/track/abc?x=1"', $spotify);
+        self::assertStringNotContainsString('show_teaser', $spotify . $mixcloud);
+    }
+
     public function testSanitizeDoesNotAddASecondLoadingAttribute(): void
     {
         Functions\when('wp_kses')->returnArg(1);

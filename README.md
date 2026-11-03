@@ -139,6 +139,9 @@ CI (GitHub Actions) runs PHPUnit and PHPCS on every push and pull request.
 
 ## Changelog
 
+### 1.5.1
+- SoundCloud players no longer show the "Play on SoundCloud" / "Listen in browser" screen on phones: `show_teaser=false` is added to every SoundCloud player address, also for players already saved.
+
 ### 1.5.0
 - New Events → DJs page and DJ table (name, other spellings, Spotify/SoundCloud/Mixcloud links), filled once from existing event titles and links. Events whose title or text names a DJ (whole words, case and accents ignored) get that DJ's links for services they have no link for yet, and their player is updated; a link typed on the event is never replaced. Future events are checked again after every DJ change.
 - The play button starts the player through the official Spotify, SoundCloud and Mixcloud player APIs, loaded only after the click; if an API does not load, the player is shown as before.
