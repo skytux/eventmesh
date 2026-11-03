@@ -211,7 +211,7 @@ final class EventListBlockRenderersTest extends TestCase
 
         self::assertSame(
             '<h1 class="wp-block-eventmesh-test"><a href="https://example.test/events/ecstatic-dance/">Ecstatic Dance</a>'
-            . '<span class="eventmesh-dj-line">DJ Kai</span></h1>',
+            . '<span class="eventmesh-dj-line">Kai</span></h1>',
             $html
         );
     }

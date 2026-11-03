@@ -9,7 +9,7 @@ use EventMesh\Translation\TranslationDisplay;
 /**
  * What the public site shows as an event's title: the clean name (see
  * EventNameFilters) and, under it on its own line, the DJ line
- * ("DJ Kai", "DJs Kai & Lumi", "DJs Kai, Lumi & Ode").
+ * ("Kai", "Kai & Lumi", "Kai, Lumi & Ode").
  *
  * The name is in the page's language the same way TranslationDisplay picks
  * it: the Finnish name when the page is shown in Finnish, the original-language
@@ -54,7 +54,7 @@ final class EventDisplayName
     }
 
     /**
-     * "DJ X", "DJs X & Y", "DJs A, B & C"; '' for no names.
+     * "X", "X & Y", "A, B & C"; '' for no names.
      *
      * @param array<mixed> $djs
      */
@@ -76,10 +76,8 @@ final class EventDisplayName
         }
 
         $last = array_pop($names);
-        $list = [] === $names ? $last : implode(', ', $names) . ' & ' . $last;
 
-        /* translators: %s: one DJ name, or a list of DJ names such as "Kai, Lumi & Ode" */
-        return sprintf(_n('DJ %s', 'DJs %s', $count, 'eventmesh'), $list);
+        return [] === $names ? $last : implode(', ', $names) . ' & ' . $last;
     }
 
     /**
