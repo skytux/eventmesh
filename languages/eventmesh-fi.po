@@ -8,11 +8,97 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2026-11-02 00:00+0200\n"
+"PO-Revision-Date: 2026-11-03 00:00+0200\n"
 "Language-Team: Finnish\n"
 "Language: fi\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Domain: eventmesh\n"
+
+#: templates/admin/djs.php
+msgid "%d future event got new or changed links."
+msgid_plural "%d future events got new or changed links."
+msgstr[0] "%d tuleva tapahtuma sai uusia tai muutettuja linkkejä."
+msgstr[1] "%d tulevaa tapahtumaa sai uusia tai muutettuja linkkejä."
+
+#: templates/admin/djs.php
+msgid "A DJ needs a name."
+msgstr "DJ tarvitsee nimen."
+
+#: templates/admin/djs.php
+msgid "Actions"
+msgstr "Toiminnot"
+
+#: templates/admin/djs.php
+msgid "Add DJ"
+msgstr "Lisää DJ"
+
+#: templates/admin/djs.php
+msgid "Cancel"
+msgstr "Peruuta"
+
+#: templates/admin/djs.php
+msgid "DJ deleted."
+msgstr "DJ poistettu."
+
+#: templates/admin/djs.php
+msgid "DJ name"
+msgstr "DJ:n nimi"
+
+#: templates/admin/djs.php
+msgid "DJ saved."
+msgstr "DJ tallennettu."
+
+#: src/Admin/DjsPage.php templates/admin/djs.php
+msgid "DJs"
+msgstr "DJ:t"
+
+#: templates/admin/djs.php
+msgid "Delete"
+msgstr "Poista"
+
+#: templates/admin/djs.php
+msgid "Delete this DJ?"
+msgstr "Poistetaanko tämä DJ?"
+
+#: templates/admin/djs.php
+msgid "Each link must be an address on its own service: a Spotify link in the Spotify field, and so on."
+msgstr "Jokaisen linkin on oltava oman palvelunsa osoite: Spotify-linkki Spotify-kenttään ja niin edelleen."
+
+#: templates/admin/djs.php
+msgid "Edit"
+msgstr "Muokkaa"
+
+#: templates/admin/djs.php
+msgid "Edit DJ"
+msgstr "Muokkaa DJ:tä"
+
+#: templates/admin/djs.php
+msgid "No DJs yet."
+msgstr "Ei vielä DJ:itä."
+
+#: templates/admin/djs.php
+msgid "One per line. Matched the same way as the name."
+msgstr "Yksi riviä kohden. Etsitään samalla tavalla kuin nimi."
+
+#: templates/admin/djs.php
+msgid "Other spellings"
+msgstr "Muut kirjoitusasut"
+
+#: templates/admin/djs.php
+msgid "Save DJ"
+msgstr "Tallenna DJ"
+
+#: templates/admin/djs.php
+msgid "The DJ could not be saved."
+msgstr "DJ:tä ei voitu tallentaa."
+
+#: templates/admin/djs.php
+msgid "When a DJ name or other spelling appears as whole words in an event title or text (case and accents do not matter), the event gets the DJ links for each service it has no link for yet, and its player is updated. A link typed on the event itself is never replaced. After every change here, all future events are checked again."
+msgstr "Kun DJ:n nimi tai muu kirjoitusasu on kokonaisina sanoina tapahtuman otsikossa tai tekstissä (isoilla kirjaimilla ja aksenteilla ei ole väliä), tapahtuma saa DJ:n linkit niihin palveluihin, joihin sillä ei vielä ole linkkiä, ja sen soitin päivitetään. Tapahtumaan itse kirjoitettua linkkiä ei koskaan korvata. Jokaisen muutoksen jälkeen kaikki tulevat tapahtumat tarkistetaan uudelleen."
+
+#: src/Admin/DjsPage.php
+msgid "You do not have permission to edit DJs."
+msgstr "Sinulla ei ole oikeutta muokata DJ:itä."
 
 #: templates/admin/dashboard.php:58
 msgid "(change in Settings)"

@@ -95,12 +95,26 @@ if (! class_exists('WP_Query')) {
 /**
  * Minimal stand-in for $wpdb, only covering the bits EventQuery's
  * posts_clauses filter touches (table name properties and prepare()'s %s
- * quoting) - not a general-purpose query builder.
+ * quoting), plus query() for the factory reset's DROP TABLE - not a
+ * general-purpose query builder.
  */
 if (! isset($GLOBALS['wpdb'])) {
     $GLOBALS['wpdb'] = new class {
+        public string $prefix = 'wp_';
         public string $posts = 'wp_posts';
         public string $postmeta = 'wp_postmeta';
+
+        /**
+         * @var array<int, string>
+         */
+        public array $queries = [];
+
+        public function query(string $query): bool
+        {
+            $this->queries[] = $query;
+
+            return true;
+        }
 
         public function prepare(string $query, mixed ...$args): string
         {

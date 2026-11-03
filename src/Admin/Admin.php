@@ -74,6 +74,16 @@ final class Admin
         );
 
         add_action(
+            'admin_post_eventmesh_save_dj',
+            [$this->container->get(DjsPage::class), 'save']
+        );
+
+        add_action(
+            'admin_post_eventmesh_delete_dj',
+            [$this->container->get(DjsPage::class), 'delete']
+        );
+
+        add_action(
             'admin_post_eventmesh_save_sources',
             [$this->container->get(SourcesPage::class), 'save']
         );
@@ -174,6 +184,10 @@ final class Admin
             'eventmesh-settings',
             [$this->container->get(SettingsPage::class), 'render']
         );
+
+        // Under the Events menu (the event post type), not under EventMesh:
+        // the DJ list is about the events' content, not about syncing.
+        $this->container->get(DjsPage::class)->registerMenu();
     }
 
     public function handleSync(): void

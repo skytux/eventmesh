@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EventMesh\Sync;
 
 use EventMesh\Content\EventPostType;
+use EventMesh\Djs\DjLinkApplier;
 use EventMesh\Models\Event;
 use EventMesh\Services\EventMediaEnricher;
 use EventMesh\Services\ProviderEmbedEnricher;
@@ -19,7 +20,8 @@ final class EventSynchronizer
         private readonly Logger $logger,
         private readonly EventMediaEnricher $mediaEnricher,
         private readonly ProviderEnricher $providerEnricher,
-        private readonly ProviderEmbedEnricher $providerEmbedEnricher
+        private readonly ProviderEmbedEnricher $providerEmbedEnricher,
+        private readonly ?DjLinkApplier $djLinkApplier = null
     ) {
     }
 
@@ -104,6 +106,9 @@ final class EventSynchronizer
         $this->writeMeta($syncedPostId, $event);
         $this->mediaEnricher->enrich($syncedPostId, $event);
         $this->providerEnricher->enrich($syncedPostId, $event);
+        // DJ table links fill in services the source gave no link for. Runs
+        // before the player is built so the player can use them.
+        $this->djLinkApplier?->apply($syncedPostId);
         $this->providerEmbedEnricher->enrich($syncedPostId);
 
         /**

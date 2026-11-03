@@ -26,6 +26,7 @@ Requires WordPress 6.8+ and PHP 8.2+.
 - **Editable overrides** — every field and provider link, plus the title, description, and featured image, is editable per event and kept on the next sync. A per-field **Follow source again** returns to the source whenever you want it.
 - **Per-event visibility** — **Hide** drops an event from listings, **Disable** also 404s its page, and **Keep published if removed from the source** pins an event so it survives after the source delists it.
 - **Provider links & embeds** — provider links (Spotify, YouTube, Mixcloud, Bandcamp, SoundCloud, Instagram, Facebook) found on an event page are attached and rendered as embeds.
+- **DJ table** — under **Events → DJs**, each DJ's name, other spellings, and Spotify, SoundCloud and Mixcloud links. Events that name a DJ get that DJ's links for services they have no link for yet; a link typed on the event is never replaced.
 - **Reversible source management** — disabling a source archives its events (Draft) on the next sync; re-enabling republishes them. Uninstalling keeps your data unless you opt in to deletion.
 - **Automatic translation (optional)** — translates each event's title and text with a language model on a server you choose, for visitors viewing the site in another language. See [Automatic translation](#automatic-translation).
 - **Connector-agnostic** — new sources can be added as self-contained connectors without touching the core plugin.
@@ -137,6 +138,10 @@ php tools/make-mo.php              # compile languages/*.po into .mo
 CI (GitHub Actions) runs PHPUnit and PHPCS on every push and pull request.
 
 ## Changelog
+
+### 1.5.0
+- New Events → DJs page and DJ table (name, other spellings, Spotify/SoundCloud/Mixcloud links), filled once from existing event titles and links. Events whose title or text names a DJ (whole words, case and accents ignored) get that DJ's links for services they have no link for yet, and their player is updated; a link typed on the event is never replaced. Future events are checked again after every DJ change.
+- The play button starts the player through the official Spotify, SoundCloud and Mixcloud player APIs, loaded only after the click; if an API does not load, the player is shown as before.
 
 ### 1.4.0
 - Optional automatic translation of event titles and text with a language model on a server you choose (OpenAI-compatible chat API): encrypted API key, background queue, safety check before saving, per-event editable translations, "Automatically translated" label. Off by default.

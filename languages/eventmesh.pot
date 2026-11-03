@@ -9,6 +9,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Domain: eventmesh\n"
 
+#: templates/admin/djs.php:47
+#. translators: %d: number of future events
+msgid "%d future event got new or changed links."
+msgid_plural "%d future events got new or changed links."
+msgstr[0] ""
+msgstr[1] ""
+
 #: templates/admin/dashboard.php:58
 msgid "(change in Settings)"
 msgstr ""
@@ -19,6 +26,10 @@ msgstr ""
 
 #: src/Admin/TranslationMetaBox.php:67
 msgid "(the text has changed; it will be checked again)"
+msgstr ""
+
+#: templates/admin/djs.php:29
+msgid "A DJ needs a name."
 msgstr ""
 
 #: templates/admin/settings.php:151
@@ -33,12 +44,20 @@ msgstr ""
 msgid "API key"
 msgstr ""
 
-#: src/Content/EventPostType.php:70
+#: templates/admin/djs.php:69
+msgid "Actions"
+msgstr ""
+
+#: templates/admin/djs.php:107
+msgid "Add DJ"
+msgstr ""
+
+#: src/Content/EventPostType.php:72
 msgctxt "event"
 msgid "Add New"
 msgstr ""
 
-#: src/Content/EventPostType.php:71
+#: src/Content/EventPostType.php:73
 msgid "Add New Event"
 msgstr ""
 
@@ -79,7 +98,7 @@ msgstr ""
 msgid "Automatically translated"
 msgstr ""
 
-#: src/Content/EventPostType.php:325
+#: src/Content/EventPostType.php:327
 msgid "Available"
 msgstr ""
 
@@ -101,6 +120,10 @@ msgstr ""
 
 #: templates/frontend/sync-status.php:38
 msgid "Background sync:"
+msgstr ""
+
+#: templates/admin/djs.php:137
+msgid "Cancel"
 msgstr ""
 
 #: src/Support/SyncStatus.php:20
@@ -150,7 +173,7 @@ msgstr ""
 msgid "Created %1$d, updated %2$d, failed %3$d, skipped %4$d."
 msgstr ""
 
-#: src/Content/EventPostType.php:206 src/Content/EventPostType.php:213
+#: src/Content/EventPostType.php:208 src/Content/EventPostType.php:215
 msgid "Customized"
 msgstr ""
 
@@ -168,27 +191,51 @@ msgstr ""
 msgid "DISABLE_WP_CRON"
 msgstr ""
 
-#: src/Admin/Admin.php:100
+#: templates/admin/djs.php:28
+msgid "DJ deleted."
+msgstr ""
+
+#: templates/admin/djs.php:64 templates/admin/djs.php:116
+msgid "DJ name"
+msgstr ""
+
+#: templates/admin/djs.php:27
+msgid "DJ saved."
+msgstr ""
+
+#: src/Admin/DjsPage.php:38 src/Admin/DjsPage.php:39 templates/admin/djs.php:36
+msgid "DJs"
+msgstr ""
+
+#: src/Admin/Admin.php:110
 msgid "Daily"
 msgstr ""
 
-#: src/Admin/Admin.php:144 src/Admin/Admin.php:145 templates/admin/dashboard.php:27
+#: src/Admin/Admin.php:154 src/Admin/Admin.php:155 templates/admin/dashboard.php:27
 msgid "Dashboard"
+msgstr ""
+
+#: templates/admin/djs.php:98
+msgid "Delete"
 msgstr ""
 
 #: templates/admin/settings.php:243
 msgid "Delete all EventMesh data when the plugin is deleted"
 msgstr ""
 
-#: src/Content/EventPostType.php:221
+#: templates/admin/djs.php:97
+msgid "Delete this DJ?"
+msgstr ""
+
+#: src/Content/EventPostType.php:223
 msgid "Description"
 msgstr ""
 
-#: src/Admin/Admin.php:162 src/Admin/Admin.php:163 templates/admin/diagnostics.php:35
+#: src/Admin/Admin.php:172 src/Admin/Admin.php:173 templates/admin/diagnostics.php:35
 msgid "Diagnostics"
 msgstr ""
 
-#: src/Content/EventPostType.php:280
+#: src/Content/EventPostType.php:282
 msgid "Disable (also returns 404 on its own page)"
 msgstr ""
 
@@ -208,11 +255,23 @@ msgstr ""
 msgid "Dummy (testing) — sample events"
 msgstr ""
 
-#: src/Content/EventPostType.php:177
+#: src/Content/EventPostType.php:179
 msgid "Each field shows the value found on the last sync; type a value below it to override what appears on the front end. Overrides are kept and never replaced by a later sync. Leave blank to use the found value."
 msgstr ""
 
-#: src/Content/EventPostType.php:73
+#: templates/admin/djs.php:30
+msgid "Each link must be an address on its own service: a Spotify link in the Spotify field, and so on."
+msgstr ""
+
+#: templates/admin/djs.php:94
+msgid "Edit"
+msgstr ""
+
+#: templates/admin/djs.php:107
+msgid "Edit DJ"
+msgstr ""
+
+#: src/Content/EventPostType.php:75
 msgid "Edit Event"
 msgstr ""
 
@@ -234,7 +293,7 @@ msgstr ""
 msgid "Enabled"
 msgstr ""
 
-#: src/Content/EventPostType.php:182
+#: src/Content/EventPostType.php:184
 msgid "Ends at"
 msgstr ""
 
@@ -246,25 +305,25 @@ msgstr ""
 msgid "Error"
 msgstr ""
 
-#: src/Content/EventPostType.php:69
+#: src/Content/EventPostType.php:71
 msgctxt "add new on admin bar"
 msgid "Event"
 msgstr ""
 
-#: src/Content/EventPostType.php:67
+#: src/Content/EventPostType.php:69
 msgctxt "post type singular name"
 msgid "Event"
 msgstr ""
 
-#: src/Content/EventPostType.php:80
+#: src/Content/EventPostType.php:82
 msgid "Event Archives"
 msgstr ""
 
-#: src/Content/EventPostType.php:81
+#: src/Content/EventPostType.php:83
 msgid "Event Attributes"
 msgstr ""
 
-#: src/Admin/Admin.php:133 src/Admin/Admin.php:134 src/Admin/EventListBlock.php:898
+#: src/Admin/Admin.php:143 src/Admin/Admin.php:144 src/Admin/EventListBlock.php:898
 msgid "EventMesh"
 msgstr ""
 
@@ -272,7 +331,7 @@ msgstr ""
 msgid "EventMesh can no longer read the saved API key for automatic translation (the site's security keys have changed). Enter the key again."
 msgstr ""
 
-#: src/Content/EventPostType.php:150
+#: src/Content/EventPostType.php:152
 msgid "EventMesh details"
 msgstr ""
 
@@ -292,25 +351,25 @@ msgstr ""
 msgid "EventMesh: Single event"
 msgstr ""
 
-#: src/Content/EventPostType.php:75
+#: src/Content/EventPostType.php:77
 msgid "Events"
 msgstr ""
 
-#: src/Content/EventPostType.php:68
+#: src/Content/EventPostType.php:70
 msgctxt "admin menu"
 msgid "Events"
 msgstr ""
 
-#: src/Content/EventPostType.php:66
+#: src/Content/EventPostType.php:68
 msgctxt "post type general name"
 msgid "Events"
 msgstr ""
 
-#: src/Content/EventPostType.php:86
+#: src/Content/EventPostType.php:88
 msgid "Events list"
 msgstr ""
 
-#: src/Content/EventPostType.php:85
+#: src/Content/EventPostType.php:87
 msgid "Events list navigation"
 msgstr ""
 
@@ -319,11 +378,11 @@ msgstr ""
 msgid "Events waiting for translation: %d"
 msgstr ""
 
-#: src/Admin/Admin.php:96 src/Admin/Admin.php:113
+#: src/Admin/Admin.php:106 src/Admin/Admin.php:123
 msgid "Every 15 minutes"
 msgstr ""
 
-#: src/Admin/Admin.php:97 src/Admin/Admin.php:117
+#: src/Admin/Admin.php:107 src/Admin/Admin.php:127
 msgid "Every 30 minutes"
 msgstr ""
 
@@ -331,7 +390,7 @@ msgstr ""
 msgid "Every installed connector is listed here. Tick a connector to sync its events; unticking it archives its events (moves them to Draft) on the next sync."
 msgstr ""
 
-#: src/Content/EventPostType.php:167
+#: src/Content/EventPostType.php:169
 msgid "External ID"
 msgstr ""
 
@@ -358,40 +417,40 @@ msgstr ""
 msgid "Failed attempts: %1$d of %2$d (%3$s). Tried again later."
 msgstr ""
 
-#: src/Content/EventPostType.php:231
+#: src/Content/EventPostType.php:233
 msgid "Featured image"
 msgstr ""
 
-#: src/Content/EventPostType.php:228
+#: src/Content/EventPostType.php:230
 msgid "Featured image set"
 msgstr ""
 
-#: src/Content/EventPostType.php:84
+#: src/Content/EventPostType.php:86
 msgid "Filter events list"
 msgstr ""
 
-#: src/Content/EventPostType.php:249
+#: src/Content/EventPostType.php:251
 #. translators: %s: field name, e.g. Title
 msgid "Follow source again for %s"
 msgstr ""
 
-#: src/Content/EventPostType.php:329
+#: src/Content/EventPostType.php:331
 msgid "Follow the source"
 msgstr ""
 
-#: src/Content/EventPostType.php:207 src/Content/EventPostType.php:214
+#: src/Content/EventPostType.php:209 src/Content/EventPostType.php:216
 msgid "Following source"
 msgstr ""
 
-#: src/Content/EventPostType.php:331
+#: src/Content/EventPostType.php:333
 msgid "Force available"
 msgstr ""
 
-#: src/Content/EventPostType.php:330
+#: src/Content/EventPostType.php:332
 msgid "Force sold out"
 msgstr ""
 
-#: src/Content/EventPostType.php:307 src/Content/EventPostType.php:335
+#: src/Content/EventPostType.php:309 src/Content/EventPostType.php:337
 msgid "Found:"
 msgstr ""
 
@@ -404,7 +463,7 @@ msgstr ""
 msgid "Held (%ds) — a sync is running or recently died"
 msgstr ""
 
-#: src/Content/EventPostType.php:273
+#: src/Content/EventPostType.php:275
 msgid "Hide from event listings"
 msgstr ""
 
@@ -416,7 +475,7 @@ msgstr ""
 msgid "Holvi source URLs"
 msgstr ""
 
-#: src/Admin/Admin.php:98
+#: src/Admin/Admin.php:108
 msgid "Hourly"
 msgstr ""
 
@@ -432,11 +491,11 @@ msgstr ""
 msgid "Idle"
 msgstr ""
 
-#: src/Content/EventPostType.php:82
+#: src/Content/EventPostType.php:84
 msgid "Insert into event"
 msgstr ""
 
-#: src/Content/EventPostType.php:287
+#: src/Content/EventPostType.php:289
 msgid "Keep published if removed from the source"
 msgstr ""
 
@@ -506,7 +565,7 @@ msgstr ""
 msgid "Never"
 msgstr ""
 
-#: src/Content/EventPostType.php:72
+#: src/Content/EventPostType.php:74
 msgid "New Event"
 msgstr ""
 
@@ -516,6 +575,10 @@ msgstr ""
 
 #: templates/admin/dashboard.php:62 templates/admin/diagnostics.php:85
 msgid "Next scheduled sync"
+msgstr ""
+
+#: templates/admin/djs.php:76
+msgid "No DJs yet."
 msgstr ""
 
 #: templates/admin/sources.php:46
@@ -530,11 +593,11 @@ msgstr ""
 msgid "No events are available yet."
 msgstr ""
 
-#: src/Content/EventPostType.php:79
+#: src/Content/EventPostType.php:81
 msgid "No events found in Trash."
 msgstr ""
 
-#: src/Content/EventPostType.php:78
+#: src/Content/EventPostType.php:80
 msgid "No events found."
 msgstr ""
 
@@ -542,7 +605,7 @@ msgstr ""
 msgid "No events were found."
 msgstr ""
 
-#: src/Content/EventPostType.php:229
+#: src/Content/EventPostType.php:231
 msgid "No featured image"
 msgstr ""
 
@@ -582,7 +645,7 @@ msgstr ""
 msgid "None"
 msgstr ""
 
-#: src/Content/EventPostType.php:290
+#: src/Content/EventPostType.php:292
 msgid "Normally an event that no longer appears in its source is moved to Draft on the next sync. Tick this to keep it published; its details stay frozen at the last sync."
 msgstr ""
 
@@ -602,6 +665,10 @@ msgstr ""
 msgid "Off by default: deleting the plugin keeps every synced event and setting so reinstalling picks up where you left off."
 msgstr ""
 
+#: templates/admin/djs.php:123
+msgid "One per line. Matched the same way as the name."
+msgstr ""
+
 #: templates/admin/settings.php:94
 msgid "Only applies when the play button above is off. Players still load on their own, just not until the visitor scrolls to them. Players without JavaScript fall back to loading normally."
 msgstr ""
@@ -610,11 +677,15 @@ msgstr ""
 msgid "Original language:"
 msgstr ""
 
+#: templates/admin/djs.php:65 templates/admin/djs.php:120
+msgid "Other spellings"
+msgstr ""
+
 #: templates/admin/diagnostics.php:40
 msgid "PHP"
 msgstr ""
 
-#: src/Content/EventPostType.php:77
+#: src/Content/EventPostType.php:79
 msgid "Parent Events:"
 msgstr ""
 
@@ -630,7 +701,7 @@ msgstr ""
 msgid "Plugin"
 msgstr ""
 
-#: src/Content/EventPostType.php:179
+#: src/Content/EventPostType.php:181
 msgid "Price"
 msgstr ""
 
@@ -638,7 +709,7 @@ msgstr ""
 msgid "Provider embeds"
 msgstr ""
 
-#: src/Content/EventPostType.php:185
+#: src/Content/EventPostType.php:187
 msgid "Provider links"
 msgstr ""
 
@@ -658,7 +729,7 @@ msgstr ""
 msgid "Recommended. A page listing many events downloads nothing from Spotify/SoundCloud/Mixcloud until a visitor actually asks to hear something, which is by far the biggest thing you can do for its page speed score. Turn this off to have the players appear ready to play on arrival."
 msgstr ""
 
-#: src/Content/EventPostType.php:169
+#: src/Content/EventPostType.php:171
 msgid "Remote URL"
 msgstr ""
 
@@ -682,6 +753,10 @@ msgstr ""
 msgid "Runs only when the API URL, model and key below are all set."
 msgstr ""
 
+#: templates/admin/djs.php:135
+msgid "Save DJ"
+msgstr ""
+
 #: templates/admin/settings.php:253
 msgid "Save Settings"
 msgstr ""
@@ -694,11 +769,11 @@ msgstr ""
 msgid "Save the settings first; both buttons use the saved settings."
 msgstr ""
 
-#: src/Content/EventPostType.php:76
+#: src/Content/EventPostType.php:78
 msgid "Search Events"
 msgstr ""
 
-#: src/Admin/Admin.php:171 src/Admin/Admin.php:172 src/Admin/SettingsPage.php:242 templates/admin/settings.php:34
+#: src/Admin/Admin.php:181 src/Admin/Admin.php:182 src/Admin/SettingsPage.php:242 templates/admin/settings.php:34
 msgid "Settings"
 msgstr ""
 
@@ -710,7 +785,7 @@ msgstr ""
 msgid "Show more"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:663 src/Content/EventPostType.php:324 src/Content/EventPostType.php:334 templates/frontend/events-card.php:31
+#: src/Admin/EventListBlock.php:663 src/Content/EventPostType.php:326 src/Content/EventPostType.php:336 templates/frontend/events-card.php:31
 #: templates/frontend/events-card.php:46 templates/frontend/events-list.php:34 templates/frontend/events-list.php:58
 msgid "Sold out"
 msgstr ""
@@ -719,11 +794,11 @@ msgstr ""
 msgid "SoundCloud player"
 msgstr ""
 
-#: src/Content/EventPostType.php:165
+#: src/Content/EventPostType.php:167
 msgid "Source"
 msgstr ""
 
-#: src/Admin/Admin.php:153 src/Admin/Admin.php:154 templates/admin/sources.php:23
+#: src/Admin/Admin.php:163 src/Admin/Admin.php:164 templates/admin/sources.php:23
 msgid "Sources"
 msgstr ""
 
@@ -731,7 +806,7 @@ msgstr ""
 msgid "Spotify player"
 msgstr ""
 
-#: src/Content/EventPostType.php:181
+#: src/Content/EventPostType.php:183
 msgid "Starts at"
 msgstr ""
 
@@ -767,7 +842,7 @@ msgstr ""
 msgid "Sync status"
 msgstr ""
 
-#: src/Content/EventPostType.php:216
+#: src/Content/EventPostType.php:218
 msgid "Synced content"
 msgstr ""
 
@@ -777,6 +852,10 @@ msgstr ""
 
 #: src/Admin/SettingsPage.php:156
 msgid "The API key was removed."
+msgstr ""
+
+#: templates/admin/djs.php:31
+msgid "The DJ could not be saved."
 msgstr ""
 
 #: src/Admin/DiagnosticsPage.php:97
@@ -819,7 +898,7 @@ msgstr ""
 msgid "The sync request failed. Reload and try again."
 msgstr ""
 
-#: src/Content/EventPostType.php:218
+#: src/Content/EventPostType.php:220
 msgid "The title, description, and featured image follow the source until you edit them, then your version is kept on every sync. Tick a box to discard your version and follow the source again when you save."
 msgstr ""
 
@@ -835,7 +914,7 @@ msgstr ""
 msgid "Time"
 msgstr ""
 
-#: src/Admin/TranslationMetaBox.php:137 src/Content/EventPostType.php:220
+#: src/Admin/TranslationMetaBox.php:137 src/Content/EventPostType.php:222
 msgid "Title"
 msgstr ""
 
@@ -869,7 +948,7 @@ msgstr ""
 msgid "Translations"
 msgstr ""
 
-#: src/Admin/Admin.php:99
+#: src/Admin/Admin.php:109
 msgid "Twice daily"
 msgstr ""
 
@@ -885,11 +964,11 @@ msgstr ""
 msgid "Upcoming events"
 msgstr ""
 
-#: src/Content/EventPostType.php:83
+#: src/Content/EventPostType.php:85
 msgid "Uploaded to this event"
 msgstr ""
 
-#: src/Content/EventPostType.php:180
+#: src/Content/EventPostType.php:182
 msgid "Venue"
 msgstr ""
 
@@ -897,12 +976,16 @@ msgstr ""
 msgid "Venue:"
 msgstr ""
 
-#: src/Content/EventPostType.php:74
+#: src/Content/EventPostType.php:76
 msgid "View Event"
 msgstr ""
 
-#: src/Content/EventPostType.php:267
+#: src/Content/EventPostType.php:269
 msgid "Visibility"
+msgstr ""
+
+#: templates/admin/djs.php:58
+msgid "When a DJ name or other spelling appears as whole words in an event title or text (case and accents do not matter), the event gets the DJ links for each service it has no link for yet, and its player is updated. A link typed on the event itself is never replaced. After every change here, all future events are checked again."
 msgstr ""
 
 #: templates/admin/settings.php:52
@@ -917,7 +1000,11 @@ msgstr ""
 msgid "You do not have permission to do this."
 msgstr ""
 
-#: src/Admin/Admin.php:182 src/Admin/Admin.php:217
+#: src/Admin/DjsPage.php:72 src/Admin/DjsPage.php:122
+msgid "You do not have permission to edit DJs."
+msgstr ""
+
+#: src/Admin/Admin.php:196 src/Admin/Admin.php:231
 msgid "You do not have permission to run this action."
 msgstr ""
 

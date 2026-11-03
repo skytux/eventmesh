@@ -4,7 +4,7 @@ Tags: events, sync, holvi, gutenberg, event list
 Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 1.4.0
+Stable tag: 1.5.0
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -20,6 +20,7 @@ EventMesh pulls event listings from external sources into real WordPress posts (
 * **Holvi connector** — point the plugin at one or more Holvi shop URLs and their event listings are imported, including dates, venues, images, sold-out state, and ticket links.
 * **Gutenberg blocks** — an event list block plus Query Loop-ready blocks for the event date, title, venue, ticket button, provider embeds (Spotify, YouTube, Mixcloud, Bandcamp, SoundCloud), and a "Past Events" divider. All blocks support the standard color, typography, border, and spacing controls.
 * **Provider links & embeds** — provider links (Spotify, YouTube, Mixcloud, Bandcamp, SoundCloud) found on a source's event page are attached to the event and rendered as embeds.
+* **DJ table** — under Events → DJs, keep each DJ's name, other spellings, and Spotify, SoundCloud and Mixcloud links. When an event's title or text names a DJ, the event gets that DJ's links for the services it has no link for yet. A link typed on the event is never replaced.
 * **Editable overrides** — every event field (title, description, date, venue, price, sold-out state, and provider links) and the featured image is editable per event and kept on the next sync. A per-field "Follow source again" discards your version and returns to the source whenever you want it.
 * **Hide and disable events** — "Hide" keeps an event out of the front-end listings while its own page still works; "Disable" also makes its page return 404. Both are per-event and survive re-sync.
 * **Keep events the source dropped** — pin an event to stay published even after it disappears from its source (instead of being archived on the next sync); its details freeze at the last sync.
@@ -39,6 +40,9 @@ When you add one or more Holvi shop URLs under EventMesh → Sources, the plugin
 
 **Media provider oEmbed endpoints (Spotify, YouTube, Mixcloud, Bandcamp, SoundCloud)**
 When a synced event links to an artist page or track on one of these providers (found on the source's event page), the plugin requests that provider's public oEmbed endpoint to fetch embeddable player markup for the URL in question. Only that provider URL is sent; no visitor or site data is included. See each provider's terms and privacy policy: [Spotify](https://www.spotify.com/legal/), [YouTube](https://www.youtube.com/t/terms), [Mixcloud](https://www.mixcloud.com/terms/), [Bandcamp](https://bandcamp.com/terms_of_use), [SoundCloud](https://soundcloud.com/terms-of-use).
+
+**Player APIs (Spotify, SoundCloud, Mixcloud), only after a visitor clicks play**
+When a visitor clicks the play button on an event's player, the visitor's browser loads that service's official player script (Spotify iFrame API from open.spotify.com, SoundCloud Widget API from w.soundcloud.com, Mixcloud Widget API from widget.mixcloud.com) so the player starts without a second click. Nothing is loaded from these services before the click. The same terms and privacy policies as above apply.
 
 **Event images**
 When a source lists an image for an event, the plugin downloads that image from the URL the source provided (which may be a CDN) into your media library, so events display images hosted on your own site.
@@ -132,6 +136,11 @@ No. The only outgoing requests are the ones described under External services, a
 
 == Changelog ==
 
+= 1.5.0 =
+* New Events → DJs page and DJ table: each DJ has a name, other spellings, and Spotify, SoundCloud and Mixcloud links. On first use the table is filled once from existing events: the DJ name is the part of the title after " / " (several DJs split on "&"), and an event with one DJ gives its links.
+* When an event is saved or synced, DJ names and other spellings are looked for in its title and text (whole words, case and accents ignored). The event gets the DJ's links only for services it has no link for yet, and its player is updated. A link typed on the event is never replaced. After a DJ is added, changed or deleted, all future events are checked again.
+* The play button now starts the player through the service's official player API (Spotify, SoundCloud, Mixcloud), so one click is enough. The API script is loaded only after the click. If it does not load, the player is shown as before and the visitor presses play inside it.
+
 = 1.4.0 =
 * Optional automatic translation of event titles and text with a language model on a server you choose (OpenAI-compatible chat API). Set up under EventMesh → Settings: API URL, model, API key (stored encrypted), target languages, "Translate now" and "Test connection". Off by default; no server is built in.
 * The original language of each event is detected by the model. Translations run in the background after each sync, only when an event's text has changed, and are checked before saving (numbers, links, email addresses, HTML tags and blocks must match).
@@ -169,6 +178,9 @@ No. The only outgoing requests are the ones described under External services, a
 * Built-in dummy/test source (enable in Sources) for demos.
 
 == Upgrade Notice ==
+
+= 1.5.0 =
+Adds a DJ table (Events → DJs) that gives events their DJ's player links, filled once from existing events on the first admin page after the update. The play button now starts the player with one click.
 
 = 1.4.0 =
 Adds optional automatic translation of events with a language model server you choose. Off until you set it up under Settings.
