@@ -139,6 +139,9 @@ CI (GitHub Actions) runs PHPUnit and PHPCS on every push and pull request.
 
 ## Changelog
 
+### 1.9.0
+- The DJ line under each event title shows only the names, without the word "DJ" or "DJs" in front.
+
 ### 1.8.0
 - Public pages show each event's clean name (normal case, no date) with the DJ names on their own line under it: the event title field (event lists and the single event page) and the event-list block's list and card templates. While an event has no clean name yet, its title is shown as before.
 
