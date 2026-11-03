@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace EventMesh\Translation;
 
+use EventMesh\Naming\EventNameQueue;
+use EventMesh\Naming\EventNameStore;
+
 /**
  * Removes everything automatic translation stores: its options (including
  * the encrypted API key), the per-event translation meta, the chunk cache
- * transients, and the scheduled queue run.
+ * transients, and the scheduled queue run. The same for the event names the
+ * language model writes (EventNameQueue).
  */
 final class TranslationCleanup
 {
@@ -22,6 +26,9 @@ final class TranslationCleanup
         }
 
         wp_clear_scheduled_hook(TranslationQueue::HOOK);
+
+        delete_option(EventNameQueue::OPTION_QUEUE);
+        wp_clear_scheduled_hook(EventNameQueue::HOOK);
     }
 
     /**
@@ -36,6 +43,9 @@ final class TranslationCleanup
         $metaPrefixes = [
             TranslationStore::META_PREFIX,
             TranslationStore::META_ORIGINAL_LANG,
+            // _eventmesh_name, _eventmesh_name_fi, _eventmesh_name_hash, _eventmesh_name_fail.
+            EventNameStore::META_NAME,
+            EventNameStore::META_DJ_NAMES,
         ];
 
         foreach ($metaPrefixes as $prefix) {

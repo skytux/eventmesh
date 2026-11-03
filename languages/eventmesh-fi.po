@@ -44,6 +44,10 @@ msgstr "DJ poistettu."
 msgid "DJ name"
 msgstr "DJ:n nimi"
 
+#: src/Admin/TranslationMetaBox.php:119
+msgid "DJ names:"
+msgstr "DJ-nimet:"
+
 #: templates/admin/djs.php
 msgid "DJ saved."
 msgstr "DJ tallennettu."
@@ -412,6 +416,10 @@ msgstr "Tapahtuma-arkisto"
 msgid "Event Attributes"
 msgstr "Tapahtuman ominaisuudet"
 
+#: src/Admin/TranslationMetaBox.php:108
+msgid "Event name:"
+msgstr "Tapahtuman nimi:"
+
 #: src/Admin/Admin.php:113 src/Admin/Admin.php:114 src/Admin/EventListBlock.php:898
 msgid "EventMesh"
 msgstr "EventMesh"
@@ -517,6 +525,10 @@ msgstr "Artikkelikuva asetettu"
 #: src/Content/EventPostType.php:84
 msgid "Filter events list"
 msgstr "Suodata tapahtumalistaa"
+
+#: src/Admin/TranslationMetaBox.php:117
+msgid "Finnish name:"
+msgstr "Nimi suomeksi:"
 
 #: src/Content/EventPostType.php:249
 #. translators: %s: field name, e.g. Title
@@ -1104,6 +1116,10 @@ msgstr "asettelu"
 #: src/Admin/TranslationMetaBox.php:63
 msgid "not detected yet"
 msgstr "ei vielä tunnistettu"
+
+#: src/Admin/TranslationMetaBox.php:104
+msgid "not written yet"
+msgstr "ei vielä tehty"
 
 #: src/Admin/EventListBlock.php:1059
 msgid "query"

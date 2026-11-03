@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EventMesh\Admin;
 
 use EventMesh\Content\EventPostType;
+use EventMesh\Naming\EventNameStore;
 use EventMesh\Translation\LlmSettings;
 use EventMesh\Translation\TranslationQueue;
 use EventMesh\Translation\TranslationStore;
@@ -78,6 +79,8 @@ final class TranslationMetaBox
             (string) (TranslationStore::failure($post->ID, TranslationStore::META_ORIGINAL_LANG_FAIL)['kind'] ?? '')
         );
 
+        $this->renderEventName($post);
+
         $languages = TranslationStore::targetsFor(LlmSettings::targetLanguages(), $originalLang);
 
         if ([] === $languages) {
@@ -89,6 +92,39 @@ final class TranslationMetaBox
         foreach ($languages as $lang) {
             $this->renderLanguage($post, $lang, $hash);
         }
+    }
+
+    /**
+     * The clean name and DJ names the language model wrote (EventNameQueue),
+     * read-only.
+     */
+    private function renderEventName(\WP_Post $post): void
+    {
+        $stored = EventNameStore::read($post->ID);
+        $notYet = __('not written yet', 'eventmesh');
+        $currentHash = EventNameStore::sourceHash((string) $post->post_title, EventNameStore::finnishTitle($post));
+        $fresh = $stored['hash'] === $currentHash;
+
+        echo '<p><strong>' . esc_html__('Event name:', 'eventmesh') . '</strong> '
+            . esc_html('' !== $stored['name'] ? $stored['name'] : $notYet);
+
+        if ('' !== $stored['name'] && ! $fresh) {
+            echo ' <span class="description">'
+                . esc_html__('(the text has changed; it will be checked again)', 'eventmesh')
+                . '</span>';
+        }
+
+        echo '<br /><strong>' . esc_html__('Finnish name:', 'eventmesh') . '</strong> '
+            . esc_html('' !== $stored['name_fi'] ? $stored['name_fi'] : $notYet)
+            . '<br /><strong>' . esc_html__('DJ names:', 'eventmesh') . '</strong> '
+            . esc_html([] !== $stored['djs'] ? implode(', ', $stored['djs']) : '–')
+            . '</p>';
+
+        $failure = TranslationStore::failure($post->ID, EventNameStore::META_FAIL);
+        $this->renderFailures(
+            TranslationStore::attemptsFor($failure, $currentHash),
+            (string) ($failure['kind'] ?? '')
+        );
     }
 
     private function renderLanguage(\WP_Post $post, string $lang, string $hash): void
