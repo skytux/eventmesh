@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace EventMesh\Support;
 
 use EventMesh\Content\EventPostType;
+use EventMesh\Djs\DjSeeder;
+use EventMesh\Djs\DjTable;
 use EventMesh\Translation\TranslationCleanup;
 use WP_Query;
 
@@ -31,6 +33,11 @@ final class FactoryReset
         // Translation options (including the API key) and the queued run.
         // Translation meta went with the deleted events.
         TranslationCleanup::deleteSettings();
+
+        // The DJ table and its options. With the plugin still active, the
+        // next admin page creates an empty table again.
+        DjTable::drop();
+        delete_option(DjSeeder::SEEDED_OPTION);
 
         return [
             'deleted_events' => $deletedEvents,

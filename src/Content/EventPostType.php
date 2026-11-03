@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace EventMesh\Content;
 
+use EventMesh\Djs\DjLinkApplier;
 use EventMesh\Services\EventMediaEnricher;
 use EventMesh\Services\ProviderEmbedEnricher;
 use EventMesh\Support\KnownProviders;
@@ -21,7 +22,8 @@ final class EventPostType
      */
     public function __construct(
         private readonly ?ProviderEmbedEnricher $providerEmbedEnricher = null,
-        private readonly ?EventMediaEnricher $mediaEnricher = null
+        private readonly ?EventMediaEnricher $mediaEnricher = null,
+        private readonly ?DjLinkApplier $djLinkApplier = null
     ) {
     }
 
@@ -404,6 +406,11 @@ final class EventPostType
 
         $this->applySourceResets($postId);
 
+        // DJ table links fill in services the event has no link for. Runs
+        // after the hand-typed links are saved (those are never replaced) and
+        // before the player is rebuilt.
+        $this->djLinkApplier?->apply($postId);
+
         $this->providerEmbedEnricher?->enrich($postId);
     }
 
@@ -582,6 +589,7 @@ final class EventPostType
             '_eventmesh_source_content',
             '_eventmesh_synced_title',
             '_eventmesh_synced_content_hash',
+            '_eventmesh_dj_links',
         ];
 
         foreach ($internalFields as $field) {

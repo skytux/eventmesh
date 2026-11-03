@@ -7,6 +7,7 @@ namespace EventMesh\Core;
 use EventMesh\Admin\Admin;
 use EventMesh\Admin\DashboardPage;
 use EventMesh\Admin\DiagnosticsPage;
+use EventMesh\Admin\DjsPage;
 use EventMesh\Admin\EventListBlock;
 use EventMesh\Admin\SettingsPage;
 use EventMesh\Admin\SourcesPage;
@@ -16,6 +17,11 @@ use EventMesh\Connectors\Holvi\HolviHtmlParser;
 use EventMesh\Content\EventPostType;
 use EventMesh\Content\EventQuery;
 use EventMesh\Content\SingleEventTemplate;
+use EventMesh\Djs\DjLinkApplier;
+use EventMesh\Djs\DjRepository;
+use EventMesh\Djs\DjSeeder;
+use EventMesh\Djs\DjSetup;
+use EventMesh\Djs\DjTable;
 use EventMesh\Services\ConnectorManager;
 use EventMesh\Services\CronFallbackTrigger;
 use EventMesh\Services\EventMediaEnricher;
@@ -65,6 +71,7 @@ final class Kernel
         $this->container->get(TranslationQueue::class)->boot();
         $this->container->get(TranslationDisplay::class)->boot();
         $this->container->get(TranslationMetaBox::class)->boot();
+        $this->container->get(DjSetup::class)->boot();
 
         do_action(
             'eventmesh/register_connectors',
@@ -148,7 +155,42 @@ final class Kernel
             EventPostType::class,
             fn (Container $container) => new EventPostType(
                 $container->get(ProviderEmbedEnricher::class),
-                $container->get(EventMediaEnricher::class)
+                $container->get(EventMediaEnricher::class),
+                $container->get(DjLinkApplier::class)
+            )
+        );
+
+        $this->container->singleton(
+            DjTable::class,
+            fn () => new DjTable()
+        );
+
+        $this->container->singleton(
+            DjRepository::class,
+            fn () => new DjRepository()
+        );
+
+        $this->container->singleton(
+            DjLinkApplier::class,
+            fn (Container $container) => new DjLinkApplier(
+                $container->get(DjRepository::class),
+                $container->get(ProviderEmbedEnricher::class)
+            )
+        );
+
+        $this->container->singleton(
+            DjSeeder::class,
+            fn (Container $container) => new DjSeeder(
+                $container->get(DjRepository::class)
+            )
+        );
+
+        $this->container->singleton(
+            DjSetup::class,
+            fn (Container $container) => new DjSetup(
+                $container->get(DjTable::class),
+                $container->get(DjSeeder::class),
+                $container->get(DjLinkApplier::class)
             )
         );
 
@@ -216,7 +258,8 @@ final class Kernel
                 $container->get(Logger::class),
                 $container->get(EventMediaEnricher::class),
                 $container->get(ProviderEnricher::class),
-                $container->get(ProviderEmbedEnricher::class)
+                $container->get(ProviderEmbedEnricher::class),
+                $container->get(DjLinkApplier::class)
             )
         );
 
@@ -284,6 +327,15 @@ final class Kernel
             fn (Container $container) => new DiagnosticsPage(
                 $container->get(View::class),
                 $container->get(Logger::class)
+            )
+        );
+
+        $this->container->singleton(
+            DjsPage::class,
+            fn (Container $container) => new DjsPage(
+                $container->get(View::class),
+                $container->get(DjRepository::class),
+                $container->get(DjLinkApplier::class)
             )
         );
 
