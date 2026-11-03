@@ -435,7 +435,8 @@ final class HolviHtmlParserTest extends TestCase
     public function testSingleDayLatestEndAlongsideAKloStart(): void
     {
         // Mirrors a real Ecstatic Dance listing: doors and warm-up first, then
-        // "21:30 Loppupiiri" (closing). "klo 19:00" gives the start; 21:30 end.
+        // "21:30 Loppupiiri" (closing). The doors-open line gives the start
+        // (18:30), never "Ovet suljetaan klo 19:00"; 21:30 is the end.
         $event = $this->parser()->parseDetailPage(
             '<html><body><h1 itemprop="name">Ecstatic Dance 8.8.2026</h1>' .
             '<div itemprop="description"><p>18:30-19:00 Ovet auki. 19:00 Alkupiiri. ' .
@@ -444,9 +445,130 @@ final class HolviHtmlParserTest extends TestCase
         );
 
         self::assertNotNull($event);
-        self::assertSame('2026-08-08 19:00', $event->startsAt()->format('Y-m-d H:i'));
+        self::assertSame('2026-08-08 18:30', $event->startsAt()->format('Y-m-d H:i'));
         self::assertNotNull($event->endsAt());
         self::assertSame('2026-08-08 21:30', $event->endsAt()->format('Y-m-d H:i'));
+    }
+
+    private function detailPageWithDescription(string $descriptionHtml): string
+    {
+        return '<html><body><h1 itemprop="name">Ecstatic Dance 14.11.2026</h1>' .
+            '<div itemprop="description">' . $descriptionHtml . '</div></body></html>';
+    }
+
+    /**
+     * The live Holvi text, one schedule line per paragraph: the door CLOSING
+     * time "klo 19:00" is the first "klo" time, but the start is the
+     * doors-open line.
+     */
+    public function testDoorsOpenLineGivesTheStartNotTheDoorsClosingTime(): void
+    {
+        $event = $this->parser()->parseDetailPage(
+            $this->detailPageWithDescription(
+                "<p>Tervetuloa tanssimaan!</p>\n" .
+                "<p>Huom! Ovet suljetaan klo 19:00. Myöhässä tulevia ei päästetä sisään.</p>\n" .
+                "<p>18:30-19:00 Ovet auki</p>\n" .
+                "<p>19:00 Alkupiiri &amp; lämmittely</p>\n" .
+                "<p>19:30 Ecstatic Dance</p>\n" .
+                "<p>21:30 Loppupiiri</p>\n"
+            ),
+            'https://shop.holvi.com/e/ecstatic/'
+        );
+
+        self::assertNotNull($event);
+        self::assertSame('2026-11-14 18:30', $event->startsAt()->format('Y-m-d H:i'));
+        self::assertNotNull($event->endsAt());
+        self::assertSame('2026-11-14 21:30', $event->endsAt()->format('Y-m-d H:i'), 'The end is still the latest time.');
+    }
+
+    public function testDoorsOpenLineWithKloAndTheTimeAfterTheWords(): void
+    {
+        $event = $this->parser()->parseDetailPage(
+            $this->detailPageWithDescription(
+                "<p>Huom! Ovet suljetaan klo 19:00.</p>\n<p>Ovet auki klo 18.30</p>\n<p>21:30 Loppupiiri</p>"
+            ),
+            'https://shop.holvi.com/e/ecstatic/'
+        );
+
+        self::assertNotNull($event);
+        self::assertSame('18:30', $event->startsAt()->format('H:i'));
+        self::assertNotNull($event->endsAt());
+        self::assertSame('21:30', $event->endsAt()->format('H:i'));
+    }
+
+    public function testEnglishDoorsOpenLineWithARangeAfterTheWords(): void
+    {
+        $event = $this->parser()->parseDetailPage(
+            $this->detailPageWithDescription(
+                "<p>Please note: doors close at 19:00.</p>\n" .
+                "<p>DOORS OPEN 18:30-19:00</p>\n" .
+                "<p>19:00 Opening circle &amp; warm-up</p>\n" .
+                "<p>19:30 Ecstatic Dance</p>\n" .
+                "<p>21:30 Closing circle</p>"
+            ),
+            'https://shop.holvi.com/e/ecstatic/'
+        );
+
+        self::assertNotNull($event);
+        self::assertSame('18:30', $event->startsAt()->format('H:i'));
+        self::assertNotNull($event->endsAt());
+        self::assertSame('21:30', $event->endsAt()->format('H:i'));
+    }
+
+    public function testEnglishDoorsOpenLineWithTheTimeInFront(): void
+    {
+        $event = $this->parser()->parseDetailPage(
+            $this->detailPageWithDescription(
+                "<p>18.30 Doors open</p>\n<p>19:00 Opening circle</p>\n<p>21:30 Closing circle</p>"
+            ),
+            'https://shop.holvi.com/e/ecstatic/'
+        );
+
+        self::assertNotNull($event);
+        self::assertSame('18:30', $event->startsAt()->format('H:i'));
+        self::assertSame('21:30', $event->endsAt()?->format('H:i'));
+    }
+
+    public function testADoorsClosingTimeIsNeverTheStartEvenWithoutADoorsOpenLine(): void
+    {
+        $event = $this->parser()->parseDetailPage(
+            $this->detailPageWithDescription(
+                "<p>Huom! Ovet suljetaan klo 19:00.</p>\n<p>Tanssi klo 19:15-21:30</p>"
+            ),
+            'https://shop.holvi.com/e/ecstatic/'
+        );
+
+        self::assertNotNull($event);
+        self::assertSame('19:15', $event->startsAt()->format('H:i'));
+        self::assertSame('21:30', $event->endsAt()?->format('H:i'));
+    }
+
+    public function testTextWithoutADoorsLineKeepsTheFirstKloTime(): void
+    {
+        $event = $this->parser()->parseDetailPage(
+            $this->detailPageWithDescription(
+                "<p>Lauantaina klo 19:00 alkaen.</p>\n<p>19:30 Ecstatic Dance</p>\n<p>21:30 Loppupiiri</p>"
+            ),
+            'https://shop.holvi.com/e/ecstatic/'
+        );
+
+        self::assertNotNull($event);
+        self::assertSame('2026-11-14 19:00', $event->startsAt()->format('Y-m-d H:i'));
+        self::assertSame('2026-11-14 21:30', $event->endsAt()?->format('Y-m-d H:i'));
+    }
+
+    public function testTheExplicitScheduleStillWinsOverADoorsOpenLine(): void
+    {
+        $event = $this->parser()->parseDetailPage(
+            $this->detailPageWithDescription(
+                "<p>14.11.2026 19:00 - 22:00</p>\n<p>18:30-19:00 Ovet auki</p>\n<p>21:30 Loppupiiri</p>"
+            ),
+            'https://shop.holvi.com/e/ecstatic/'
+        );
+
+        self::assertNotNull($event);
+        self::assertSame('2026-11-14 19:00', $event->startsAt()->format('Y-m-d H:i'));
+        self::assertSame('2026-11-14 22:00', $event->endsAt()?->format('Y-m-d H:i'));
     }
 
     public function testExplicitSameDayScheduleFormatWinsOverGuessing(): void
