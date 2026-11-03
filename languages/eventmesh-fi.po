@@ -36,6 +36,13 @@ msgstr "Lisää DJ"
 msgid "Cancel"
 msgstr "Peruuta"
 
+#: src/Naming/EventDisplayName.php:82
+#. translators: %s: one DJ name, or a list of DJ names such as "Kai, Lumi & Ode"
+msgid "DJ %s"
+msgid_plural "DJs %s"
+msgstr[0] "DJ %s"
+msgstr[1] "DJs %s"
+
 #: templates/admin/djs.php
 msgid "DJ deleted."
 msgstr "DJ poistettu."

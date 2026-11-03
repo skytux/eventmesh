@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace EventMesh\Content;
 
+use EventMesh\Naming\EventDisplayName;
 use EventMesh\Support\EventMeta;
 use EventMesh\Support\EventStatus;
 use EventMesh\Support\LocalTime;
@@ -111,10 +112,18 @@ final class EventQuery
             // TranslationDisplay), else the original. is_canceled below keeps
             // reading the original title.
             $translation = $this->translationDisplay?->forEvent($post);
+            $title = '' !== ($translation['title'] ?? '') ? $translation['title'] : $post->post_title;
+
+            // What the templates show as the heading: the clean name and its
+            // DJ line, or the title (and no DJ line) while there is no clean
+            // name yet - see EventDisplayName.
+            $display = EventDisplayName::forEvent($postId);
 
             $events[] = [
                 'id' => $postId,
-                'title' => '' !== ($translation['title'] ?? '') ? $translation['title'] : $post->post_title,
+                'title' => $title,
+                'display_title' => null !== $display ? $display['name'] : $title,
+                'dj_line' => null !== $display ? $display['dj_line'] : '',
                 'content' => '' !== ($translation['content'] ?? '') ? $translation['content'] : $post->post_content,
                 'excerpt' => '' !== ($translation['excerpt'] ?? '') ? $translation['excerpt'] : $post->post_excerpt,
                 'auto_translated' => null !== $translation && TranslationStore::STATUS_AUTO === $translation['status'],

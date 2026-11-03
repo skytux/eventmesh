@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace EventMesh\Tests\Admin;
 
+use Brain\Monkey\Filters;
 use Brain\Monkey\Functions;
 use EventMesh\Admin\EventListBlock;
 use EventMesh\Connectors\Holvi\HolviHtmlParser;
@@ -38,6 +39,7 @@ final class EventListBlockRenderTest extends TestCase
         Functions\when('get_permalink')->justReturn('');
         Functions\when('get_the_post_thumbnail_url')->justReturn('');
         Functions\when('get_post_thumbnail_id')->justReturn(0);
+        Functions\when('determine_locale')->justReturn('en_US');
         Functions\when('get_post_meta')->alias(
             static function (int $postId, string $key = '', bool $single = false) {
                 return '' === $key ? [] : '';
@@ -113,5 +115,24 @@ final class EventListBlockRenderTest extends TestCase
         $html = $this->block()->render([]);
 
         self::assertStringContainsString('A Real Event', $html);
+    }
+
+    public function testRenderShowsTheCleanNameAndTheDjLineInBothTemplates(): void
+    {
+        Functions\when('_n')->alias(
+            static fn (string $single, string $plural, int $count) => 1 === $count ? $single : $plural
+        );
+        Filters\expectApplied('eventmesh/event_name')->andReturn('Ecstatic Dance');
+        Filters\expectApplied('eventmesh/event_dj_names')->andReturn(['Kai', 'Lumi', 'Ode']);
+
+        foreach (['events-list', 'events-card'] as $template) {
+            $this->queueQueryResults([new \WP_Post(1, 'eventmesh_event', 'ECSTATIC DANCE 14.11.2026 / KAI, LUMI, ODE')]);
+
+            $html = $this->block()->render(['template' => $template]);
+
+            self::assertStringContainsString('Ecstatic Dance', $html, $template);
+            self::assertStringContainsString('<span class="eventmesh-dj-line">DJs Kai, Lumi & Ode</span></h3>', $html, $template);
+            self::assertStringNotContainsString('>ECSTATIC DANCE', $html, $template);
+        }
     }
 }

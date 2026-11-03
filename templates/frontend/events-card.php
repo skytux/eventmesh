@@ -26,7 +26,7 @@ if (! defined('ABSPATH')) {
             <?php if ('' !== $image) : ?>
                 <img src="<?php echo esc_url($image); ?>" alt="<?php echo esc_attr($title); ?>" />
             <?php endif; ?>
-            <h3<?php echo $canceled ? ' style="text-decoration:line-through"' : ''; ?>><?php echo esc_html($title); ?></h3>
+            <h3<?php echo $canceled ? ' style="text-decoration:line-through"' : ''; ?>><?php echo esc_html((string) ($event['display_title'] ?? $title)); ?><?php echo EventMesh\Naming\EventDisplayName::djLineHtml((string) ($event['dj_line'] ?? '')); ?></h3>
             <?php if ($soldOut) : ?>
                 <p class="eventmesh-sold-out-label"><?php esc_html_e('Sold out', 'eventmesh'); ?></p>
             <?php endif; ?>
