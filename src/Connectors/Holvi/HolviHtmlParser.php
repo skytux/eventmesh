@@ -844,12 +844,95 @@ final class HolviHtmlParser
         return ['hour' => $latest['hour'], 'minute' => $latest['minute']];
     }
 
+    /** A time of day: "18:30" or "18.30". */
+    private const TIME = '\d{1,2}[:.]\d{2}';
+
+    /** "Ovet auki" (Finnish) or "Doors open". */
+    private const DOORS_OPEN = '(?:ovet\s+auki|doors\s+open)';
+
+    /** "Ovet suljetaan" (Finnish) or "Doors close/closes/closed/closing". */
+    private const DOORS_CLOSE = '(?:ovet\s+suljetaan|doors\s+clos(?:e|es|ed|ing))';
+
     /**
+     * The time a schedule gives for the doors opening, e.g.
+     * "18:30-19:00 Ovet auki", "Ovet auki klo 18:30", "Doors open 18:30-19:00".
+     * The first time on that line is the start. Null when the text has no
+     * doors-open line.
+     *
+     * @return array{hour: int, minute: int}|null
+     */
+    private function doorsOpenTime(string $text): ?array
+    {
+        $patterns = [
+            // The time (or range) in front of the words, on the same line.
+            '/(?<t>' . self::TIME . ')(?:[^\S\n]*[-\x{2013}\x{2014}][^\S\n]*' . self::TIME . ')?'
+                . '[^\S\n]*[:,\x{2013}\x{2014}-]?[^\S\n]*' . self::DOORS_OPEN . '/iu',
+            // The time after the words, optionally after "klo"/"at"/"from".
+            '/' . self::DOORS_OPEN . '[^\S\n]*[:,\x{2013}\x{2014}-]?[^\S\n]*(?:(?:klo|at|from)[^\S\n]+)?'
+                . '(?<t>' . self::TIME . ')/iu',
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (1 !== preg_match($pattern, $text, $matches)) {
+                continue;
+            }
+
+            $parts = preg_split('/[:.]/', $matches['t']);
+            $hour = (int) ($parts[0] ?? -1);
+            $minute = (int) ($parts[1] ?? 0);
+
+            if ($hour >= 0 && $hour <= 23 && $minute <= 59) {
+                return ['hour' => $hour, 'minute' => $minute];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * The text without the times that say when the doors close
+     * ("Ovet suljetaan klo 19:00", "19:00 doors close"), so a closing time is
+     * never taken as the start.
+     */
+    private function withoutDoorsClosing(string $text): string
+    {
+        $text = (string) preg_replace(
+            '/' . self::DOORS_CLOSE . '[^\n\d]*' . self::TIME . '/iu',
+            ' ',
+            $text
+        );
+
+        return (string) preg_replace(
+            '/' . self::TIME . '[^\S\n]*[:,\x{2013}\x{2014}-]?[^\S\n]*' . self::DOORS_CLOSE . '/iu',
+            ' ',
+            $text
+        );
+    }
+
+    /**
+     * The start (and, from a range, the end) time of day in the text. A
+     * doors-open line wins: its first time is the start, and the end is left
+     * to the latest time in the text (see applyTimeRange()). Otherwise the
+     * first "klo HH:MM" or bare "HH:MM-HH:MM", never a doors-closing time.
+     *
      * @return array{startHour: ?int, startMinute: ?int, endHour: ?int, endMinute: ?int}
      */
     private function findTimeRangeInText(string $text): array
     {
         $none = ['startHour' => null, 'startMinute' => null, 'endHour' => null, 'endMinute' => null];
+
+        $doors = $this->doorsOpenTime($text);
+
+        if (null !== $doors) {
+            return [
+                'startHour' => $doors['hour'],
+                'startMinute' => $doors['minute'],
+                'endHour' => null,
+                'endMinute' => null,
+            ];
+        }
+
+        $text = $this->withoutDoorsClosing($text);
 
         if (
             1 === preg_match(
