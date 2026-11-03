@@ -4,7 +4,7 @@ Tags: events, sync, holvi, gutenberg, event list
 Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 1.8.0
+Stable tag: 1.9.0
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -136,6 +136,9 @@ No. The only outgoing requests are the ones described under External services, a
 
 == Changelog ==
 
+= 1.9.0 =
+* The DJ line under each event title shows only the names, without the word "DJ" or "DJs" in front.
+
 = 1.8.0 =
 * Public pages show each event's clean name (normal case, no date) with the DJ names on their own line under it: the event title field (event lists and the single event page) and the event-list block's list and card templates. While an event has no clean name yet, its title is shown as before.
 
@@ -190,6 +193,9 @@ No. The only outgoing requests are the ones described under External services, a
 * Built-in dummy/test source (enable in Sources) for demos.
 
 == Upgrade Notice ==
+
+= 1.9.0 =
+Display only; nothing changes in the database.
 
 = 1.8.0 =
 Display only; nothing changes in the database.

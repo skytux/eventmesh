@@ -131,7 +131,7 @@ final class EventListBlockRenderTest extends TestCase
             $html = $this->block()->render(['template' => $template]);
 
             self::assertStringContainsString('Ecstatic Dance', $html, $template);
-            self::assertStringContainsString('<span class="eventmesh-dj-line">DJs Kai, Lumi & Ode</span></h3>', $html, $template);
+            self::assertStringContainsString('<span class="eventmesh-dj-line">Kai, Lumi & Ode</span></h3>', $html, $template);
             self::assertStringNotContainsString('>ECSTATIC DANCE', $html, $template);
         }
     }
