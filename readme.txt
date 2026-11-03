@@ -4,7 +4,7 @@ Tags: events, sync, holvi, gutenberg, event list
 Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 1.5.1
+Stable tag: 1.6.0
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -136,6 +136,9 @@ No. The only outgoing requests are the ones described under External services, a
 
 == Changelog ==
 
+= 1.6.0 =
+* DJ descriptions: every DJ in Events > DJs has a description, typed by hand or filled in automatically from the Team page (the paragraphs under the DJ's name heading) or from the DJ's SoundCloud or Mixcloud profile. A typed description is never overwritten. Set the Team page and press "Fetch descriptions now" on the DJs page. Other plugins get the DJs an event names, with their descriptions, through the filter `eventmesh/event_djs`.
+
 = 1.5.1 =
 * SoundCloud players no longer show the "Play on SoundCloud" / "Listen in browser" screen on phones (show_teaser=false is added to every SoundCloud player address, also for players already saved).
 
@@ -181,6 +184,9 @@ No. The only outgoing requests are the ones described under External services, a
 * Built-in dummy/test source (enable in Sources) for demos.
 
 == Upgrade Notice ==
+
+= 1.6.0 =
+Adds two columns to the DJ table (description, description_source); the next admin page adds them.
 
 = 1.5.1 =
 SoundCloud players on phones no longer show the "Listen in browser" screen.

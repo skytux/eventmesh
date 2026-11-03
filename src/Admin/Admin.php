@@ -84,6 +84,16 @@ final class Admin
         );
 
         add_action(
+            'admin_post_eventmesh_save_dj_team_page',
+            [$this->container->get(DjsPage::class), 'saveTeamPage']
+        );
+
+        add_action(
+            'admin_post_eventmesh_fetch_dj_descriptions',
+            [$this->container->get(DjsPage::class), 'fetchDescriptions']
+        );
+
+        add_action(
             'admin_post_eventmesh_save_sources',
             [$this->container->get(SourcesPage::class), 'save']
         );

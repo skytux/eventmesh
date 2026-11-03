@@ -100,6 +100,63 @@ msgstr "Kun DJ:n nimi tai muu kirjoitusasu on kokonaisina sanoina tapahtuman ots
 msgid "You do not have permission to edit DJs."
 msgstr "Sinulla ei ole oikeutta muokata DJ:itä."
 
+#: templates/admin/djs.php
+msgid "%d DJ profile will be fetched in the background."
+msgid_plural "%d DJ profiles will be fetched in the background."
+msgstr[0] "%d DJ-profiili haetaan taustalla."
+msgstr[1] "%d DJ-profiilia haetaan taustalla."
+
+#: templates/admin/djs.php
+msgid "%d DJ got a new or changed description."
+msgid_plural "%d DJs got a new or changed description."
+msgstr[0] "%d DJ sai uuden tai muutetun kuvauksen."
+msgstr[1] "%d DJ:tä sai uuden tai muutetun kuvauksen."
+
+#: templates/admin/djs.php
+msgid "A DJ without a typed description gets the text under its name on the team page: a heading (h2 to h4) that is the DJ name or other spelling, and the paragraphs after it. A DJ not on the team page gets the profile text from SoundCloud or Mixcloud. Other plugins read the descriptions with the eventmesh/event_djs filter."
+msgstr "DJ, jolle ei ole kirjoitettu kuvausta, saa tiimisivulta nimensä alla olevan tekstin: otsikon (h2–h4), joka on DJ:n nimi tai muu kirjoitusasu, ja sen jälkeiset kappaleet. DJ, jota ei ole tiimisivulla, saa profiilitekstin SoundCloudista tai Mixcloudista. Muut lisäosat lukevat kuvaukset eventmesh/event_djs-suodattimella."
+
+#: templates/admin/djs.php
+msgid "A few sentences in English about the DJ. Text you type here is kept as it is. Leave it empty to fill it from the team page or the SoundCloud or Mixcloud profile."
+msgstr "Muutama englanninkielinen lause DJ:stä. Tähän kirjoitettu teksti säilyy sellaisenaan. Jätä tyhjäksi, niin se täytetään tiimisivulta tai SoundCloud- tai Mixcloud-profiilista."
+
+#: templates/admin/djs.php
+msgid "Descriptions"
+msgstr "Kuvaukset"
+
+#: templates/admin/djs.php
+msgid "Descriptions fetched."
+msgstr "Kuvaukset haettu."
+
+#: templates/admin/djs.php
+msgid "Fetch descriptions now"
+msgstr "Hae kuvaukset nyt"
+
+#. translators: %s: where the description came from, such as Team page or SoundCloud
+#: templates/admin/djs.php
+msgid "Now from: %s."
+msgstr "Nyt lähteestä: %s."
+
+#: templates/admin/djs.php
+msgid "Reads the team page and every profile again. Typed descriptions are not changed."
+msgstr "Lukee tiimisivun ja jokaisen profiilin uudelleen. Kirjoitettuja kuvauksia ei muuteta."
+
+#: templates/admin/djs.php
+msgid "Save team page"
+msgstr "Tallenna tiimisivu"
+
+#: templates/admin/djs.php src/Admin/DjsPage.php
+msgid "Team page"
+msgstr "Tiimisivu"
+
+#: templates/admin/djs.php
+msgid "Team page saved."
+msgstr "Tiimisivu tallennettu."
+
+#: src/Admin/DjsPage.php
+msgid "Typed here"
+msgstr "Kirjoitettu tähän"
+
 #: templates/admin/dashboard.php:58
 msgid "(change in Settings)"
 msgstr "(muuta asetuksissa)"

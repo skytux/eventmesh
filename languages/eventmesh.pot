@@ -9,7 +9,21 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Domain: eventmesh\n"
 
-#: templates/admin/djs.php:47
+#: templates/admin/djs.php:78
+#. translators: %d: number of DJs
+msgid "%d DJ profile will be fetched in the background."
+msgid_plural "%d DJ profiles will be fetched in the background."
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/admin/djs.php:68
+#. translators: %d: number of DJs
+msgid "%d DJ got a new or changed description."
+msgid_plural "%d DJs got a new or changed description."
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/admin/djs.php:57
 #. translators: %d: number of future events
 msgid "%d future event got new or changed links."
 msgid_plural "%d future events got new or changed links."
@@ -28,8 +42,16 @@ msgstr ""
 msgid "(the text has changed; it will be checked again)"
 msgstr ""
 
-#: templates/admin/djs.php:29
+#: templates/admin/djs.php:37
 msgid "A DJ needs a name."
+msgstr ""
+
+#: templates/admin/djs.php:210
+msgid "A DJ without a typed description gets the text under its name on the team page: a heading (h2 to h4) that is the DJ name or other spelling, and the paragraphs after it. A DJ not on the team page gets the profile text from SoundCloud or Mixcloud. Other plugins read the descriptions with the eventmesh/event_djs filter."
+msgstr ""
+
+#: templates/admin/djs.php:180
+msgid "A few sentences in English about the DJ. Text you type here is kept as it is. Leave it empty to fill it from the team page or the SoundCloud or Mixcloud profile."
 msgstr ""
 
 #: templates/admin/settings.php:151
@@ -44,11 +66,11 @@ msgstr ""
 msgid "API key"
 msgstr ""
 
-#: templates/admin/djs.php:69
+#: templates/admin/djs.php:102
 msgid "Actions"
 msgstr ""
 
-#: templates/admin/djs.php:107
+#: templates/admin/djs.php:150
 msgid "Add DJ"
 msgstr ""
 
@@ -122,7 +144,7 @@ msgstr ""
 msgid "Background sync:"
 msgstr ""
 
-#: templates/admin/djs.php:137
+#: templates/admin/djs.php:200
 msgid "Cancel"
 msgstr ""
 
@@ -191,31 +213,31 @@ msgstr ""
 msgid "DISABLE_WP_CRON"
 msgstr ""
 
-#: templates/admin/djs.php:28
+#: templates/admin/djs.php:36
 msgid "DJ deleted."
 msgstr ""
 
-#: templates/admin/djs.php:64 templates/admin/djs.php:116
+#: templates/admin/djs.php:96 templates/admin/djs.php:159
 msgid "DJ name"
 msgstr ""
 
-#: templates/admin/djs.php:27
+#: templates/admin/djs.php:35
 msgid "DJ saved."
 msgstr ""
 
-#: src/Admin/DjsPage.php:38 src/Admin/DjsPage.php:39 templates/admin/djs.php:36
+#: src/Admin/DjsPage.php:42 src/Admin/DjsPage.php:43 templates/admin/djs.php:46
 msgid "DJs"
 msgstr ""
 
-#: src/Admin/Admin.php:110
+#: src/Admin/Admin.php:120
 msgid "Daily"
 msgstr ""
 
-#: src/Admin/Admin.php:154 src/Admin/Admin.php:155 templates/admin/dashboard.php:27
+#: src/Admin/Admin.php:164 src/Admin/Admin.php:165 templates/admin/dashboard.php:27
 msgid "Dashboard"
 msgstr ""
 
-#: templates/admin/djs.php:98
+#: templates/admin/djs.php:141
 msgid "Delete"
 msgstr ""
 
@@ -223,15 +245,23 @@ msgstr ""
 msgid "Delete all EventMesh data when the plugin is deleted"
 msgstr ""
 
-#: templates/admin/djs.php:97
+#: templates/admin/djs.php:140
 msgid "Delete this DJ?"
 msgstr ""
 
-#: src/Content/EventPostType.php:223
+#: src/Content/EventPostType.php:223 templates/admin/djs.php:101 templates/admin/djs.php:176
 msgid "Description"
 msgstr ""
 
-#: src/Admin/Admin.php:172 src/Admin/Admin.php:173 templates/admin/diagnostics.php:35
+#: templates/admin/djs.php:207
+msgid "Descriptions"
+msgstr ""
+
+#: templates/admin/djs.php:41
+msgid "Descriptions fetched."
+msgstr ""
+
+#: src/Admin/Admin.php:182 src/Admin/Admin.php:183 templates/admin/diagnostics.php:35
 msgid "Diagnostics"
 msgstr ""
 
@@ -259,15 +289,15 @@ msgstr ""
 msgid "Each field shows the value found on the last sync; type a value below it to override what appears on the front end. Overrides are kept and never replaced by a later sync. Leave blank to use the found value."
 msgstr ""
 
-#: templates/admin/djs.php:30
+#: templates/admin/djs.php:38
 msgid "Each link must be an address on its own service: a Spotify link in the Spotify field, and so on."
 msgstr ""
 
-#: templates/admin/djs.php:94
+#: templates/admin/djs.php:137
 msgid "Edit"
 msgstr ""
 
-#: templates/admin/djs.php:107
+#: templates/admin/djs.php:150
 msgid "Edit DJ"
 msgstr ""
 
@@ -279,7 +309,7 @@ msgstr ""
 msgid "Edited by hand. Automatic translation leaves it alone."
 msgstr ""
 
-#: src/Support/EmbedHtmlSanitizer.php:80
+#: src/Support/EmbedHtmlSanitizer.php:114
 msgid "Embedded media player"
 msgstr ""
 
@@ -323,7 +353,7 @@ msgstr ""
 msgid "Event Attributes"
 msgstr ""
 
-#: src/Admin/Admin.php:143 src/Admin/Admin.php:144 src/Admin/EventListBlock.php:898
+#: src/Admin/Admin.php:153 src/Admin/Admin.php:154 src/Admin/EventListBlock.php:898
 msgid "EventMesh"
 msgstr ""
 
@@ -378,11 +408,11 @@ msgstr ""
 msgid "Events waiting for translation: %d"
 msgstr ""
 
-#: src/Admin/Admin.php:106 src/Admin/Admin.php:123
+#: src/Admin/Admin.php:116 src/Admin/Admin.php:133
 msgid "Every 15 minutes"
 msgstr ""
 
-#: src/Admin/Admin.php:107 src/Admin/Admin.php:127
+#: src/Admin/Admin.php:117 src/Admin/Admin.php:137
 msgid "Every 30 minutes"
 msgstr ""
 
@@ -423,6 +453,10 @@ msgstr ""
 
 #: src/Content/EventPostType.php:230
 msgid "Featured image set"
+msgstr ""
+
+#: templates/admin/djs.php:244
+msgid "Fetch descriptions now"
 msgstr ""
 
 #: src/Content/EventPostType.php:86
@@ -475,7 +509,7 @@ msgstr ""
 msgid "Holvi source URLs"
 msgstr ""
 
-#: src/Admin/Admin.php:108
+#: src/Admin/Admin.php:118
 msgid "Hourly"
 msgstr ""
 
@@ -553,7 +587,7 @@ msgstr ""
 msgid "Message:"
 msgstr ""
 
-#: src/Support/EmbedHtmlSanitizer.php:71
+#: src/Support/EmbedHtmlSanitizer.php:105
 msgid "Mixcloud player"
 msgstr ""
 
@@ -577,7 +611,7 @@ msgstr ""
 msgid "Next scheduled sync"
 msgstr ""
 
-#: templates/admin/djs.php:76
+#: templates/admin/djs.php:109
 msgid "No DJs yet."
 msgstr ""
 
@@ -641,7 +675,7 @@ msgstr ""
 msgid "No upcoming events."
 msgstr ""
 
-#: templates/admin/dashboard.php:49 templates/admin/dashboard.php:171
+#: templates/admin/dashboard.php:49 templates/admin/dashboard.php:171 templates/admin/djs.php:227
 msgid "None"
 msgstr ""
 
@@ -661,11 +695,16 @@ msgstr ""
 msgid "Not translated yet."
 msgstr ""
 
+#: templates/admin/djs.php:186
+#. translators: %s: where the description came from, such as Team page or SoundCloud
+msgid "Now from: %s."
+msgstr ""
+
 #: templates/admin/settings.php:246
 msgid "Off by default: deleting the plugin keeps every synced event and setting so reinstalling picks up where you left off."
 msgstr ""
 
-#: templates/admin/djs.php:123
+#: templates/admin/djs.php:166
 msgid "One per line. Matched the same way as the name."
 msgstr ""
 
@@ -677,7 +716,7 @@ msgstr ""
 msgid "Original language:"
 msgstr ""
 
-#: templates/admin/djs.php:65 templates/admin/djs.php:120
+#: templates/admin/djs.php:97 templates/admin/djs.php:163
 msgid "Other spellings"
 msgstr ""
 
@@ -717,6 +756,10 @@ msgstr ""
 msgid "Published events"
 msgstr ""
 
+#: templates/admin/djs.php:245
+msgid "Reads the team page and every profile again. Typed descriptions are not changed."
+msgstr ""
+
 #: templates/admin/diagnostics.php:160
 msgid "Recent EventMesh activity"
 msgstr ""
@@ -753,7 +796,7 @@ msgstr ""
 msgid "Runs only when the API URL, model and key below are all set."
 msgstr ""
 
-#: templates/admin/djs.php:135
+#: templates/admin/djs.php:198
 msgid "Save DJ"
 msgstr ""
 
@@ -765,6 +808,10 @@ msgstr ""
 msgid "Save sources"
 msgstr ""
 
+#: templates/admin/djs.php:237
+msgid "Save team page"
+msgstr ""
+
 #: templates/admin/settings.php:227
 msgid "Save the settings first; both buttons use the saved settings."
 msgstr ""
@@ -773,7 +820,7 @@ msgstr ""
 msgid "Search Events"
 msgstr ""
 
-#: src/Admin/Admin.php:181 src/Admin/Admin.php:182 src/Admin/SettingsPage.php:242 templates/admin/settings.php:34
+#: src/Admin/Admin.php:191 src/Admin/Admin.php:192 src/Admin/SettingsPage.php:242 templates/admin/settings.php:34
 msgid "Settings"
 msgstr ""
 
@@ -790,7 +837,7 @@ msgstr ""
 msgid "Sold out"
 msgstr ""
 
-#: src/Support/EmbedHtmlSanitizer.php:70
+#: src/Support/EmbedHtmlSanitizer.php:104
 msgid "SoundCloud player"
 msgstr ""
 
@@ -798,11 +845,11 @@ msgstr ""
 msgid "Source"
 msgstr ""
 
-#: src/Admin/Admin.php:163 src/Admin/Admin.php:164 templates/admin/sources.php:23
+#: src/Admin/Admin.php:173 src/Admin/Admin.php:174 templates/admin/sources.php:23
 msgid "Sources"
 msgstr ""
 
-#: src/Support/EmbedHtmlSanitizer.php:69
+#: src/Support/EmbedHtmlSanitizer.php:103
 msgid "Spotify player"
 msgstr ""
 
@@ -846,6 +893,14 @@ msgstr ""
 msgid "Synced content"
 msgstr ""
 
+#: src/Admin/DjsPage.php:219 templates/admin/djs.php:219
+msgid "Team page"
+msgstr ""
+
+#: templates/admin/djs.php:40
+msgid "Team page saved."
+msgstr ""
+
 #: templates/admin/settings.php:224
 msgid "Test connection"
 msgstr ""
@@ -854,7 +909,7 @@ msgstr ""
 msgid "The API key was removed."
 msgstr ""
 
-#: templates/admin/djs.php:31
+#: templates/admin/djs.php:39
 msgid "The DJ could not be saved."
 msgstr ""
 
@@ -948,12 +1003,16 @@ msgstr ""
 msgid "Translations"
 msgstr ""
 
-#: src/Admin/Admin.php:109
+#: src/Admin/Admin.php:119
 msgid "Twice daily"
 msgstr ""
 
 #: src/Admin/EventListBlock.php:1052
 msgid "Two separate, independently styleable Query Loops - one for upcoming events, one for past - each under its own heading, built from ordinary blocks so the layout can be freely rearranged, restyled, or removed."
+msgstr ""
+
+#: src/Admin/DjsPage.php:218
+msgid "Typed here"
 msgstr ""
 
 #: templates/admin/settings.php:238
@@ -984,7 +1043,7 @@ msgstr ""
 msgid "Visibility"
 msgstr ""
 
-#: templates/admin/djs.php:58
+#: templates/admin/djs.php:90
 msgid "When a DJ name or other spelling appears as whole words in an event title or text (case and accents do not matter), the event gets the DJ links for each service it has no link for yet, and its player is updated. A link typed on the event itself is never replaced. After every change here, all future events are checked again."
 msgstr ""
 
@@ -1000,11 +1059,11 @@ msgstr ""
 msgid "You do not have permission to do this."
 msgstr ""
 
-#: src/Admin/DjsPage.php:72 src/Admin/DjsPage.php:122
+#: src/Admin/DjsPage.php:82 src/Admin/DjsPage.php:175 src/Admin/DjsPage.php:200 src/Admin/DjsPage.php:228
 msgid "You do not have permission to edit DJs."
 msgstr ""
 
-#: src/Admin/Admin.php:196 src/Admin/Admin.php:231
+#: src/Admin/Admin.php:206 src/Admin/Admin.php:241
 msgid "You do not have permission to run this action."
 msgstr ""
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EventMesh\Support;
 
 use EventMesh\Content\EventPostType;
+use EventMesh\Djs\DjDescriptions;
 use EventMesh\Djs\DjSeeder;
 use EventMesh\Djs\DjTable;
 use EventMesh\Translation\TranslationCleanup;
@@ -38,6 +39,9 @@ final class FactoryReset
         // next admin page creates an empty table again.
         DjTable::drop();
         delete_option(DjSeeder::SEEDED_OPTION);
+        delete_option(DjDescriptions::TEAM_PAGE_OPTION);
+        delete_option(DjDescriptions::QUEUE_OPTION);
+        wp_clear_scheduled_hook(DjDescriptions::HOOK);
 
         return [
             'deleted_events' => $deletedEvents,

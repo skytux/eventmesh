@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace EventMesh\Djs;
 
 /**
- * One row of the DJ table: a name, other spellings of that name, and up to
- * one link per player service.
+ * One row of the DJ table: a name, other spellings of that name, up to one
+ * link per player service, and a short English description of the DJ with
+ * where that description came from (see DjDescriptions).
  */
 final class Dj
 {
@@ -17,16 +18,39 @@ final class Dj
     public const LINK_KINDS = ['spotify', 'soundcloud', 'mixcloud'];
 
     /**
-     * @param array<int, string>    $aliases Other spellings of the name.
-     * @param array<string, string> $links   Service key (one of LINK_KINDS) => URL.
-     *                                       Services with no link are left out.
+     * Where a description came from. SOURCE_NONE: there is no description,
+     * or it was emptied by hand and the automatic sources may fill it again.
+     */
+    public const SOURCE_NONE = '';
+    public const SOURCE_MANUAL = 'manual';
+    public const SOURCE_TEAM = 'team';
+    public const SOURCE_SOUNDCLOUD = 'soundcloud';
+    public const SOURCE_MIXCLOUD = 'mixcloud';
+
+    /**
+     * @param array<int, string>    $aliases           Other spellings of the name.
+     * @param array<string, string> $links             Service key (one of LINK_KINDS) => URL.
+     *                                                 Services with no link are left out.
+     * @param string                $description       Plain text, paragraphs separated by "\n\n".
+     * @param string                $descriptionSource One of the SOURCE_* constants.
      */
     public function __construct(
         public readonly int $id,
         public readonly string $name,
         public readonly array $aliases = [],
-        public readonly array $links = []
+        public readonly array $links = [],
+        public readonly string $description = '',
+        public readonly string $descriptionSource = self::SOURCE_NONE
     ) {
+    }
+
+    /**
+     * True when an organizer typed the description; automatic refreshes
+     * leave it alone.
+     */
+    public function hasManualDescription(): bool
+    {
+        return self::SOURCE_MANUAL === $this->descriptionSource;
     }
 
     /**
