@@ -139,6 +139,9 @@ CI (GitHub Actions) runs PHPUnit and PHPCS on every push and pull request.
 
 ## Changelog
 
+### 1.8.0
+- Public pages show each event's clean name (normal case, no date) with the DJ names on their own line under it: the event title field (event lists and the single event page) and the event-list block's list and card templates. While an event has no clean name yet, its title is shown as before.
+
 ### 1.7.0
 - Clean event names: the language model writes each event's name without the date and the DJ names, in normal case ("Ecstatic Dance" from "ECSTATIC DANCE 14.11.2026 / ..."), also from the Finnish title, and lists the DJ names in the title. Every answer is checked against the title and rejected when it adds words. Other plugins read them through the filters `eventmesh/event_name` and `eventmesh/event_dj_names`; the event edit screen shows them.
 

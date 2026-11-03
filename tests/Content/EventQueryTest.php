@@ -17,6 +17,7 @@ final class EventQueryTest extends TestCase
         Functions\when('get_permalink')->justReturn('');
         Functions\when('get_the_post_thumbnail_url')->justReturn('');
         Functions\when('get_post_thumbnail_id')->justReturn(0);
+        Functions\when('determine_locale')->justReturn('en_US');
     }
 
     public function testDefaultIncludesPastEventsInsteadOfExcludingThem(): void

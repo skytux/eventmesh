@@ -171,6 +171,17 @@
     outline: none;
 }
 
+/*
+ * The "DJ Kai" / "DJs Kai & Lumi" line under an event's clean name, inside the
+ * title's own tag. Weight and case reset so a heading's style stays on the name.
+ */
+.eventmesh-dj-line {
+    display: block;
+    font-size: 0.75em;
+    font-weight: normal;
+    text-transform: none;
+}
+
 /* The "Automatically translated" line under machine-translated event text. */
 .eventmesh-auto-translated {
     font-size: 0.8em;

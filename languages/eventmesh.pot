@@ -199,12 +199,12 @@ msgstr ""
 msgid "Customized"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:554
+#: src/Admin/EventListBlock.php:579
 #. translators: event date without year, as a PHP date() format, e.g. Finnish "D j.n."
 msgid "D j F"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:552
+#: src/Admin/EventListBlock.php:577
 #. translators: event date with year, as a PHP date() format, e.g. Finnish "D j.n.Y"
 msgid "D j F Y"
 msgstr ""
@@ -232,6 +232,13 @@ msgstr ""
 #: src/Admin/DjsPage.php:42 src/Admin/DjsPage.php:43 templates/admin/djs.php:46
 msgid "DJs"
 msgstr ""
+
+#: src/Naming/EventDisplayName.php:82
+#. translators: %s: one DJ name, or a list of DJ names such as "Kai, Lumi & Ode"
+msgid "DJ %s"
+msgid_plural "DJs %s"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/Admin/Admin.php:120
 msgid "Daily"
@@ -277,7 +284,7 @@ msgstr ""
 msgid "Disabled"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:906
+#: src/Admin/EventListBlock.php:931
 msgid "Displays a curated list of upcoming events."
 msgstr ""
 
@@ -361,7 +368,7 @@ msgstr ""
 msgid "Event name:"
 msgstr ""
 
-#: src/Admin/Admin.php:153 src/Admin/Admin.php:154 src/Admin/EventListBlock.php:898
+#: src/Admin/Admin.php:153 src/Admin/Admin.php:154 src/Admin/EventListBlock.php:923
 msgid "EventMesh"
 msgstr ""
 
@@ -373,11 +380,11 @@ msgstr ""
 msgid "EventMesh details"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:905
+#: src/Admin/EventListBlock.php:930
 msgid "EventMesh events"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1051
+#: src/Admin/EventListBlock.php:1076
 msgid "EventMesh events (upcoming + past)"
 msgstr ""
 
@@ -663,7 +670,7 @@ msgstr ""
 msgid "No other plugins are connected to EventMesh."
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1044
+#: src/Admin/EventListBlock.php:1069
 msgid "No past events."
 msgstr ""
 
@@ -683,7 +690,7 @@ msgstr ""
 msgid "No target languages other than the original."
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1043
+#: src/Admin/EventListBlock.php:1068
 msgid "No upcoming events."
 msgstr ""
 
@@ -740,11 +747,11 @@ msgstr ""
 msgid "Parent Events:"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:256 templates/frontend/events-card.php:22 templates/frontend/events-list.php:23
+#: src/Admin/EventListBlock.php:257 templates/frontend/events-card.php:22 templates/frontend/events-list.php:23
 msgid "Past Events"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1041
+#: src/Admin/EventListBlock.php:1066
 msgid "Past events"
 msgstr ""
 
@@ -840,11 +847,11 @@ msgstr ""
 msgid "Show a play button and load the player only when clicked"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1042
+#: src/Admin/EventListBlock.php:1067
 msgid "Show more"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:663 src/Content/EventPostType.php:326 src/Content/EventPostType.php:336 templates/frontend/events-card.php:31
+#: src/Admin/EventListBlock.php:688 src/Content/EventPostType.php:326 src/Content/EventPostType.php:336 templates/frontend/events-card.php:31
 #: templates/frontend/events-card.php:46 templates/frontend/events-list.php:34 templates/frontend/events-list.php:58
 msgid "Sold out"
 msgstr ""
@@ -973,7 +980,7 @@ msgstr ""
 msgid "This will permanently delete all synced events and reset every EventMesh setting. Continue?"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:720 templates/frontend/events-card.php:46 templates/frontend/events-list.php:58
+#: src/Admin/EventListBlock.php:745 templates/frontend/events-card.php:46 templates/frontend/events-list.php:58
 msgid "Tickets"
 msgstr ""
 
@@ -1019,7 +1026,7 @@ msgstr ""
 msgid "Twice daily"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1052
+#: src/Admin/EventListBlock.php:1077
 msgid "Two separate, independently styleable Query Loops - one for upcoming events, one for past - each under its own heading, built from ordinary blocks so the layout can be freely rearranged, restyled, or removed."
 msgstr ""
 
@@ -1031,7 +1038,7 @@ msgstr ""
 msgid "Uninstalling"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1040
+#: src/Admin/EventListBlock.php:1065
 msgid "Upcoming events"
 msgstr ""
 
@@ -1087,7 +1094,7 @@ msgstr ""
 msgid "You do not have permission to save this setting."
 msgstr ""
 
-#: src/Admin/EventListBlock.php:909
+#: src/Admin/EventListBlock.php:934
 msgid "calendar"
 msgstr ""
 
@@ -1095,7 +1102,7 @@ msgstr ""
 msgid "date unknown"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:909 src/Admin/EventListBlock.php:1059
+#: src/Admin/EventListBlock.php:934 src/Admin/EventListBlock.php:1084
 msgid "events"
 msgstr ""
 
@@ -1107,7 +1114,7 @@ msgstr ""
 msgid "fastcgi_finish_request"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1059
+#: src/Admin/EventListBlock.php:1084
 msgid "layout"
 msgstr ""
 
@@ -1119,7 +1126,7 @@ msgstr ""
 msgid "not written yet"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1059
+#: src/Admin/EventListBlock.php:1084
 msgid "query"
 msgstr ""
 

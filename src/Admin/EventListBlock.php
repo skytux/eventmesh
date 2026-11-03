@@ -7,6 +7,7 @@ namespace EventMesh\Admin;
 use EventMesh\Connectors\Holvi\HolviHtmlParser;
 use EventMesh\Content\EventPostType;
 use EventMesh\Content\EventQuery;
+use EventMesh\Naming\EventDisplayName;
 use EventMesh\Support\EventMeta;
 use EventMesh\Support\EventStatus;
 use EventMesh\Support\KnownProviders;
@@ -355,6 +356,9 @@ final class EventListBlock
     }
 
     /**
+     * The event's clean name with the DJ line under it (EventDisplayName),
+     * or, while no clean name exists yet, the title without its date.
+     *
      * @param array<string, mixed> $attributes
      */
     private function renderTitleField(int $postId, array $attributes): string
@@ -365,10 +369,25 @@ final class EventListBlock
             return '';
         }
 
-        $title = $this->holviHtmlParser->stripDateForDisplay($title);
-        $strikethrough = EventStatus::isCanceled($title) ? ' style="text-decoration:line-through"' : '';
+        // Read from the full title: the clean name may have dropped the keyword.
+        $canceled = EventStatus::isCanceled($title);
+        $display = EventDisplayName::forEvent($postId);
 
-        return $this->renderTextField($postId, $attributes, $title, 'p', $strikethrough);
+        if (null === $display) {
+            $title = $this->holviHtmlParser->stripDateForDisplay($title);
+            $canceled = EventStatus::isCanceled($title);
+        }
+
+        $strikethrough = $canceled ? ' style="text-decoration:line-through"' : '';
+
+        return $this->renderTextField(
+            $postId,
+            $attributes,
+            null !== $display ? $display['name'] : $title,
+            'p',
+            $strikethrough,
+            EventDisplayName::djLineHtml($display['dj_line'] ?? '')
+        );
     }
 
     /**
@@ -410,6 +429,9 @@ final class EventListBlock
      * single-event template's own fields, since a field linking back to the
      * very page it's already on is meaningless there.
      *
+     * $afterHtml (already escaped, e.g. the title's DJ line) goes last inside
+     * the tag, outside the link and the strikethrough.
+     *
      * @param array<string, mixed> $attributes
      */
     private function renderTextField(
@@ -417,7 +439,8 @@ final class EventListBlock
         array $attributes,
         string $text,
         string $defaultTag,
-        string $extraAttrs = ''
+        string $extraAttrs = '',
+        string $afterHtml = ''
     ): string {
         $tag = isset($attributes['tag']) && is_string($attributes['tag']) && '' !== $attributes['tag']
             ? $attributes['tag']
@@ -452,6 +475,8 @@ final class EventListBlock
         if ('' !== $suffix) {
             $inner .= esc_html($suffix);
         }
+
+        $inner .= $afterHtml;
 
         return sprintf('<%1$s %2$s>%3$s</%1$s>', esc_html($tag), get_block_wrapper_attributes(), $inner);
     }

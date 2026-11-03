@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace EventMesh\Tests\Admin;
 
+use Brain\Monkey\Filters;
 use Brain\Monkey\Functions;
 use EventMesh\Admin\EventListBlock;
 use EventMesh\Connectors\Holvi\HolviHtmlParser;
@@ -31,6 +32,7 @@ final class EventListBlockRenderersTest extends TestCase
         // dedicated enqueue test below.
         Functions\when('wp_style_is')->justReturn(true);
         Functions\when('wp_enqueue_style')->justReturn(true);
+        Functions\when('determine_locale')->justReturn('en_US');
     }
 
     private function block(): EventListBlock
@@ -187,6 +189,59 @@ final class EventListBlockRenderersTest extends TestCase
         $html = $this->block()->renderEventField(['field' => 'title'], '', $this->blockInstance(['postId' => 42]));
 
         self::assertStringNotContainsString('text-decoration:line-through', $html);
+    }
+
+    public function testRenderEventFieldTitleShowsTheCleanNameWithTheDjLineUnderIt(): void
+    {
+        Functions\when('get_the_title')->justReturn('ECSTATIC DANCE 14.11.2026 / DJ KAI');
+        Functions\when('get_permalink')->justReturn('https://example.test/events/ecstatic-dance/');
+        Functions\when('get_post_meta')->justReturn('');
+        Functions\when('_n')->alias(
+            static fn (string $single, string $plural, int $count) => 1 === $count ? $single : $plural
+        );
+        Functions\when('esc_attr')->alias(static fn ($value) => $value);
+        Filters\expectApplied('eventmesh/event_name')->with('', 42, 'en')->andReturn('Ecstatic Dance');
+        Filters\expectApplied('eventmesh/event_dj_names')->andReturn(['Kai']);
+
+        $html = $this->block()->renderEventField(
+            ['field' => 'title', 'tag' => 'h1', 'linked' => true],
+            '',
+            $this->blockInstance(['postId' => 42])
+        );
+
+        self::assertSame(
+            '<h1 class="wp-block-eventmesh-test"><a href="https://example.test/events/ecstatic-dance/">Ecstatic Dance</a>'
+            . '<span class="eventmesh-dj-line">DJ Kai</span></h1>',
+            $html
+        );
+    }
+
+    public function testRenderEventFieldTitleStrikesTheCleanNameWhenTheTitleSaysCanceled(): void
+    {
+        Functions\when('get_the_title')->justReturn('CANCELED ECSTATIC DANCE 14.11.2026');
+        Functions\when('get_post_meta')->justReturn('');
+        Functions\when('_n')->alias(
+            static fn (string $single, string $plural, int $count) => 1 === $count ? $single : $plural
+        );
+        Filters\expectApplied('eventmesh/event_name')->andReturn('Ecstatic Dance');
+        Filters\expectApplied('eventmesh/event_dj_names')->andReturn([]);
+
+        $html = $this->block()->renderEventField(['field' => 'title'], '', $this->blockInstance(['postId' => 42]));
+
+        self::assertStringContainsString('<span style="text-decoration:line-through">Ecstatic Dance</span>', $html);
+        self::assertStringNotContainsString('eventmesh-dj-line', $html);
+    }
+
+    public function testRenderEventFieldTitleKeepsTheTitleAndNoDjLineWithoutACleanName(): void
+    {
+        Functions\when('get_the_title')->justReturn('ECSTATIC DANCE 12.8.2026 / DJ KAI');
+        Functions\when('get_post_meta')->justReturn('');
+
+        $html = $this->block()->renderEventField(['field' => 'title'], '', $this->blockInstance(['postId' => 42]));
+
+        self::assertStringContainsString('ECSTATIC DANCE', $html);
+        self::assertStringContainsString('DJ KAI', $html);
+        self::assertStringNotContainsString('eventmesh-dj-line', $html);
     }
 
     public function testRenderEventFieldVenueRendersTheVenueName(): void
