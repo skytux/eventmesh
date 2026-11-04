@@ -26,6 +26,7 @@ if (! defined('ABSPATH')) {
         <p>
             <strong><?php esc_html_e('Last run:', 'eventmesh'); ?></strong>
             <?php echo esc_html(sprintf(
+                /* translators: 1: events created, 2: events updated, 3: events failed, 4: events skipped. */
                 __('Created %1$d, updated %2$d, failed %3$d, skipped %4$d.', 'eventmesh'),
                 $lastSync['created'],
                 $lastSync['updated'],

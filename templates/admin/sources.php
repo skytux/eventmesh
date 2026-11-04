@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Sources admin view.
  *

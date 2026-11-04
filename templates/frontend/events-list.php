@@ -29,12 +29,12 @@ if (! defined('ABSPATH')) {
                             <img src="<?php echo esc_url($image); ?>" alt="<?php echo esc_attr((string) ($event['title'] ?? '')); ?>" />
                         </a>
                     <?php endif; ?>
-                    <h3<?php echo $canceled ? ' style="text-decoration:line-through"' : ''; ?>><a href="<?php echo esc_url((string) ($event['url'] ?? '#')); ?>"><?php echo esc_html((string) ($event['display_title'] ?? $event['title'] ?? '')); ?></a><?php echo EventMesh\Naming\EventDisplayName::djLineHtml((string) ($event['dj_line'] ?? '')); ?></h3>
+                    <h3<?php echo $canceled ? ' style="text-decoration:line-through"' : ''; ?>><a href="<?php echo esc_url((string) ($event['url'] ?? '#')); ?>"><?php echo esc_html((string) ($event['display_title'] ?? $event['title'] ?? '')); ?></a><?php echo EventMesh\Naming\EventDisplayName::djLineHtml((string) ($event['dj_line'] ?? '')); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- djLineHtml() escapes the DJ line itself and returns a span. ?></h3>
                     <?php if ($soldOut) : ?>
                         <p class="eventmesh-sold-out-label"><?php esc_html_e('Sold out', 'eventmesh'); ?></p>
                     <?php endif; ?>
                     <?php if (! empty($event['embed_html'])) : ?>
-                        <div class="eventmesh-provider-embed"><?php echo EventMesh\Support\ProviderEmbedMarkup::render((string) $event['embed_html']); ?></div>
+                        <div class="eventmesh-provider-embed"><?php echo EventMesh\Support\ProviderEmbedMarkup::render((string) $event['embed_html']); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- iframe HTML already cleaned by EmbedHtmlSanitizer; escaping would print it as text. ?></div>
                     <?php endif; ?>
                     <?php if (! empty($event['starts_at'])) : ?>
                         <p<?php echo $canceled ? ' style="text-decoration:line-through"' : ''; ?>><strong><?php esc_html_e('Starts:', 'eventmesh'); ?></strong> <?php echo esc_html((string) $event['starts_at']); ?></p>

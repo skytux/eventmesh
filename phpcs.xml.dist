@@ -8,6 +8,7 @@
     <arg value="ps"/>
 
     <file>src</file>
+    <file>templates</file>
 
     <!--
         The codebase follows PSR-12 (camelCase, strict_types, short array

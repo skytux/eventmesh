@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Single event template.
  *
@@ -18,7 +19,10 @@ $postId = get_the_ID();
 
 <main id="primary" class="site-main">
     <article id="post-<?php the_ID(); ?>" <?php post_class('eventmesh-single-event'); ?>>
-        <?php echo (new EventMesh\Content\SingleEventTemplate())->render($postId); ?>
+        <?php
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- rendered block HTML; escaping prints it as text.
+        echo (new EventMesh\Content\SingleEventTemplate())->render($postId);
+        ?>
     </article>
 </main>
 

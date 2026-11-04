@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Dashboard admin view.
  *

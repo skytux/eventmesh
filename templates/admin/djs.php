@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Events → DJs admin view.
  *

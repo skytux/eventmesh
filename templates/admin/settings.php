@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Settings admin view.
  *
