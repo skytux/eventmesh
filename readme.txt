@@ -4,7 +4,7 @@ Tags: events, sync, holvi, gutenberg, event list
 Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 1.10.4
+Stable tag: 1.10.5
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -136,6 +136,9 @@ No. The only outgoing requests are the ones described under External services, a
 
 == Changelog ==
 
+= 1.10.5 =
+* Holvi pages are fetched over https only and never from the hosting network; detail pages only from the shop page host. The event list shows at most 50 events and only its two own templates (Q257).
+
 = 1.10.4 =
 * The event field and past-events heading blocks only accept p, h1-h6, div or span as their tag (Q250).
 
@@ -209,6 +212,9 @@ No. The only outgoing requests are the ones described under External services, a
 * Built-in dummy/test source (enable in Sources) for demos.
 
 == Upgrade Notice ==
+
+= 1.10.5 =
+Security fix. An event list set to more than 50 events shows 50. No database schema change.
 
 = 1.10.4 =
 Security fix. No database schema change.

@@ -32,6 +32,19 @@ final class EventListBlock
     private const ALLOWED_TAGS = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div', 'span'];
 
     /**
+     * Templates in templates/frontend/ that the event-list block and the
+     * [eventmesh_events] shortcode may use.
+     */
+    private const LIST_TEMPLATES = ['events-list', 'events-card'];
+
+    /**
+     * Number of events an event list shows when "count" is missing or below
+     * 1, and the most it can show.
+     */
+    private const LIST_DEFAULT_COUNT = 6;
+    private const LIST_MAX_COUNT = 50;
+
+    /**
      * Tracks whether eventmesh/past-events-marker has already rendered its
      * heading for the Query Loop currently being rendered - reset by
      * resetPastEventsMarker() right as each Query Loop's own query is built
@@ -900,19 +913,54 @@ final class EventListBlock
     }
 
     /**
+     * Number of events the event-list block or [eventmesh_events] shows:
+     * the "count" setting when it is 1 to LIST_MAX_COUNT, LIST_MAX_COUNT when
+     * it is higher, and LIST_DEFAULT_COUNT when it is missing or below 1
+     * (so -1 no longer loads every event).
+     *
+     * @param array<string, mixed> $attributes
+     */
+    public static function listCount(array $attributes): int
+    {
+        $count = isset($attributes['count']) && is_numeric($attributes['count'])
+            ? (int) $attributes['count']
+            : self::LIST_DEFAULT_COUNT;
+
+        if ($count < 1) {
+            return self::LIST_DEFAULT_COUNT;
+        }
+
+        return min($count, self::LIST_MAX_COUNT);
+    }
+
+    /**
+     * Template file name the event-list block or [eventmesh_events] uses:
+     * the "template" setting when it is one of LIST_TEMPLATES, otherwise
+     * "events-list".
+     *
+     * @param array<string, mixed> $attributes
+     */
+    public static function listTemplate(array $attributes): string
+    {
+        $template = isset($attributes['template']) && is_string($attributes['template'])
+            ? $attributes['template']
+            : '';
+
+        return in_array($template, self::LIST_TEMPLATES, true) ? $template : 'events-list';
+    }
+
+    /**
      * @param array<string, mixed> $attributes
      */
     public function render(array $attributes = []): string
     {
         $events = $this->eventQuery->recent(
             [
-                'posts_per_page' => (int) ($attributes['count'] ?? 6),
+                'posts_per_page' => self::listCount($attributes),
             ]
         );
 
-        $template = isset($attributes['template']) && is_string($attributes['template'])
-            ? sanitize_file_name($attributes['template'])
-            : 'events-list';
+        $template = self::listTemplate($attributes);
 
         ob_start();
 

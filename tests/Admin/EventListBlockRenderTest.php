@@ -107,6 +107,46 @@ final class EventListBlockRenderTest extends TestCase
         self::assertSame(6, \WP_Query::$lastArgs['posts_per_page']);
     }
 
+    /**
+     * @return array<string, array{0: mixed, 1: int}>
+     */
+    public static function countProvider(): array
+    {
+        return [
+            'minus one (all events)' => [-1, 6],
+            'zero' => [0, 6],
+            'not a number' => ['many', 6],
+            'one' => [1, 1],
+            'fifty' => [50, 50],
+            'above the maximum' => [100000, 50],
+            'numeric string' => ['12', 12],
+        ];
+    }
+
+    /**
+     * @dataProvider countProvider
+     */
+    public function testRenderKeepsTheCountInASaneRange(mixed $count, int $expected): void
+    {
+        $this->queueQueryResults([]);
+
+        $this->block()->render(['count' => $count]);
+
+        self::assertSame($expected, \WP_Query::$lastArgs['posts_per_page']);
+    }
+
+    public function testRenderOnlyUsesAListTemplateFromTheKnownList(): void
+    {
+        $this->queueQueryResults([]);
+
+        // sync-status.php is a real file in templates/frontend/, but not an
+        // event list template.
+        $html = $this->block()->render(['template' => 'sync-status']);
+
+        self::assertStringContainsString('eventmesh-events-list', $html);
+        self::assertStringNotContainsString('eventmesh-sync-status', $html);
+    }
+
     public function testRenderShowsAnEventsTitle(): void
     {
         $post = new \WP_Post(1, 'eventmesh_event', 'A Real Event');

@@ -56,7 +56,7 @@ final class HolviConnectorTest extends TestCase
         $listingBody = $this->fixture('listing-with-detail-link.html');
         $detailBody = $this->fixture('detail-page.html');
 
-        Functions\when('wp_remote_get')->alias(
+        Functions\when('wp_safe_remote_get')->alias(
             function (string $url) use ($listingBody, $detailBody) {
                 return match ($url) {
                     self::LISTING_URL => ['__body' => $listingBody],
@@ -89,7 +89,7 @@ final class HolviConnectorTest extends TestCase
         $listingBody = $this->fixture('listing-with-detail-link.html');
         $detailBody = $this->fixture('detail-page.html');
 
-        Functions\when('wp_remote_get')->alias(
+        Functions\when('wp_safe_remote_get')->alias(
             function (string $url) use ($listingBody, $detailBody) {
                 return match ($url) {
                     self::LISTING_URL => ['__body' => $listingBody],
@@ -114,7 +114,7 @@ final class HolviConnectorTest extends TestCase
     {
         $listingBody = $this->fixture('listing-with-detail-link.html');
 
-        Functions\when('wp_remote_get')->alias(
+        Functions\when('wp_safe_remote_get')->alias(
             function (string $url) use ($listingBody) {
                 return match ($url) {
                     self::LISTING_URL => ['__body' => $listingBody],
@@ -135,7 +135,7 @@ final class HolviConnectorTest extends TestCase
 
     public function testListingPageFailureIncrementsFetchErrors(): void
     {
-        Functions\when('wp_remote_get')->justReturn(new \WP_Error('timeout', 'Listing page timed out'));
+        Functions\when('wp_safe_remote_get')->justReturn(new \WP_Error('timeout', 'Listing page timed out'));
 
         $connector = $this->connector();
         $events = $connector->fetch();
@@ -159,7 +159,7 @@ final class HolviConnectorTest extends TestCase
         $listingBody = '<!DOCTYPE html><html><body>' . $items . '</body></html>';
         $detailFetchCount = 0;
 
-        Functions\when('wp_remote_get')->alias(
+        Functions\when('wp_safe_remote_get')->alias(
             function (string $url) use ($listingBody, &$detailFetchCount) {
                 if (self::LISTING_URL === $url) {
                     return ['__body' => $listingBody];
@@ -212,7 +212,7 @@ final class HolviConnectorTest extends TestCase
             }
         );
 
-        Functions\when('wp_remote_get')->alias(
+        Functions\when('wp_safe_remote_get')->alias(
             function (string $url) use ($listingBody, &$fetchedDetailUrls) {
                 if (self::LISTING_URL === $url) {
                     return ['__body' => $listingBody];
@@ -246,5 +246,95 @@ final class HolviConnectorTest extends TestCase
                 "Event {$i}, never enriched in run 1, must be prioritized in run 2."
             );
         }
+    }
+
+    /**
+     * A detail link is only followed when it is https on the listing page's
+     * own host: a changed shop page must not make the server request any
+     * other address (another host, another port, plain http).
+     */
+    public function testDetailPagesAreOnlyFetchedOverHttpsFromTheShopsOwnHost(): void
+    {
+        $links = [
+            'https://shop.holvi.com/product/ok/',
+            'https://SHOP.holvi.com/product/upper/',
+            'https://169.254.169.254/latest/meta-data/',
+            'https://evil.example/product/',
+            'http://shop.holvi.com/product/plain-http/',
+            'https://shop.holvi.com:8080/product/other-port/',
+        ];
+        $items = '';
+
+        foreach ($links as $i => $link) {
+            $items .= sprintf(
+                '<div class="product"><h2 itemprop="name">Band %1$d 1.1.2030</h2><a href="%2$s">Details</a></div>',
+                $i,
+                $link
+            );
+        }
+
+        $listingBody = '<!DOCTYPE html><html><body>' . $items . '</body></html>';
+        $requested = [];
+
+        Functions\when('wp_safe_remote_get')->alias(
+            function (string $url) use ($listingBody, &$requested) {
+                $requested[] = $url;
+
+                return self::LISTING_URL === $url
+                    ? ['__body' => $listingBody]
+                    : new \WP_Error('unreached', 'not needed for this test');
+            }
+        );
+
+        $events = $this->connector()->fetch();
+
+        self::assertCount(count($links), $events, 'Events with a refused detail link are still returned.');
+        self::assertSame(
+            [self::LISTING_URL, 'https://shop.holvi.com/product/ok/', 'https://SHOP.holvi.com/product/upper/'],
+            $requested
+        );
+    }
+
+    public function testAnHttpSourceAddressIsFetchedOverHttps(): void
+    {
+        Functions\when('get_option')->justReturn(
+            [
+                ['id' => 'main', 'url' => 'http://shop.holvi.com/venue/events', 'enabled' => true],
+            ]
+        );
+
+        $requested = [];
+        Functions\when('wp_safe_remote_get')->alias(
+            function (string $url) use (&$requested) {
+                $requested[] = $url;
+
+                return ['__body' => '<!DOCTYPE html><html><body></body></html>'];
+            }
+        );
+
+        $this->connector()->fetch();
+
+        self::assertSame([self::LISTING_URL], $requested);
+    }
+
+    public function testASourceAddressThatIsNotHttpOrHttpsIsNotFetched(): void
+    {
+        Functions\when('get_option')->justReturn(
+            [
+                ['id' => 'main', 'url' => 'ftp://shop.holvi.com/venue/events', 'enabled' => true],
+            ]
+        );
+
+        $requested = [];
+        Functions\when('wp_safe_remote_get')->alias(
+            function (string $url) use (&$requested) {
+                $requested[] = $url;
+
+                return ['__body' => ''];
+            }
+        );
+
+        self::assertSame([], $this->connector()->fetch());
+        self::assertSame([], $requested);
     }
 }

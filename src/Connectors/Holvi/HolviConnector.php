@@ -70,10 +70,15 @@ final class HolviConnector implements ConnectorInterface
     public function fetch(): array
     {
         $events = [];
+        // The host of the source each event came from, by the event's index
+        // in $events: a detail page is only fetched from that same host.
+        $sourceHosts = [];
         $this->fetchErrors = 0;
 
         foreach ($this->sourceUrls() as $sourceUrl) {
-            $response = wp_remote_get(
+            // wp_safe_remote_get refuses addresses inside the hosting network
+            // (localhost, private ranges) and unusual ports.
+            $response = wp_safe_remote_get(
                 $sourceUrl,
                 [
                     'timeout' => 20,
@@ -110,16 +115,19 @@ final class HolviConnector implements ConnectorInterface
                 continue;
             }
 
-            $events = array_merge(
-                $events,
-                $this->parser->parse(
-                    (string) wp_remote_retrieve_body($response),
-                    $sourceUrl
-                )
+            $parsed = $this->parser->parse(
+                (string) wp_remote_retrieve_body($response),
+                $sourceUrl
             );
+            $sourceHost = self::host($sourceUrl);
+
+            foreach ($parsed as $event) {
+                $events[] = $event;
+                $sourceHosts[] = $sourceHost;
+            }
         }
 
-        return $this->enrichEvents($events);
+        return $this->enrichEvents($events, $sourceHosts);
     }
 
     public function fetchErrors(): int
@@ -128,11 +136,12 @@ final class HolviConnector implements ConnectorInterface
     }
 
     /**
-     * @param array<int, Event> $events
+     * @param array<int, Event>  $events
+     * @param array<int, string> $sourceHosts Host of each event's source, same keys as $events.
      *
      * @return array<int, Event>
      */
-    private function enrichEvents(array $events): array
+    private function enrichEvents(array $events, array $sourceHosts): array
     {
         $enrichedAt = get_option(self::DETAIL_ENRICHED_AT_OPTION, []);
 
@@ -159,6 +168,16 @@ final class HolviConnector implements ConnectorInterface
             $event = $events[$index];
 
             if ('' === $event->url()) {
+                continue;
+            }
+
+            if (! self::isShopDetailUrl($event->url(), $sourceHosts[$index] ?? '')) {
+                $this->logger->warning(
+                    sprintf(
+                        'Holvi detail page not fetched: "%s" is not an https address on the shop\'s own host.',
+                        $event->url()
+                    )
+                );
                 continue;
             }
 
@@ -194,7 +213,7 @@ final class HolviConnector implements ConnectorInterface
      */
     private function enrichWithDetailPage(Event $event): Event
     {
-        $response = wp_remote_get(
+        $response = wp_safe_remote_get(
             $event->url(),
             [
                 'timeout' => self::DETAIL_FETCH_TIMEOUT,
@@ -303,16 +322,61 @@ final class HolviConnector implements ConnectorInterface
         $filtered = apply_filters('eventmesh/holvi/source_urls', $urls);
 
         if (! is_array($filtered)) {
-            return $urls;
+            $filtered = $urls;
         }
 
         return array_values(
             array_filter(
                 array_map(
-                    static fn (mixed $url): string => esc_url_raw((string) $url),
+                    static fn (mixed $url): string => self::httpsUrl(esc_url_raw((string) $url)),
                     $filtered
                 )
             )
         );
+    }
+
+    /**
+     * $url fetched over https only: an http:// address is changed to
+     * https://, and anything else (another scheme, no host) becomes ''.
+     */
+    private static function httpsUrl(string $url): string
+    {
+        if (1 === preg_match('#^http://#i', $url)) {
+            $url = 'https://' . substr($url, 7);
+        }
+
+        if (1 !== preg_match('#^https://#i', $url) || '' === self::host($url)) {
+            return '';
+        }
+
+        return $url;
+    }
+
+    /**
+     * True when $url is an https address on $shopHost, the host of the source
+     * page the event was listed on.
+     */
+    private static function isShopDetailUrl(string $url, string $shopHost): bool
+    {
+        return '' !== $shopHost
+            && 1 === preg_match('#^https://#i', $url)
+            && self::host($url) === $shopHost;
+    }
+
+    /**
+     * Lower-case host of $url, with ":port" added when the address names a
+     * port, so the same host on another port does not count as the same.
+     */
+    private static function host(string $url): string
+    {
+        $host = wp_parse_url($url, PHP_URL_HOST);
+
+        if (! is_string($host) || '' === $host) {
+            return '';
+        }
+
+        $port = wp_parse_url($url, PHP_URL_PORT);
+
+        return strtolower($host) . (is_int($port) ? ':' . $port : '');
     }
 }

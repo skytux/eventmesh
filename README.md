@@ -139,6 +139,9 @@ CI (GitHub Actions) runs PHPUnit and PHPCS on every push and pull request.
 
 ## Changelog
 
+### 1.10.5
+- Holvi pages are fetched over https only and never from the hosting network; detail pages only from the shop page host. The event list shows at most 50 events and only its two own templates (Q257).
+
 ### 1.10.4
 - The event field and past-events heading blocks only accept p, h1-h6, div or span as their tag (Q250).
 
