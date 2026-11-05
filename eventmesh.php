@@ -2,7 +2,7 @@
 /**
  * Plugin Name: EventMesh
  * Description: Synchronize external event sources such as Holvi into native WordPress content.
- * Version: 1.10.7
+ * Version: 1.10.8
  * Requires at least: 6.8
  * Requires PHP: 8.2
  * Author: skytux
@@ -18,7 +18,7 @@ if (! defined('ABSPATH')) {
 	exit;
 }
 
-define('EVENTMESH_VERSION', '1.10.7');
+define('EVENTMESH_VERSION', '1.10.8');
 define('EVENTMESH_PLUGIN_FILE', __FILE__);
 define('EVENTMESH_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('EVENTMESH_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -26,6 +26,8 @@ define('EVENTMESH_PLUGIN_URL', plugin_dir_url(__FILE__));
 require EVENTMESH_PLUGIN_DIR . 'src/Support/Autoloader.php';
 
 EventMesh\Support\Autoloader::register();
+
+require EVENTMESH_PLUGIN_DIR . 'src/functions.php';
 
 // Each connector's own register.php hooks eventmesh/register_connectors -
 // dropping in a new connector directory is enough, no edit needed here.

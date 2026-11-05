@@ -8,6 +8,7 @@ use Brain\Monkey\Filters;
 use Brain\Monkey\Functions;
 use EventMesh\Admin\EventListBlock;
 use EventMesh\Connectors\Holvi\HolviHtmlParser;
+use EventMesh\Content\EventPostType;
 use EventMesh\Content\EventQuery;
 use EventMesh\Tests\TestCase;
 
@@ -33,6 +34,11 @@ final class EventListBlockRenderersTest extends TestCase
         Functions\when('wp_style_is')->justReturn(true);
         Functions\when('wp_enqueue_style')->justReturn(true);
         Functions\when('determine_locale')->justReturn('en_US');
+        // The title field's fallback reads the stored post through
+        // eventmesh_display_title(); give it the title each test stubs.
+        Functions\when('get_post')->alias(
+            static fn ($id) => new \WP_Post((int) $id, EventPostType::NAME, (string) get_the_title($id))
+        );
     }
 
     private function block(): EventListBlock

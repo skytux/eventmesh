@@ -25,6 +25,8 @@ if (! defined('EVENTMESH_PLUGIN_URL')) {
     define('EVENTMESH_PLUGIN_URL', 'https://example.test/wp-content/plugins/eventmesh/');
 }
 
+require dirname(__DIR__) . '/src/functions.php';
+
 if (! defined('DATE_ATOM')) {
     define('DATE_ATOM', 'Y-m-d\TH:i:sP');
 }

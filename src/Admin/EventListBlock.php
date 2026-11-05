@@ -388,7 +388,8 @@ final class EventListBlock
 
     /**
      * The event's clean name with the DJ line under it (EventDisplayName),
-     * or, while no clean name exists yet, the title without its date.
+     * or, while no clean name exists yet, the title without its date in the
+     * page's language (eventmesh_display_title()).
      *
      * @param array<string, mixed> $attributes
      */
@@ -405,7 +406,7 @@ final class EventListBlock
         $display = EventDisplayName::forEvent($postId);
 
         if (null === $display) {
-            $title = $this->holviHtmlParser->stripDateForDisplay($title);
+            $title = eventmesh_display_title($postId);
             $canceled = EventStatus::isCanceled($title);
         }
 
