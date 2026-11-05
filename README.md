@@ -139,6 +139,9 @@ CI (GitHub Actions) runs PHPUnit and PHPCS on every push and pull request.
 
 ## Changelog
 
+### 1.10.6
+- Deactivating EventMesh removes its scheduled background jobs (Q258, S-I1).
+
 ### 1.10.5
 - Holvi pages are fetched over https only and never from the hosting network; detail pages only from the shop page host. The event list shows at most 50 events and only its two own templates (Q257).
 
