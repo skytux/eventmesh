@@ -37,6 +37,8 @@ final class EventSynchronizerTest extends TestCase
         // sync did before this tracking existed.
         Functions\when('get_post')->justReturn(null);
         Functions\when('wp_kses')->returnArg(1);
+        Functions\when('wp_kses_data')->returnArg(1);
+        Functions\when('wp_kses_post')->returnArg(1);
         Functions\when('__')->returnArg(1);
     }
 
@@ -77,6 +79,46 @@ final class EventSynchronizerTest extends TestCase
         $postId = $this->synchronizer()->sync($this->event('ext-existing'));
 
         self::assertSame(55, $postId);
+    }
+
+    /**
+     * "Sync now" runs as an administrator, whom WordPress lets save any HTML,
+     * so the synchronizer itself must clean the source title and text before
+     * writing them - both the post fields and the stored source copies that
+     * "Follow source again" restores from.
+     */
+    public function testSyncCleansTheSourceTitleAndText(): void
+    {
+        $this->queueQueryResults([]);
+
+        Functions\when('wp_kses_data')->alias(static fn (string $text) => 'data(' . $text . ')');
+        Functions\when('wp_kses_post')->alias(static fn (string $text) => 'post(' . $text . ')');
+
+        $inserted = [];
+        Functions\when('wp_insert_post')->alias(
+            static function (array $postarr) use (&$inserted): int {
+                $inserted = $postarr;
+
+                return 501;
+            }
+        );
+
+        $meta = [];
+        Functions\when('update_post_meta')->alias(
+            static function (int $postId, string $key, $value) use (&$meta): bool {
+                $meta[$key] = $value;
+
+                return true;
+            }
+        );
+
+        $event = new Event('holvi', 'ext-x', 'Title<script>', null, null, '', '<p>Text</p><script>x</script>');
+        $this->synchronizer()->sync($event);
+
+        self::assertSame('data(Title<script>)', $inserted['post_title']);
+        self::assertSame('post(<p>Text</p><script>x</script>)', $inserted['post_content']);
+        self::assertSame('data(Title<script>)', $meta['_eventmesh_source_title']);
+        self::assertSame('post(<p>Text</p><script>x</script>)', $meta['_eventmesh_source_content']);
     }
 
     /**

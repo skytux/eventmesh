@@ -31,8 +31,12 @@ final class EventSynchronizer
         $postId = $this->findExistingPostId($event);
         $isNew = 0 === $postId;
 
-        $sourceTitle = $event->title();
-        $sourceContent = $event->description();
+        // Clean the source's title and text the same way WordPress cleans them
+        // when the automatic sync saves with no user logged in. "Sync now"
+        // runs as an administrator, whom WordPress lets save any HTML, so
+        // without this a script in the shop's text would reach the event page.
+        $sourceTitle = wp_kses_data($event->title());
+        $sourceContent = wp_kses_post($event->description());
 
         // Title and description are native post fields a person edits directly
         // in the block editor. Only overwrite them while they still match what
