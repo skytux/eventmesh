@@ -354,12 +354,10 @@ final class Admin
         $eventQuery = $this->container->get(\EventMesh\Content\EventQuery::class);
         $events = $eventQuery->recent(
             [
-                'posts_per_page' => (int) ($attributes['count'] ?? 6),
+                'posts_per_page' => EventListBlock::listCount($attributes),
             ]
         );
-        $template = isset($attributes['template']) && is_string($attributes['template'])
-            ? sanitize_file_name($attributes['template'])
-            : 'events-list';
+        $template = EventListBlock::listTemplate($attributes);
 
         ob_start();
 
