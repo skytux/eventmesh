@@ -24,12 +24,13 @@
 						{ title: __( 'Event list settings', 'eventmesh' ) },
 						el( RangeControl, {
 							label: __( 'Number of events', 'eventmesh' ),
+							help: __( 'At most 50.', 'eventmesh' ),
 							value: attributes.count,
 							onChange: function ( value ) {
 								setAttributes( { count: value } );
 							},
 							min: 1,
-							max: 12,
+							max: 50,
 						} ),
 						el( SelectControl, {
 							label: __( 'Layout', 'eventmesh' ),
