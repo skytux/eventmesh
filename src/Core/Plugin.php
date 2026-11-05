@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace EventMesh\Core;
 
+use EventMesh\Translation\EventPageLanguage;
+
 final class Plugin
 {
     private static ?self $instance = null;
@@ -22,6 +24,9 @@ final class Plugin
     private function __construct()
     {
         $this->kernel = new Kernel();
+
+        // Before plugins_loaded: Polylang picks the language at priority 1.
+        (new EventPageLanguage())->boot();
 
         add_action(
             'plugins_loaded',

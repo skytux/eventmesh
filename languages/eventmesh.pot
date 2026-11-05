@@ -74,12 +74,12 @@ msgstr ""
 msgid "Add DJ"
 msgstr ""
 
-#: src/Content/EventPostType.php:72
+#: src/Content/EventPostType.php:75
 msgctxt "event"
 msgid "Add New"
 msgstr ""
 
-#: src/Content/EventPostType.php:73
+#: src/Content/EventPostType.php:76
 msgid "Add New Event"
 msgstr ""
 
@@ -120,7 +120,7 @@ msgstr ""
 msgid "Automatically translated"
 msgstr ""
 
-#: src/Content/EventPostType.php:327
+#: src/Content/EventPostType.php:330
 msgid "Available"
 msgstr ""
 
@@ -196,7 +196,7 @@ msgstr ""
 msgid "Created %1$d, updated %2$d, failed %3$d, skipped %4$d."
 msgstr ""
 
-#: src/Content/EventPostType.php:208 src/Content/EventPostType.php:215
+#: src/Content/EventPostType.php:211 src/Content/EventPostType.php:218
 msgid "Customized"
 msgstr ""
 
@@ -254,7 +254,7 @@ msgstr ""
 msgid "Delete this DJ?"
 msgstr ""
 
-#: src/Content/EventPostType.php:223 templates/admin/djs.php:102 templates/admin/djs.php:177
+#: src/Content/EventPostType.php:226 templates/admin/djs.php:102 templates/admin/djs.php:177
 msgid "Description"
 msgstr ""
 
@@ -270,7 +270,7 @@ msgstr ""
 msgid "Diagnostics"
 msgstr ""
 
-#: src/Content/EventPostType.php:282
+#: src/Content/EventPostType.php:285
 msgid "Disable (also returns 404 on its own page)"
 msgstr ""
 
@@ -278,7 +278,7 @@ msgstr ""
 msgid "Disabled"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:996
+#: src/Admin/EventListBlock.php:1002
 msgid "Displays a curated list of upcoming events."
 msgstr ""
 
@@ -290,7 +290,7 @@ msgstr ""
 msgid "Dummy (testing) — sample events"
 msgstr ""
 
-#: src/Content/EventPostType.php:179
+#: src/Content/EventPostType.php:182
 msgid "Each field shows the value found on the last sync; type a value below it to override what appears on the front end. Overrides are kept and never replaced by a later sync. Leave blank to use the found value."
 msgstr ""
 
@@ -306,7 +306,7 @@ msgstr ""
 msgid "Edit DJ"
 msgstr ""
 
-#: src/Content/EventPostType.php:75
+#: src/Content/EventPostType.php:78
 msgid "Edit Event"
 msgstr ""
 
@@ -328,7 +328,7 @@ msgstr ""
 msgid "Enabled"
 msgstr ""
 
-#: src/Content/EventPostType.php:184
+#: src/Content/EventPostType.php:187
 msgid "Ends at"
 msgstr ""
 
@@ -340,21 +340,21 @@ msgstr ""
 msgid "Error"
 msgstr ""
 
-#: src/Content/EventPostType.php:71
+#: src/Content/EventPostType.php:74
 msgctxt "add new on admin bar"
 msgid "Event"
 msgstr ""
 
-#: src/Content/EventPostType.php:69
+#: src/Content/EventPostType.php:72
 msgctxt "post type singular name"
 msgid "Event"
 msgstr ""
 
-#: src/Content/EventPostType.php:82
+#: src/Content/EventPostType.php:85
 msgid "Event Archives"
 msgstr ""
 
-#: src/Content/EventPostType.php:83
+#: src/Content/EventPostType.php:86
 msgid "Event Attributes"
 msgstr ""
 
@@ -362,7 +362,7 @@ msgstr ""
 msgid "Event name:"
 msgstr ""
 
-#: src/Admin/Admin.php:153 src/Admin/Admin.php:154 src/Admin/EventListBlock.php:988
+#: src/Admin/Admin.php:153 src/Admin/Admin.php:154 src/Admin/EventListBlock.php:994
 msgid "EventMesh"
 msgstr ""
 
@@ -370,15 +370,15 @@ msgstr ""
 msgid "EventMesh can no longer read the saved API key for automatic translation (the site's security keys have changed). Enter the key again."
 msgstr ""
 
-#: src/Content/EventPostType.php:152
+#: src/Content/EventPostType.php:155
 msgid "EventMesh details"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:995
+#: src/Admin/EventListBlock.php:1001
 msgid "EventMesh events"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1141
+#: src/Admin/EventListBlock.php:1147
 msgid "EventMesh events (upcoming + past)"
 msgstr ""
 
@@ -390,25 +390,25 @@ msgstr ""
 msgid "EventMesh: Single event"
 msgstr ""
 
-#: src/Content/EventPostType.php:77
+#: src/Content/EventPostType.php:80
 msgid "Events"
 msgstr ""
 
-#: src/Content/EventPostType.php:70
+#: src/Content/EventPostType.php:73
 msgctxt "admin menu"
 msgid "Events"
 msgstr ""
 
-#: src/Content/EventPostType.php:68
+#: src/Content/EventPostType.php:71
 msgctxt "post type general name"
 msgid "Events"
 msgstr ""
 
-#: src/Content/EventPostType.php:88
+#: src/Content/EventPostType.php:91
 msgid "Events list"
 msgstr ""
 
-#: src/Content/EventPostType.php:87
+#: src/Content/EventPostType.php:90
 msgid "Events list navigation"
 msgstr ""
 
@@ -429,7 +429,7 @@ msgstr ""
 msgid "Every installed connector is listed here. Tick a connector to sync its events; unticking it archives its events (moves them to Draft) on the next sync."
 msgstr ""
 
-#: src/Content/EventPostType.php:169
+#: src/Content/EventPostType.php:172
 msgid "External ID"
 msgstr ""
 
@@ -456,11 +456,11 @@ msgstr ""
 msgid "Failed attempts: %1$d of %2$d (%3$s). Tried again later."
 msgstr ""
 
-#: src/Content/EventPostType.php:233
+#: src/Content/EventPostType.php:236
 msgid "Featured image"
 msgstr ""
 
-#: src/Content/EventPostType.php:230
+#: src/Content/EventPostType.php:233
 msgid "Featured image set"
 msgstr ""
 
@@ -468,7 +468,7 @@ msgstr ""
 msgid "Fetch descriptions now"
 msgstr ""
 
-#: src/Content/EventPostType.php:86
+#: src/Content/EventPostType.php:89
 msgid "Filter events list"
 msgstr ""
 
@@ -476,28 +476,28 @@ msgstr ""
 msgid "Finnish name:"
 msgstr ""
 
-#: src/Content/EventPostType.php:251
+#: src/Content/EventPostType.php:254
 #. translators: %s: field name, e.g. Title
 msgid "Follow source again for %s"
 msgstr ""
 
-#: src/Content/EventPostType.php:331
+#: src/Content/EventPostType.php:334
 msgid "Follow the source"
 msgstr ""
 
-#: src/Content/EventPostType.php:209 src/Content/EventPostType.php:216
+#: src/Content/EventPostType.php:212 src/Content/EventPostType.php:219
 msgid "Following source"
 msgstr ""
 
-#: src/Content/EventPostType.php:333
+#: src/Content/EventPostType.php:336
 msgid "Force available"
 msgstr ""
 
-#: src/Content/EventPostType.php:332
+#: src/Content/EventPostType.php:335
 msgid "Force sold out"
 msgstr ""
 
-#: src/Content/EventPostType.php:309 src/Content/EventPostType.php:337
+#: src/Content/EventPostType.php:312 src/Content/EventPostType.php:340
 msgid "Found:"
 msgstr ""
 
@@ -510,7 +510,7 @@ msgstr ""
 msgid "Held (%ds) — a sync is running or recently died"
 msgstr ""
 
-#: src/Content/EventPostType.php:275
+#: src/Content/EventPostType.php:278
 msgid "Hide from event listings"
 msgstr ""
 
@@ -538,11 +538,11 @@ msgstr ""
 msgid "Idle"
 msgstr ""
 
-#: src/Content/EventPostType.php:84
+#: src/Content/EventPostType.php:87
 msgid "Insert into event"
 msgstr ""
 
-#: src/Content/EventPostType.php:289
+#: src/Content/EventPostType.php:292
 msgid "Keep published if removed from the source"
 msgstr ""
 
@@ -612,7 +612,7 @@ msgstr ""
 msgid "Never"
 msgstr ""
 
-#: src/Content/EventPostType.php:74
+#: src/Content/EventPostType.php:77
 msgid "New Event"
 msgstr ""
 
@@ -640,11 +640,11 @@ msgstr ""
 msgid "No events are available yet."
 msgstr ""
 
-#: src/Content/EventPostType.php:81
+#: src/Content/EventPostType.php:84
 msgid "No events found in Trash."
 msgstr ""
 
-#: src/Content/EventPostType.php:80
+#: src/Content/EventPostType.php:83
 msgid "No events found."
 msgstr ""
 
@@ -652,7 +652,7 @@ msgstr ""
 msgid "No events were found."
 msgstr ""
 
-#: src/Content/EventPostType.php:231
+#: src/Content/EventPostType.php:234
 msgid "No featured image"
 msgstr ""
 
@@ -664,7 +664,7 @@ msgstr ""
 msgid "No other plugins are connected to EventMesh."
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1134
+#: src/Admin/EventListBlock.php:1140
 msgid "No past events."
 msgstr ""
 
@@ -684,7 +684,7 @@ msgstr ""
 msgid "No target languages other than the original."
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1133
+#: src/Admin/EventListBlock.php:1139
 msgid "No upcoming events."
 msgstr ""
 
@@ -692,7 +692,7 @@ msgstr ""
 msgid "None"
 msgstr ""
 
-#: src/Content/EventPostType.php:292
+#: src/Content/EventPostType.php:295
 msgid "Normally an event that no longer appears in its source is moved to Draft on the next sync. Tick this to keep it published; its details stay frozen at the last sync."
 msgstr ""
 
@@ -737,7 +737,7 @@ msgstr ""
 msgid "PHP"
 msgstr ""
 
-#: src/Content/EventPostType.php:79
+#: src/Content/EventPostType.php:82
 msgid "Parent Events:"
 msgstr ""
 
@@ -745,7 +745,7 @@ msgstr ""
 msgid "Past Events"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1131
+#: src/Admin/EventListBlock.php:1137
 msgid "Past events"
 msgstr ""
 
@@ -753,7 +753,7 @@ msgstr ""
 msgid "Plugin"
 msgstr ""
 
-#: src/Content/EventPostType.php:181
+#: src/Content/EventPostType.php:184
 msgid "Price"
 msgstr ""
 
@@ -761,7 +761,7 @@ msgstr ""
 msgid "Provider embeds"
 msgstr ""
 
-#: src/Content/EventPostType.php:187
+#: src/Content/EventPostType.php:190
 msgid "Provider links"
 msgstr ""
 
@@ -785,7 +785,7 @@ msgstr ""
 msgid "Recommended. A page listing many events downloads nothing from Spotify/SoundCloud/Mixcloud until a visitor actually asks to hear something, which is by far the biggest thing you can do for its page speed score. Turn this off to have the players appear ready to play on arrival."
 msgstr ""
 
-#: src/Content/EventPostType.php:171
+#: src/Content/EventPostType.php:174
 msgid "Remote URL"
 msgstr ""
 
@@ -829,7 +829,7 @@ msgstr ""
 msgid "Save the settings first; both buttons use the saved settings."
 msgstr ""
 
-#: src/Content/EventPostType.php:78
+#: src/Content/EventPostType.php:81
 msgid "Search Events"
 msgstr ""
 
@@ -841,11 +841,11 @@ msgstr ""
 msgid "Show a play button and load the player only when clicked"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1132
+#: src/Admin/EventListBlock.php:1138
 msgid "Show more"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:718 src/Content/EventPostType.php:326 src/Content/EventPostType.php:336 templates/frontend/events-card.php:31
+#: src/Admin/EventListBlock.php:718 src/Content/EventPostType.php:329 src/Content/EventPostType.php:339 templates/frontend/events-card.php:31
 #: templates/frontend/events-card.php:46 templates/frontend/events-list.php:34 templates/frontend/events-list.php:58
 msgid "Sold out"
 msgstr ""
@@ -854,7 +854,7 @@ msgstr ""
 msgid "SoundCloud player"
 msgstr ""
 
-#: src/Content/EventPostType.php:167
+#: src/Content/EventPostType.php:170
 msgid "Source"
 msgstr ""
 
@@ -866,7 +866,7 @@ msgstr ""
 msgid "Spotify player"
 msgstr ""
 
-#: src/Content/EventPostType.php:183
+#: src/Content/EventPostType.php:186
 msgid "Starts at"
 msgstr ""
 
@@ -902,7 +902,7 @@ msgstr ""
 msgid "Sync status"
 msgstr ""
 
-#: src/Content/EventPostType.php:218
+#: src/Content/EventPostType.php:221
 msgid "Synced content"
 msgstr ""
 
@@ -966,7 +966,7 @@ msgstr ""
 msgid "The sync request failed. Reload and try again."
 msgstr ""
 
-#: src/Content/EventPostType.php:220
+#: src/Content/EventPostType.php:223
 msgid "The title, description, and featured image follow the source until you edit them, then your version is kept on every sync. Tick a box to discard your version and follow the source again when you save."
 msgstr ""
 
@@ -974,15 +974,19 @@ msgstr ""
 msgid "This will permanently delete all synced events and reset every EventMesh setting. Continue?"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:775 templates/frontend/events-card.php:46 templates/frontend/events-list.php:58
+#: src/Admin/EventListBlock.php:781 templates/frontend/events-card.php:46 templates/frontend/events-list.php:58
 msgid "Tickets"
+msgstr ""
+
+#: src/Admin/EventListBlock.php:767
+msgid "Tickets %s"
 msgstr ""
 
 #: templates/admin/diagnostics.php:168
 msgid "Time"
 msgstr ""
 
-#: src/Admin/TranslationMetaBox.php:173 src/Content/EventPostType.php:222
+#: src/Admin/TranslationMetaBox.php:173 src/Content/EventPostType.php:225
 msgid "Title"
 msgstr ""
 
@@ -1020,7 +1024,7 @@ msgstr ""
 msgid "Twice daily"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1142
+#: src/Admin/EventListBlock.php:1148
 msgid "Two separate, independently styleable Query Loops - one for upcoming events, one for past - each under its own heading, built from ordinary blocks so the layout can be freely rearranged, restyled, or removed."
 msgstr ""
 
@@ -1032,15 +1036,15 @@ msgstr ""
 msgid "Uninstalling"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1130
+#: src/Admin/EventListBlock.php:1136
 msgid "Upcoming events"
 msgstr ""
 
-#: src/Content/EventPostType.php:85
+#: src/Content/EventPostType.php:88
 msgid "Uploaded to this event"
 msgstr ""
 
-#: src/Content/EventPostType.php:182
+#: src/Content/EventPostType.php:185
 msgid "Venue"
 msgstr ""
 
@@ -1048,11 +1052,11 @@ msgstr ""
 msgid "Venue:"
 msgstr ""
 
-#: src/Content/EventPostType.php:76
+#: src/Content/EventPostType.php:79
 msgid "View Event"
 msgstr ""
 
-#: src/Content/EventPostType.php:269
+#: src/Content/EventPostType.php:272
 msgid "Visibility"
 msgstr ""
 
@@ -1088,7 +1092,7 @@ msgstr ""
 msgid "You do not have permission to save this setting."
 msgstr ""
 
-#: src/Admin/EventListBlock.php:999
+#: src/Admin/EventListBlock.php:1005
 msgid "calendar"
 msgstr ""
 
@@ -1096,7 +1100,7 @@ msgstr ""
 msgid "date unknown"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:999 src/Admin/EventListBlock.php:1149
+#: src/Admin/EventListBlock.php:1005 src/Admin/EventListBlock.php:1155
 msgid "events"
 msgstr ""
 
@@ -1108,7 +1112,7 @@ msgstr ""
 msgid "fastcgi_finish_request"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1149
+#: src/Admin/EventListBlock.php:1155
 msgid "layout"
 msgstr ""
 
@@ -1120,7 +1124,7 @@ msgstr ""
 msgid "not written yet"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1149
+#: src/Admin/EventListBlock.php:1155
 msgid "query"
 msgstr ""
 

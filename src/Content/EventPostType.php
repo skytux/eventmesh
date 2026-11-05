@@ -13,6 +13,9 @@ final class EventPostType
 {
     public const NAME = 'eventmesh_event';
 
+    /** The first part of an event's address: /events/<name>/. */
+    public const REWRITE_SLUG = 'events';
+
     /**
      * Nullable/optional: eventmesh.php's activation hook constructs this
      * class directly (new EventPostType()) just to call register() before
@@ -95,7 +98,7 @@ final class EventPostType
                 'supports' => ['title', 'editor', 'excerpt', 'thumbnail', 'custom-fields'],
                 'has_archive' => true,
                 'rewrite' => [
-                    'slug' => 'events',
+                    'slug' => self::REWRITE_SLUG,
                     'with_front' => false,
                 ],
                 'capability_type' => 'post',

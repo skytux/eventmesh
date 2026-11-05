@@ -589,8 +589,28 @@ final class EventListBlockRenderersTest extends TestCase
 
         $html = $this->block()->renderTicketButton([], '', $this->blockInstance(['postId' => 42]));
 
-        self::assertStringContainsString('€15', $html);
-        self::assertStringNotContainsString('Tickets', $html, 'The real price replaces the generic "Tickets" label.');
+        self::assertStringContainsString('>Tickets €15<', $html, 'Without a prefix the price follows "Tickets ".');
+    }
+
+    public function testRenderTicketButtonShowsOnlyThePriceAfterAnEditorPrefix(): void
+    {
+        Functions\when('get_post_meta')->alias(
+            static function (int $postId, string $key) {
+                return match ($key) {
+                    '_eventmesh_url' => 'https://holvi.com/shop/ExampleShop/product/abc123/',
+                    '_eventmesh_price' => '€15',
+                    default => '',
+                };
+            }
+        );
+
+        $html = $this->block()->renderTicketButton(
+            ['prefix' => 'Liput '],
+            '',
+            $this->blockInstance(['postId' => 42])
+        );
+
+        self::assertStringContainsString('>Liput €15<', $html, 'An editor prefix replaces "Tickets ", never doubles it.');
     }
 
     public function testRenderTicketButtonUsesACustomTextAttributeWhenSetAndNoPrice(): void
