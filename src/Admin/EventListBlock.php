@@ -740,7 +740,8 @@ final class EventListBlock
 
     /**
      * The button shows the event's actual price when the block's "Show price"
-     * toggle is on (the default) and the source provided one, falling back to
+     * toggle is on (the default) and the source provided one, after "Tickets "
+     * unless the block has its own prefix, falling back to
      * the block's own custom label, then to "Tickets". With the toggle off, the
      * price is skipped entirely so the custom label / "Tickets" always wins -
      * letting an editor place one price button and one plain button side by
@@ -758,7 +759,12 @@ final class EventListBlock
             $price = EventMeta::resolve($postId, 'price');
 
             if ('' !== $price) {
-                return $price;
+                // Without an editor-set prefix the price alone would not say
+                // what the button is for: "Tickets 22.00 EUR".
+                $prefix = isset($attributes['prefix']) && is_string($attributes['prefix']) ? $attributes['prefix'] : '';
+
+                /* translators: %s: the ticket price, e.g. "22.00 EUR". */
+                return '' === $prefix ? sprintf(__('Tickets %s', 'eventmesh'), $price) : $price;
             }
         }
 
