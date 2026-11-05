@@ -19,6 +19,11 @@
     -->
     <rule ref="PSR12"/>
 
+    <!-- Templates are mostly HTML; long lines there are markup, not code. -->
+    <rule ref="Generic.Files.LineLength">
+        <exclude-pattern>templates/*</exclude-pattern>
+    </rule>
+
     <rule ref="WordPress.Security.EscapeOutput">
         <!-- Flags variables interpolated into exception messages as unescaped
              output, but exception messages are never rendered as HTML. -->

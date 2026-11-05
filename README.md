@@ -139,6 +139,9 @@ CI (GitHub Actions) runs PHPUnit and PHPCS on every push and pull request.
 
 ## Changelog
 
+### 1.10.2
+- Developer: the line-length rule of the code style check (phpcs) no longer applies to templates/ (Q231).
+
 ### 1.10.1
 - Developer: the code style check (phpcs) now also covers templates/; no change in output.
 

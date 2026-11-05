@@ -4,7 +4,7 @@ Tags: events, sync, holvi, gutenberg, event list
 Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 1.10.1
+Stable tag: 1.10.2
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -136,6 +136,9 @@ No. The only outgoing requests are the ones described under External services, a
 
 == Changelog ==
 
+= 1.10.2 =
+* Developer: the line-length rule of the code style check (phpcs) no longer applies to templates/ (Q231).
+
 = 1.10.1 =
 * Developer: the code style check (phpcs) now also covers templates/; no change in output.
 
@@ -200,6 +203,9 @@ No. The only outgoing requests are the ones described under External services, a
 * Built-in dummy/test source (enable in Sources) for demos.
 
 == Upgrade Notice ==
+
+= 1.10.2 =
+Developer change only; nothing changes in the output or the database.
 
 = 1.10.1 =
 Developer change only; nothing changes in the output or the database.
