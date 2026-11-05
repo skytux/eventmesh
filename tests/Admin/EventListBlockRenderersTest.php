@@ -180,6 +180,44 @@ final class EventListBlockRenderersTest extends TestCase
         self::assertStringContainsString('Some Band', $html);
     }
 
+    /**
+     * @return array<string, array{0: string, 1: string}>
+     */
+    public static function blockTagProvider(): array
+    {
+        return [
+            'p' => ['p', 'p'],
+            'h1' => ['h1', 'h1'],
+            'h6' => ['h6', 'h6'],
+            'div' => ['div', 'div'],
+            'span' => ['span', 'span'],
+            'upper case' => ['H2', 'h2'],
+            'script' => ['script', 'p'],
+            'attribute injection' => ['img src=x onerror=alert(1)', 'p'],
+            'a' => ['a', 'p'],
+            'empty' => ['', 'p'],
+        ];
+    }
+
+    /**
+     * @dataProvider blockTagProvider
+     */
+    public function testRenderEventFieldOnlyUsesAnAllowedTag(string $tag, string $expected): void
+    {
+        Functions\when('get_the_title')->justReturn('Some Band');
+        Functions\when('get_post_meta')->justReturn('');
+
+        $html = $this->block()->renderEventField(
+            ['field' => 'title', 'tag' => $tag],
+            '',
+            $this->blockInstance(['postId' => 42])
+        );
+
+        self::assertStringStartsWith('<' . $expected . ' ', $html);
+        self::assertStringEndsWith('</' . $expected . '>', $html);
+        self::assertStringNotContainsString('onerror', $html);
+    }
+
     public function testRenderEventFieldTitleIsNotStruckThroughForAnOrdinaryTitle(): void
     {
         Functions\when('get_the_title')->justReturn('Some Band 12.8.2026');
@@ -983,6 +1021,21 @@ final class EventListBlockRenderersTest extends TestCase
 
         self::assertStringStartsWith('<h2 ', $html);
         self::assertStringContainsString('Archive', $html);
+    }
+
+    public function testRenderPastEventsMarkerFallsBackToH3ForATagOutsideTheAllowList(): void
+    {
+        Functions\when('get_post_meta')->justReturn('2000-01-01T00:00:00+00:00');
+
+        $html = $this->block()->renderPastEventsMarker(
+            ['tag' => 'img src=x onerror=alert(1)'],
+            '',
+            $this->blockInstance(['postId' => 1])
+        );
+
+        self::assertStringStartsWith('<h3 ', $html);
+        self::assertStringEndsWith('</h3>', $html);
+        self::assertStringNotContainsString('onerror', $html);
     }
 
     public function testResetPastEventsMarkerAllowsTheMarkerToRenderAgainForANewLoop(): void

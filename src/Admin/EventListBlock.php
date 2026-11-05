@@ -25,6 +25,13 @@ final class EventListBlock
     private const THUMBNAIL_MAX_WIDTH = 150;
 
     /**
+     * The only element names the field and past-events-marker blocks may wrap
+     * their text in. The "tag" attribute is stored in the post, so anyone who
+     * can write a post could otherwise put any markup there.
+     */
+    private const ALLOWED_TAGS = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div', 'span'];
+
+    /**
      * Tracks whether eventmesh/past-events-marker has already rendered its
      * heading for the Query Loop currently being rendered - reset by
      * resetPastEventsMarker() right as each Query Loop's own query is built
@@ -245,9 +252,7 @@ final class EventListBlock
 
         $this->pastEventsMarkerShown = true;
 
-        $tag = isset($attributes['tag']) && is_string($attributes['tag']) && '' !== $attributes['tag']
-            ? $attributes['tag']
-            : 'h3';
+        $tag = $this->blockTag($attributes, 'h3');
         // WordPress fills in block.json's English default ("Past Events") for
         // a block whose text was never changed, so that value is translated
         // here rather than printed as typed text.
@@ -257,6 +262,19 @@ final class EventListBlock
             : __('Past Events', 'eventmesh');
 
         return sprintf('<%1$s %2$s>%3$s</%1$s>', esc_html($tag), get_block_wrapper_attributes(), esc_html($text));
+    }
+
+    /**
+     * The block's "tag" attribute when it is one of ALLOWED_TAGS, otherwise
+     * $defaultTag.
+     *
+     * @param array<string, mixed> $attributes
+     */
+    private function blockTag(array $attributes, string $defaultTag): string
+    {
+        $tag = isset($attributes['tag']) && is_string($attributes['tag']) ? strtolower($attributes['tag']) : '';
+
+        return in_array($tag, self::ALLOWED_TAGS, true) ? $tag : $defaultTag;
     }
 
     private function isPastEvent(int $postId): bool
@@ -442,9 +460,7 @@ final class EventListBlock
         string $extraAttrs = '',
         string $afterHtml = ''
     ): string {
-        $tag = isset($attributes['tag']) && is_string($attributes['tag']) && '' !== $attributes['tag']
-            ? $attributes['tag']
-            : $defaultTag;
+        $tag = $this->blockTag($attributes, $defaultTag);
         $linked = isset($attributes['linked']) && (bool) $attributes['linked'];
 
         $inner = match (true) {

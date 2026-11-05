@@ -139,6 +139,9 @@ CI (GitHub Actions) runs PHPUnit and PHPCS on every push and pull request.
 
 ## Changelog
 
+### 1.10.4
+- The event field and past-events heading blocks only accept p, h1-h6, div or span as their tag (Q250).
+
 ### 1.10.3
 - "Sync now" cleans the synced title and text the same way the automatic sync does (Q249).
 

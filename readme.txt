@@ -4,7 +4,7 @@ Tags: events, sync, holvi, gutenberg, event list
 Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 1.10.3
+Stable tag: 1.10.4
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -136,6 +136,9 @@ No. The only outgoing requests are the ones described under External services, a
 
 == Changelog ==
 
+= 1.10.4 =
+* The event field and past-events heading blocks only accept p, h1-h6, div or span as their tag (Q250).
+
 = 1.10.3 =
 * "Sync now" cleans the synced title and text the same way the automatic sync does (Q249).
 
@@ -206,6 +209,9 @@ No. The only outgoing requests are the ones described under External services, a
 * Built-in dummy/test source (enable in Sources) for demos.
 
 == Upgrade Notice ==
+
+= 1.10.4 =
+Security fix. No database schema change.
 
 = 1.10.3 =
 Security fix. No database schema change.
