@@ -139,6 +139,9 @@ CI (GitHub Actions) runs PHPUnit and PHPCS on every push and pull request.
 
 ## Changelog
 
+### 1.10.8
+- New public function eventmesh_display_title() gives an event title in a chosen language, without the date. The event list block uses it when an event has no clean name (Q312).
+
 ### 1.10.7
 - The event list block shows "At most 50." under its number of events, and the slider goes up to 50 (Q265).
 

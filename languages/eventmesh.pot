@@ -9,28 +9,28 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Domain: eventmesh\n"
 
-#: templates/admin/djs.php:78
+#: templates/admin/djs.php:79
 #. translators: %d: number of DJs
 msgid "%d DJ profile will be fetched in the background."
 msgid_plural "%d DJ profiles will be fetched in the background."
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/admin/djs.php:68
+#: templates/admin/djs.php:69
 #. translators: %d: number of DJs
 msgid "%d DJ got a new or changed description."
 msgid_plural "%d DJs got a new or changed description."
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/admin/djs.php:57
+#: templates/admin/djs.php:58
 #. translators: %d: number of future events
 msgid "%d future event got new or changed links."
 msgid_plural "%d future events got new or changed links."
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/admin/dashboard.php:58
+#: templates/admin/dashboard.php:59
 msgid "(change in Settings)"
 msgstr ""
 
@@ -42,35 +42,35 @@ msgstr ""
 msgid "(the text has changed; it will be checked again)"
 msgstr ""
 
-#: templates/admin/djs.php:37
+#: templates/admin/djs.php:38
 msgid "A DJ needs a name."
 msgstr ""
 
-#: templates/admin/djs.php:210
+#: templates/admin/djs.php:211
 msgid "A DJ without a typed description gets the text under its name on the team page: a heading (h2 to h4) that is the DJ name or other spelling, and the paragraphs after it. A DJ not on the team page gets the profile text from SoundCloud or Mixcloud. Other plugins read the descriptions with the eventmesh/event_djs filter."
 msgstr ""
 
-#: templates/admin/djs.php:180
+#: templates/admin/djs.php:181
 msgid "A few sentences in English about the DJ. Text you type here is kept as it is. Leave it empty to fill it from the team page or the SoundCloud or Mixcloud profile."
 msgstr ""
 
-#: templates/admin/settings.php:151
+#: templates/admin/settings.php:152
 msgid "A key is saved. Leave empty to keep the saved key."
 msgstr ""
 
-#: templates/admin/settings.php:124
+#: templates/admin/settings.php:125
 msgid "API URL"
 msgstr ""
 
-#: templates/admin/settings.php:143
+#: templates/admin/settings.php:144
 msgid "API key"
 msgstr ""
 
-#: templates/admin/djs.php:102
+#: templates/admin/djs.php:103
 msgid "Actions"
 msgstr ""
 
-#: templates/admin/djs.php:150
+#: templates/admin/djs.php:151
 msgid "Add DJ"
 msgstr ""
 
@@ -83,23 +83,23 @@ msgstr ""
 msgid "Add New Event"
 msgstr ""
 
-#: templates/admin/sources.php:108
+#: templates/admin/sources.php:109
 msgid "Add another source"
 msgstr ""
 
-#: templates/admin/sources.php:71
+#: templates/admin/sources.php:72
 msgid "Add one or more Holvi event URLs. Each row can be enabled or disabled independently."
 msgstr ""
 
-#: templates/admin/settings.php:174
+#: templates/admin/settings.php:175
 msgid "An event is never translated into its own original language."
 msgstr ""
 
-#: templates/admin/dashboard.php:55
+#: templates/admin/dashboard.php:56
 msgid "Automatic sync"
 msgstr ""
 
-#: templates/admin/settings.php:101 templates/admin/settings.php:110
+#: templates/admin/settings.php:102 templates/admin/settings.php:111
 msgid "Automatic translation"
 msgstr ""
 
@@ -132,7 +132,7 @@ msgstr ""
 msgid "Back to automatic"
 msgstr ""
 
-#: templates/admin/diagnostics.php:65 templates/admin/settings.php:44
+#: templates/admin/diagnostics.php:65 templates/admin/settings.php:45
 msgid "Background sync"
 msgstr ""
 
@@ -140,11 +140,11 @@ msgstr ""
 msgid "Background sync health"
 msgstr ""
 
-#: templates/frontend/sync-status.php:38
+#: templates/frontend/sync-status.php:39
 msgid "Background sync:"
 msgstr ""
 
-#: templates/admin/djs.php:200
+#: templates/admin/djs.php:201
 msgid "Cancel"
 msgstr ""
 
@@ -169,11 +169,11 @@ msgstr ""
 msgid "Connection failed: %s"
 msgstr ""
 
-#: templates/admin/sources.php:37
+#: templates/admin/sources.php:38
 msgid "Connector"
 msgstr ""
 
-#: templates/admin/sources.php:29
+#: templates/admin/sources.php:30
 msgid "Connectors"
 msgstr ""
 
@@ -191,7 +191,8 @@ msgstr ""
 msgid "Created %1$d, updated %2$d, failed %3$d, skipped %4$d, archived %5$d."
 msgstr ""
 
-#: templates/frontend/sync-status.php:29
+#: templates/frontend/sync-status.php:30
+#. translators: 1: events created, 2: events updated, 3: events failed, 4: events skipped.
 msgid "Created %1$d, updated %2$d, failed %3$d, skipped %4$d."
 msgstr ""
 
@@ -199,12 +200,12 @@ msgstr ""
 msgid "Customized"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:579
+#: src/Admin/EventListBlock.php:609
 #. translators: event date without year, as a PHP date() format, e.g. Finnish "D j.n."
 msgid "D j F"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:577
+#: src/Admin/EventListBlock.php:607
 #. translators: event date with year, as a PHP date() format, e.g. Finnish "D j.n.Y"
 msgid "D j F Y"
 msgstr ""
@@ -213,11 +214,11 @@ msgstr ""
 msgid "DISABLE_WP_CRON"
 msgstr ""
 
-#: templates/admin/djs.php:36
+#: templates/admin/djs.php:37
 msgid "DJ deleted."
 msgstr ""
 
-#: templates/admin/djs.php:96 templates/admin/djs.php:159
+#: templates/admin/djs.php:97 templates/admin/djs.php:160
 msgid "DJ name"
 msgstr ""
 
@@ -225,11 +226,11 @@ msgstr ""
 msgid "DJ names:"
 msgstr ""
 
-#: templates/admin/djs.php:35
+#: templates/admin/djs.php:36
 msgid "DJ saved."
 msgstr ""
 
-#: src/Admin/DjsPage.php:42 src/Admin/DjsPage.php:43 templates/admin/djs.php:46
+#: src/Admin/DjsPage.php:42 src/Admin/DjsPage.php:43 templates/admin/djs.php:47
 msgid "DJs"
 msgstr ""
 
@@ -237,31 +238,31 @@ msgstr ""
 msgid "Daily"
 msgstr ""
 
-#: src/Admin/Admin.php:164 src/Admin/Admin.php:165 templates/admin/dashboard.php:27
+#: src/Admin/Admin.php:164 src/Admin/Admin.php:165 templates/admin/dashboard.php:28
 msgid "Dashboard"
 msgstr ""
 
-#: templates/admin/djs.php:141
+#: templates/admin/djs.php:142
 msgid "Delete"
 msgstr ""
 
-#: templates/admin/settings.php:243
+#: templates/admin/settings.php:244
 msgid "Delete all EventMesh data when the plugin is deleted"
 msgstr ""
 
-#: templates/admin/djs.php:140
+#: templates/admin/djs.php:141
 msgid "Delete this DJ?"
 msgstr ""
 
-#: src/Content/EventPostType.php:223 templates/admin/djs.php:101 templates/admin/djs.php:176
+#: src/Content/EventPostType.php:223 templates/admin/djs.php:102 templates/admin/djs.php:177
 msgid "Description"
 msgstr ""
 
-#: templates/admin/djs.php:207
+#: templates/admin/djs.php:208
 msgid "Descriptions"
 msgstr ""
 
-#: templates/admin/djs.php:41
+#: templates/admin/djs.php:42
 msgid "Descriptions fetched."
 msgstr ""
 
@@ -273,11 +274,11 @@ msgstr ""
 msgid "Disable (also returns 404 on its own page)"
 msgstr ""
 
-#: templates/admin/dashboard.php:57 templates/admin/dashboard.php:160 templates/admin/diagnostics.php:70 templates/frontend/sync-status.php:39
+#: templates/admin/dashboard.php:58 templates/admin/dashboard.php:161 templates/admin/diagnostics.php:70 templates/frontend/sync-status.php:40
 msgid "Disabled"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:931
+#: src/Admin/EventListBlock.php:996
 msgid "Displays a curated list of upcoming events."
 msgstr ""
 
@@ -285,7 +286,7 @@ msgstr ""
 msgid "Dummy (testing)"
 msgstr ""
 
-#: templates/admin/sources.php:115
+#: templates/admin/sources.php:116
 msgid "Dummy (testing) — sample events"
 msgstr ""
 
@@ -293,15 +294,15 @@ msgstr ""
 msgid "Each field shows the value found on the last sync; type a value below it to override what appears on the front end. Overrides are kept and never replaced by a later sync. Leave blank to use the found value."
 msgstr ""
 
-#: templates/admin/djs.php:38
+#: templates/admin/djs.php:39
 msgid "Each link must be an address on its own service: a Spotify link in the Spotify field, and so on."
 msgstr ""
 
-#: templates/admin/djs.php:137
+#: templates/admin/djs.php:138
 msgid "Edit"
 msgstr ""
 
-#: templates/admin/djs.php:150
+#: templates/admin/djs.php:151
 msgid "Edit DJ"
 msgstr ""
 
@@ -317,13 +318,13 @@ msgstr ""
 msgid "Embedded media player"
 msgstr ""
 
-#: templates/admin/settings.php:49
+#: templates/admin/settings.php:50
 msgid "Enable automatic background synchronization"
 msgstr ""
 
-#: templates/admin/dashboard.php:57 templates/admin/dashboard.php:159 templates/admin/diagnostics.php:69 templates/admin/sources.php:39
-#: templates/admin/sources.php:59 templates/admin/sources.php:80 templates/admin/sources.php:95 templates/admin/sources.php:153
-#: templates/frontend/sync-status.php:39
+#: templates/admin/dashboard.php:58 templates/admin/dashboard.php:160 templates/admin/diagnostics.php:69 templates/admin/sources.php:40
+#: templates/admin/sources.php:60 templates/admin/sources.php:81 templates/admin/sources.php:96 templates/admin/sources.php:154
+#: templates/frontend/sync-status.php:40
 msgid "Enabled"
 msgstr ""
 
@@ -335,7 +336,7 @@ msgstr ""
 msgid "Enter the API URL, model and key first."
 msgstr ""
 
-#: src/Support/SyncStatus.php:22 templates/admin/dashboard.php:201
+#: src/Support/SyncStatus.php:22 templates/admin/dashboard.php:202
 msgid "Error"
 msgstr ""
 
@@ -361,7 +362,7 @@ msgstr ""
 msgid "Event name:"
 msgstr ""
 
-#: src/Admin/Admin.php:153 src/Admin/Admin.php:154 src/Admin/EventListBlock.php:923
+#: src/Admin/Admin.php:153 src/Admin/Admin.php:154 src/Admin/EventListBlock.php:988
 msgid "EventMesh"
 msgstr ""
 
@@ -373,11 +374,11 @@ msgstr ""
 msgid "EventMesh details"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:930
+#: src/Admin/EventListBlock.php:995
 msgid "EventMesh events"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1076
+#: src/Admin/EventListBlock.php:1141
 msgid "EventMesh events (upcoming + past)"
 msgstr ""
 
@@ -411,7 +412,7 @@ msgstr ""
 msgid "Events list navigation"
 msgstr ""
 
-#: templates/admin/settings.php:188
+#: templates/admin/settings.php:189
 #. translators: %d: number of events
 msgid "Events waiting for translation: %d"
 msgstr ""
@@ -424,7 +425,7 @@ msgstr ""
 msgid "Every 30 minutes"
 msgstr ""
 
-#: templates/admin/sources.php:31
+#: templates/admin/sources.php:32
 msgid "Every installed connector is listed here. Tick a connector to sync its events; unticking it archives its events (moves them to Draft) on the next sync."
 msgstr ""
 
@@ -432,11 +433,11 @@ msgstr ""
 msgid "External ID"
 msgstr ""
 
-#: templates/admin/settings.php:269
+#: templates/admin/settings.php:270
 msgid "Factory Reset"
 msgstr ""
 
-#: templates/admin/settings.php:258
+#: templates/admin/settings.php:259
 msgid "Factory reset"
 msgstr ""
 
@@ -463,7 +464,7 @@ msgstr ""
 msgid "Featured image set"
 msgstr ""
 
-#: templates/admin/djs.php:244
+#: templates/admin/djs.php:245
 msgid "Fetch descriptions now"
 msgstr ""
 
@@ -517,7 +518,7 @@ msgstr ""
 msgid "Holvi"
 msgstr ""
 
-#: templates/admin/sources.php:69
+#: templates/admin/sources.php:70
 msgid "Holvi source URLs"
 msgstr ""
 
@@ -525,11 +526,11 @@ msgstr ""
 msgid "Hourly"
 msgstr ""
 
-#: templates/admin/settings.php:71
+#: templates/admin/settings.php:72
 msgid "How often background sync runs. Actual timing still depends on site traffic unless real server cron is configured."
 msgstr ""
 
-#: templates/admin/sources.php:38
+#: templates/admin/sources.php:39
 msgid "ID"
 msgstr ""
 
@@ -549,11 +550,11 @@ msgstr ""
 msgid "Last completed sync"
 msgstr ""
 
-#: templates/admin/dashboard.php:45
+#: templates/admin/dashboard.php:46
 msgid "Last error"
 msgstr ""
 
-#: templates/admin/settings.php:212
+#: templates/admin/settings.php:213
 #. translators: %s: short error kind, e.g. http_401 or network
 msgid "Last error: %s"
 msgstr ""
@@ -562,12 +563,12 @@ msgstr ""
 msgid "Last run:"
 msgstr ""
 
-#: templates/admin/settings.php:200
+#: templates/admin/settings.php:201
 #. translators: 1: date and time, 2: translations made, 3: translations that failed the check
 msgid "Last run: %1$s. Translated %2$d, failed the check %3$d."
 msgstr ""
 
-#: templates/admin/dashboard.php:41
+#: templates/admin/dashboard.php:42
 msgid "Last sync"
 msgstr ""
 
@@ -587,7 +588,7 @@ msgstr ""
 msgid "Listen to this DJ"
 msgstr ""
 
-#: templates/admin/settings.php:90
+#: templates/admin/settings.php:91
 msgid "Load embedded players only when scrolled into view"
 msgstr ""
 
@@ -603,7 +604,7 @@ msgstr ""
 msgid "Mixcloud player"
 msgstr ""
 
-#: templates/admin/settings.php:135
+#: templates/admin/settings.php:136
 msgid "Model"
 msgstr ""
 
@@ -615,19 +616,19 @@ msgstr ""
 msgid "New Event"
 msgstr ""
 
-#: templates/frontend/sync-status.php:43
+#: templates/frontend/sync-status.php:44
 msgid "Next run:"
 msgstr ""
 
-#: templates/admin/dashboard.php:62 templates/admin/diagnostics.php:85
+#: templates/admin/dashboard.php:63 templates/admin/diagnostics.php:85
 msgid "Next scheduled sync"
 msgstr ""
 
-#: templates/admin/djs.php:109
+#: templates/admin/djs.php:110
 msgid "No DJs yet."
 msgstr ""
 
-#: templates/admin/sources.php:46
+#: templates/admin/sources.php:47
 msgid "No connectors are installed yet."
 msgstr ""
 
@@ -655,7 +656,7 @@ msgstr ""
 msgid "No featured image"
 msgstr ""
 
-#: templates/admin/settings.php:154
+#: templates/admin/settings.php:155
 msgid "No key saved."
 msgstr ""
 
@@ -663,11 +664,11 @@ msgstr ""
 msgid "No other plugins are connected to EventMesh."
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1069
+#: src/Admin/EventListBlock.php:1134
 msgid "No past events."
 msgstr ""
 
-#: templates/admin/dashboard.php:87 templates/admin/dashboard.php:130 templates/admin/diagnostics.php:163
+#: templates/admin/dashboard.php:88 templates/admin/dashboard.php:131 templates/admin/diagnostics.php:163
 msgid "No recent log entries yet."
 msgstr ""
 
@@ -683,11 +684,11 @@ msgstr ""
 msgid "No target languages other than the original."
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1068
+#: src/Admin/EventListBlock.php:1133
 msgid "No upcoming events."
 msgstr ""
 
-#: templates/admin/dashboard.php:49 templates/admin/dashboard.php:171 templates/admin/djs.php:227
+#: templates/admin/dashboard.php:50 templates/admin/dashboard.php:172 templates/admin/djs.php:228
 msgid "None"
 msgstr ""
 
@@ -707,20 +708,20 @@ msgstr ""
 msgid "Not translated yet."
 msgstr ""
 
-#: templates/admin/djs.php:186
+#: templates/admin/djs.php:187
 #. translators: %s: where the description came from, such as Team page or SoundCloud
 msgid "Now from: %s."
 msgstr ""
 
-#: templates/admin/settings.php:246
+#: templates/admin/settings.php:247
 msgid "Off by default: deleting the plugin keeps every synced event and setting so reinstalling picks up where you left off."
 msgstr ""
 
-#: templates/admin/djs.php:166
+#: templates/admin/djs.php:167
 msgid "One per line. Matched the same way as the name."
 msgstr ""
 
-#: templates/admin/settings.php:94
+#: templates/admin/settings.php:95
 msgid "Only applies when the play button above is off. Players still load on their own, just not until the visitor scrolls to them. Players without JavaScript fall back to loading normally."
 msgstr ""
 
@@ -728,7 +729,7 @@ msgstr ""
 msgid "Original language:"
 msgstr ""
 
-#: templates/admin/djs.php:97 templates/admin/djs.php:163
+#: templates/admin/djs.php:98 templates/admin/djs.php:164
 msgid "Other spellings"
 msgstr ""
 
@@ -740,11 +741,11 @@ msgstr ""
 msgid "Parent Events:"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:257 templates/frontend/events-card.php:22 templates/frontend/events-list.php:23
+#: src/Admin/EventListBlock.php:275 templates/frontend/events-card.php:22 templates/frontend/events-list.php:23
 msgid "Past Events"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1066
+#: src/Admin/EventListBlock.php:1131
 msgid "Past events"
 msgstr ""
 
@@ -756,7 +757,7 @@ msgstr ""
 msgid "Price"
 msgstr ""
 
-#: templates/admin/settings.php:77
+#: templates/admin/settings.php:78
 msgid "Provider embeds"
 msgstr ""
 
@@ -764,11 +765,11 @@ msgstr ""
 msgid "Provider links"
 msgstr ""
 
-#: templates/admin/dashboard.php:66
+#: templates/admin/dashboard.php:67
 msgid "Published events"
 msgstr ""
 
-#: templates/admin/djs.php:245
+#: templates/admin/djs.php:246
 msgid "Reads the team page and every profile again. Typed descriptions are not changed."
 msgstr ""
 
@@ -776,11 +777,11 @@ msgstr ""
 msgid "Recent EventMesh activity"
 msgstr ""
 
-#: templates/admin/dashboard.php:84
+#: templates/admin/dashboard.php:85
 msgid "Recent activity"
 msgstr ""
 
-#: templates/admin/settings.php:86
+#: templates/admin/settings.php:87
 msgid "Recommended. A page listing many events downloads nothing from Spotify/SoundCloud/Mixcloud until a visitor actually asks to hear something, which is by far the biggest thing you can do for its page speed score. Turn this off to have the players appear ready to play on arrival."
 msgstr ""
 
@@ -788,15 +789,15 @@ msgstr ""
 msgid "Remote URL"
 msgstr ""
 
-#: templates/admin/sources.php:85 templates/admin/sources.php:100 templates/admin/sources.php:153
+#: templates/admin/sources.php:86 templates/admin/sources.php:101 templates/admin/sources.php:154
 msgid "Remove"
 msgstr ""
 
-#: templates/admin/settings.php:152
+#: templates/admin/settings.php:153
 msgid "Remove key"
 msgstr ""
 
-#: templates/admin/settings.php:260
+#: templates/admin/settings.php:261
 msgid "Removes every synced event and resets all EventMesh settings to their defaults. The plugin itself stays installed and active. This cannot be undone."
 msgstr ""
 
@@ -804,27 +805,27 @@ msgstr ""
 msgid "Running"
 msgstr ""
 
-#: templates/admin/settings.php:118
+#: templates/admin/settings.php:119
 msgid "Runs only when the API URL, model and key below are all set."
 msgstr ""
 
-#: templates/admin/djs.php:198
+#: templates/admin/djs.php:199
 msgid "Save DJ"
 msgstr ""
 
-#: templates/admin/settings.php:253
+#: templates/admin/settings.php:254
 msgid "Save Settings"
 msgstr ""
 
-#: templates/admin/sources.php:129
+#: templates/admin/sources.php:130
 msgid "Save sources"
 msgstr ""
 
-#: templates/admin/djs.php:237
+#: templates/admin/djs.php:238
 msgid "Save team page"
 msgstr ""
 
-#: templates/admin/settings.php:227
+#: templates/admin/settings.php:228
 msgid "Save the settings first; both buttons use the saved settings."
 msgstr ""
 
@@ -832,19 +833,19 @@ msgstr ""
 msgid "Search Events"
 msgstr ""
 
-#: src/Admin/Admin.php:191 src/Admin/Admin.php:192 src/Admin/SettingsPage.php:242 templates/admin/settings.php:34
+#: src/Admin/Admin.php:191 src/Admin/Admin.php:192 src/Admin/SettingsPage.php:242 templates/admin/settings.php:35
 msgid "Settings"
 msgstr ""
 
-#: templates/admin/settings.php:82
+#: templates/admin/settings.php:83
 msgid "Show a play button and load the player only when clicked"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1067
+#: src/Admin/EventListBlock.php:1132
 msgid "Show more"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:688 src/Content/EventPostType.php:326 src/Content/EventPostType.php:336 templates/frontend/events-card.php:31
+#: src/Admin/EventListBlock.php:718 src/Content/EventPostType.php:326 src/Content/EventPostType.php:336 templates/frontend/events-card.php:31
 #: templates/frontend/events-card.php:46 templates/frontend/events-list.php:34 templates/frontend/events-list.php:58
 msgid "Sold out"
 msgstr ""
@@ -857,7 +858,7 @@ msgstr ""
 msgid "Source"
 msgstr ""
 
-#: src/Admin/Admin.php:173 src/Admin/Admin.php:174 templates/admin/sources.php:23
+#: src/Admin/Admin.php:173 src/Admin/Admin.php:174 templates/admin/sources.php:24
 msgid "Sources"
 msgstr ""
 
@@ -873,7 +874,7 @@ msgstr ""
 msgid "Starts:"
 msgstr ""
 
-#: templates/admin/dashboard.php:34 templates/admin/diagnostics.php:146 templates/admin/settings.php:180
+#: templates/admin/dashboard.php:35 templates/admin/diagnostics.php:146 templates/admin/settings.php:181
 msgid "Status"
 msgstr ""
 
@@ -885,7 +886,7 @@ msgstr ""
 msgid "Sync in progress…"
 msgstr ""
 
-#: templates/admin/settings.php:59
+#: templates/admin/settings.php:60
 msgid "Sync interval"
 msgstr ""
 
@@ -893,11 +894,11 @@ msgstr ""
 msgid "Sync lock"
 msgstr ""
 
-#: templates/admin/dashboard.php:80
+#: templates/admin/dashboard.php:81
 msgid "Sync now"
 msgstr ""
 
-#: templates/admin/dashboard.php:29
+#: templates/admin/dashboard.php:30
 msgid "Sync status"
 msgstr ""
 
@@ -905,15 +906,15 @@ msgstr ""
 msgid "Synced content"
 msgstr ""
 
-#: src/Admin/DjsPage.php:219 templates/admin/djs.php:219
+#: src/Admin/DjsPage.php:219 templates/admin/djs.php:220
 msgid "Team page"
 msgstr ""
 
-#: templates/admin/djs.php:40
+#: templates/admin/djs.php:41
 msgid "Team page saved."
 msgstr ""
 
-#: templates/admin/settings.php:224
+#: templates/admin/settings.php:225
 msgid "Test connection"
 msgstr ""
 
@@ -921,7 +922,7 @@ msgstr ""
 msgid "The API key was removed."
 msgstr ""
 
-#: templates/admin/djs.php:39
+#: templates/admin/djs.php:40
 msgid "The DJ could not be saved."
 msgstr ""
 
@@ -933,15 +934,15 @@ msgstr ""
 msgid "The background sync is overdue. WordPress runs it via a loopback request, which this host appears to block. Add define('DISABLE_WP_CRON', true); to wp-config.php and trigger wp-cron.php from a system cron (or external scheduler) instead."
 msgstr ""
 
-#: templates/admin/settings.php:129
+#: templates/admin/settings.php:130
 msgid "The base URL, without /chat/completions at the end."
 msgstr ""
 
-#: templates/admin/sources.php:117
+#: templates/admin/sources.php:118
 msgid "The dummy connector has no URLs. When enabled above, it generates these sample events on each sync — no network calls:"
 msgstr ""
 
-#: templates/admin/settings.php:158
+#: templates/admin/settings.php:159
 msgid "The key is stored encrypted and is never shown again."
 msgstr ""
 
@@ -957,11 +958,11 @@ msgstr ""
 msgid "The requested EventMesh admin view could not be loaded."
 msgstr ""
 
-#: templates/admin/settings.php:149
+#: templates/admin/settings.php:150
 msgid "The saved key can no longer be read (the site's security keys have changed). Enter it again."
 msgstr ""
 
-#: templates/admin/dashboard.php:202
+#: templates/admin/dashboard.php:203
 msgid "The sync request failed. Reload and try again."
 msgstr ""
 
@@ -969,11 +970,11 @@ msgstr ""
 msgid "The title, description, and featured image follow the source until you edit them, then your version is kept on every sync. Tick a box to discard your version and follow the source again when you save."
 msgstr ""
 
-#: templates/admin/settings.php:265
+#: templates/admin/settings.php:266
 msgid "This will permanently delete all synced events and reset every EventMesh setting. Continue?"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:745 templates/frontend/events-card.php:46 templates/frontend/events-list.php:58
+#: src/Admin/EventListBlock.php:775 templates/frontend/events-card.php:46 templates/frontend/events-list.php:58
 msgid "Tickets"
 msgstr ""
 
@@ -985,15 +986,15 @@ msgstr ""
 msgid "Title"
 msgstr ""
 
-#: templates/admin/settings.php:115
+#: templates/admin/settings.php:116
 msgid "Translate events automatically"
 msgstr ""
 
-#: templates/admin/settings.php:164
+#: templates/admin/settings.php:165
 msgid "Translate into"
 msgstr ""
 
-#: templates/admin/settings.php:222
+#: templates/admin/settings.php:223
 msgid "Translate now"
 msgstr ""
 
@@ -1007,7 +1008,7 @@ msgstr ""
 msgid "Translated %1$d. Stopped by an error from the LLM server: %2$s. It is tried again later."
 msgstr ""
 
-#: templates/admin/settings.php:104
+#: templates/admin/settings.php:105
 msgid "Translates the title and text of each event with a language model on a server you choose (any service with an OpenAI-compatible chat completions API). Only the event title and text are sent. Translations are shown to visitors who view the site in another language."
 msgstr ""
 
@@ -1019,7 +1020,7 @@ msgstr ""
 msgid "Twice daily"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1077
+#: src/Admin/EventListBlock.php:1142
 msgid "Two separate, independently styleable Query Loops - one for upcoming events, one for past - each under its own heading, built from ordinary blocks so the layout can be freely rearranged, restyled, or removed."
 msgstr ""
 
@@ -1027,11 +1028,11 @@ msgstr ""
 msgid "Typed here"
 msgstr ""
 
-#: templates/admin/settings.php:238
+#: templates/admin/settings.php:239
 msgid "Uninstalling"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1065
+#: src/Admin/EventListBlock.php:1130
 msgid "Upcoming events"
 msgstr ""
 
@@ -1055,11 +1056,11 @@ msgstr ""
 msgid "Visibility"
 msgstr ""
 
-#: templates/admin/djs.php:90
+#: templates/admin/djs.php:91
 msgid "When a DJ name or other spelling appears as whole words in an event title or text (case and accents do not matter), the event gets the DJ links for each service it has no link for yet, and its player is updated. A link typed on the event itself is never replaced. After every change here, all future events are checked again."
 msgstr ""
 
-#: templates/admin/settings.php:52
+#: templates/admin/settings.php:53
 msgid "When enabled, EventMesh will try to sync sources automatically in the background."
 msgstr ""
 
@@ -1087,7 +1088,7 @@ msgstr ""
 msgid "You do not have permission to save this setting."
 msgstr ""
 
-#: src/Admin/EventListBlock.php:934
+#: src/Admin/EventListBlock.php:999
 msgid "calendar"
 msgstr ""
 
@@ -1095,7 +1096,7 @@ msgstr ""
 msgid "date unknown"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:934 src/Admin/EventListBlock.php:1084
+#: src/Admin/EventListBlock.php:999 src/Admin/EventListBlock.php:1149
 msgid "events"
 msgstr ""
 
@@ -1107,7 +1108,7 @@ msgstr ""
 msgid "fastcgi_finish_request"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1084
+#: src/Admin/EventListBlock.php:1149
 msgid "layout"
 msgstr ""
 
@@ -1119,7 +1120,7 @@ msgstr ""
 msgid "not written yet"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1084
+#: src/Admin/EventListBlock.php:1149
 msgid "query"
 msgstr ""
 
