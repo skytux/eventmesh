@@ -139,6 +139,9 @@ CI (GitHub Actions) runs PHPUnit and PHPCS on every push and pull request.
 
 ## Changelog
 
+### 1.10.7
+- The event list block shows "At most 50." under its number of events, and the slider goes up to 50 (Q265).
+
 ### 1.10.6
 - Deactivating EventMesh removes its scheduled background jobs (Q258, S-I1).
 

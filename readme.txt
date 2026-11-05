@@ -4,7 +4,7 @@ Tags: events, sync, holvi, gutenberg, event list
 Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 1.10.6
+Stable tag: 1.10.7
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -135,6 +135,9 @@ No. The only outgoing requests are the ones described under External services, a
 5. Diagnostics with the background sync health panel.
 
 == Changelog ==
+
+= 1.10.7 =
+* The event list block shows "At most 50." under its number of events, and the slider goes up to 50 (Q265).
 
 = 1.10.6 =
 * Deactivating EventMesh removes its scheduled background jobs (Q258, S-I1).
