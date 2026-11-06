@@ -46,7 +46,8 @@ $include = [
     'templates',
     'assets',
     // The translations (.mo is what WordPress reads; .po and .pot are its
-    // source). Without it a Finnish page shows the English texts.
+    // source; the .json files are what the block editor scripts read,
+    // written below). Without it a Finnish page shows the English texts.
     'languages',
 ];
 
@@ -84,6 +85,25 @@ if (1 === preg_match("/define\('EVENTMESH_VERSION',\s*'([^']+)'\)/", $header, $c
         $version,
         $c[1]
     ));
+    exit(1);
+}
+
+// ---------------------------------------------------------------------------
+// JSON translations for the block editor scripts, made fresh from the .po
+// files so they always match the scripts being shipped (not kept in git)
+// ---------------------------------------------------------------------------
+
+require __DIR__ . '/i18n.php';
+
+try {
+    $jsonFiles = eventmesh_make_json($root);
+} catch (Throwable $e) {
+    fwrite(STDERR, 'Could not write the JSON translations: ' . $e->getMessage() . "\n");
+    exit(1);
+}
+
+if ([] === $jsonFiles) {
+    fwrite(STDERR, "No JSON translations were written; the editor would show English only.\n");
     exit(1);
 }
 

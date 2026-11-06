@@ -91,8 +91,16 @@ msgstr ""
 msgid "Add one or more Holvi event URLs. Each row can be enabled or disabled independently."
 msgstr ""
 
+#: src/blocks/provider-embed/index.js:67
+msgid "Add the platform name"
+msgstr ""
+
 #: templates/admin/settings.php:175
 msgid "An event is never translated into its own original language."
+msgstr ""
+
+#: src/blocks/event-list/index.js:27
+msgid "At most 50."
 msgstr ""
 
 #: templates/admin/dashboard.php:56
@@ -148,6 +156,10 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
+#: src/blocks/event-list/index.js:40
+msgid "Cards"
+msgstr ""
+
 #: src/Support/SyncStatus.php:20
 msgid "Completed"
 msgstr ""
@@ -200,12 +212,12 @@ msgstr ""
 msgid "Customized"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:609
+#: src/Admin/EventListBlock.php:637
 #. translators: event date without year, as a PHP date() format, e.g. Finnish "D j.n."
 msgid "D j F"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:607
+#: src/Admin/EventListBlock.php:635
 #. translators: event date with year, as a PHP date() format, e.g. Finnish "D j.n.Y"
 msgid "D j F Y"
 msgstr ""
@@ -240,6 +252,14 @@ msgstr ""
 
 #: src/Admin/Admin.php:164 src/Admin/Admin.php:165 templates/admin/dashboard.php:28
 msgid "Dashboard"
+msgstr ""
+
+#: src/blocks/event-field/index.js:30
+msgid "Date & time (full)"
+msgstr ""
+
+#: src/blocks/event-field/index.js:34
+msgid "Date range"
 msgstr ""
 
 #: templates/admin/djs.php:142
@@ -278,7 +298,7 @@ msgstr ""
 msgid "Disabled"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1002
+#: src/Admin/EventListBlock.php:1030
 msgid "Displays a curated list of upcoming events."
 msgstr ""
 
@@ -328,8 +348,20 @@ msgstr ""
 msgid "Enabled"
 msgstr ""
 
+#: src/blocks/event-field/index.js:36
+msgid "End date"
+msgstr ""
+
+#: src/blocks/event-field/index.js:38
+msgid "End time"
+msgstr ""
+
 #: src/Content/EventPostType.php:187
 msgid "Ends at"
+msgstr ""
+
+#: src/blocks/provider-embed/index.js:68
+msgid "Ends the button with the platform the player comes from, e.g. \"Spotify\". On an embed from a platform EventMesh cannot name, the suffix is left off too, so the button never trails off mid-sentence."
 msgstr ""
 
 #: src/Admin/SettingsPage.php:214
@@ -358,11 +390,19 @@ msgstr ""
 msgid "Event Attributes"
 msgstr ""
 
+#: src/blocks/event-field/index.js:25
+msgid "Event field"
+msgstr ""
+
+#: src/blocks/event-list/index.js:24
+msgid "Event list settings"
+msgstr ""
+
 #: src/Admin/TranslationMetaBox.php:108
 msgid "Event name:"
 msgstr ""
 
-#: src/Admin/Admin.php:153 src/Admin/Admin.php:154 src/Admin/EventListBlock.php:994
+#: src/Admin/Admin.php:153 src/Admin/Admin.php:154 src/Admin/EventListBlock.php:1022
 msgid "EventMesh"
 msgstr ""
 
@@ -374,11 +414,11 @@ msgstr ""
 msgid "EventMesh details"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1001
+#: src/Admin/EventListBlock.php:1029
 msgid "EventMesh events"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1147
+#: src/Admin/EventListBlock.php:1175
 msgid "EventMesh events (upcoming + past)"
 msgstr ""
 
@@ -468,6 +508,10 @@ msgstr ""
 msgid "Fetch descriptions now"
 msgstr ""
 
+#: src/blocks/event-field/index.js:27
+msgid "Field"
+msgstr ""
+
 #: src/Content/EventPostType.php:89
 msgid "Filter events list"
 msgstr ""
@@ -503,6 +547,34 @@ msgstr ""
 
 #: templates/admin/diagnostics.php:119
 msgid "Free"
+msgstr ""
+
+#: src/blocks/event-field/index.js:46 src/blocks/past-events-marker/index.js:33
+msgid "HTML tag"
+msgstr ""
+
+#: src/blocks/event-field/index.js:49 src/blocks/past-events-marker/index.js:36
+msgid "Heading 1"
+msgstr ""
+
+#: src/blocks/event-field/index.js:50 src/blocks/past-events-marker/index.js:37
+msgid "Heading 2"
+msgstr ""
+
+#: src/blocks/event-field/index.js:51 src/blocks/past-events-marker/index.js:38
+msgid "Heading 3"
+msgstr ""
+
+#: src/blocks/event-field/index.js:52 src/blocks/past-events-marker/index.js:39
+msgid "Heading 4"
+msgstr ""
+
+#: src/blocks/event-field/index.js:53 src/blocks/past-events-marker/index.js:40
+msgid "Heading 5"
+msgstr ""
+
+#: src/blocks/event-field/index.js:54 src/blocks/past-events-marker/index.js:41
+msgid "Heading 6"
 msgstr ""
 
 #: templates/admin/diagnostics.php:115
@@ -576,12 +648,24 @@ msgstr ""
 msgid "Last sync attempt"
 msgstr ""
 
+#: src/blocks/event-list/index.js:36
+msgid "Layout"
+msgstr ""
+
 #: src/Content/SingleEventTemplate.php:63
 msgid "Layout for an individual event page. Fully editable as blocks."
 msgstr ""
 
 #: templates/admin/diagnostics.php:169
 msgid "Level"
+msgstr ""
+
+#: src/blocks/event-field/index.js:62
+msgid "Link to the event page"
+msgstr ""
+
+#: src/blocks/event-list/index.js:39
+msgid "List"
 msgstr ""
 
 #: src/Support/ProviderEmbedMarkup.php:170
@@ -664,7 +748,7 @@ msgstr ""
 msgid "No other plugins are connected to EventMesh."
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1140
+#: src/Admin/EventListBlock.php:1168
 msgid "No past events."
 msgstr ""
 
@@ -684,7 +768,7 @@ msgstr ""
 msgid "No target languages other than the original."
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1139
+#: src/Admin/EventListBlock.php:1167
 msgid "No upcoming events."
 msgstr ""
 
@@ -713,6 +797,10 @@ msgstr ""
 msgid "Now from: %s."
 msgstr ""
 
+#: src/blocks/event-list/index.js:26
+msgid "Number of events"
+msgstr ""
+
 #: templates/admin/settings.php:247
 msgid "Off by default: deleting the plugin keeps every synced event and setting so reinstalling picks up where you left off."
 msgstr ""
@@ -737,24 +825,44 @@ msgstr ""
 msgid "PHP"
 msgstr ""
 
+#: src/blocks/event-field/index.js:55 src/blocks/past-events-marker/index.js:42
+msgid "Paragraph"
+msgstr ""
+
 #: src/Content/EventPostType.php:82
 msgid "Parent Events:"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:275 templates/frontend/events-card.php:22 templates/frontend/events-list.php:23
+#: src/Admin/EventListBlock.php:303 templates/frontend/events-card.php:22 templates/frontend/events-list.php:23
 msgid "Past Events"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1137
+#: src/Admin/EventListBlock.php:1165
 msgid "Past events"
+msgstr ""
+
+#: src/blocks/past-events-marker/index.js:24
+msgid "Past events marker"
+msgstr ""
+
+#: src/blocks/provider-embed/index.js:27
+msgid "Play button text"
 msgstr ""
 
 #: templates/admin/diagnostics.php:48 templates/admin/diagnostics.php:145
 msgid "Plugin"
 msgstr ""
 
-#: src/Content/EventPostType.php:184
+#: src/blocks/event-field/index.js:69 src/blocks/provider-embed/index.js:45 src/blocks/ticket-button/index.js:109
+msgid "Prefix"
+msgstr ""
+
+#: src/Content/EventPostType.php:184 src/blocks/event-field/index.js:33
 msgid "Price"
+msgstr ""
+
+#: src/blocks/provider-embed/index.js:25
+msgid "Provider embed"
 msgstr ""
 
 #: templates/admin/settings.php:78
@@ -841,11 +949,43 @@ msgstr ""
 msgid "Show a play button and load the player only when clicked"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1138
+#: src/Admin/EventListBlock.php:1166
 msgid "Show more"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:718 src/Content/EventPostType.php:329 src/Content/EventPostType.php:339 templates/frontend/events-card.php:31
+#: src/blocks/ticket-button/index.js:98
+msgid "Show price"
+msgstr ""
+
+#: src/blocks/ticket-button/index.js:121
+msgid "Shown after the button label, e.g. \" →\". Skipped on the \"Sold out\" state."
+msgstr ""
+
+#: src/blocks/provider-embed/index.js:57
+msgid "Shown after the text above, e.g. \" on \" to join it to the platform name below. Spacing is used exactly as typed."
+msgstr ""
+
+#: src/blocks/event-field/index.js:81
+msgid "Shown after the value, only when the value exists. Include your own spacing, e.g. \" onwards\"."
+msgstr ""
+
+#: src/blocks/ticket-button/index.js:110
+msgid "Shown before the button label, e.g. \"From \". Skipped on the \"Sold out\" state."
+msgstr ""
+
+#: src/blocks/provider-embed/index.js:46
+msgid "Shown before the text above. Spacing is used exactly as typed."
+msgstr ""
+
+#: src/blocks/event-field/index.js:70
+msgid "Shown before the value, only when the value exists. Include your own spacing, e.g. \"at \"."
+msgstr ""
+
+#: src/blocks/provider-embed/index.js:28
+msgid "Shown on the button that loads the player. Only used while \"Show a play button and load the player only when clicked\" is on under Settings."
+msgstr ""
+
+#: src/Admin/EventListBlock.php:746 src/Content/EventPostType.php:329 src/Content/EventPostType.php:339 templates/frontend/events-card.php:31
 #: templates/frontend/events-card.php:46 templates/frontend/events-list.php:34 templates/frontend/events-list.php:58
 msgid "Sold out"
 msgstr ""
@@ -866,6 +1006,14 @@ msgstr ""
 msgid "Spotify player"
 msgstr ""
 
+#: src/blocks/event-field/index.js:35
+msgid "Start date"
+msgstr ""
+
+#: src/blocks/event-field/index.js:37
+msgid "Start time"
+msgstr ""
+
 #: src/Content/EventPostType.php:186
 msgid "Starts at"
 msgstr ""
@@ -880,6 +1028,10 @@ msgstr ""
 
 #: templates/frontend/sync-status.php:18
 msgid "Status:"
+msgstr ""
+
+#: src/blocks/event-field/index.js:80 src/blocks/provider-embed/index.js:56 src/blocks/ticket-button/index.js:120
+msgid "Suffix"
 msgstr ""
 
 #: src/Admin/DashboardPage.php:52
@@ -916,6 +1068,10 @@ msgstr ""
 
 #: templates/admin/settings.php:225
 msgid "Test connection"
+msgstr ""
+
+#: src/blocks/past-events-marker/index.js:26
+msgid "Text"
 msgstr ""
 
 #: src/Admin/SettingsPage.php:156
@@ -974,11 +1130,16 @@ msgstr ""
 msgid "This will permanently delete all synced events and reset every EventMesh setting. Continue?"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:781 templates/frontend/events-card.php:46 templates/frontend/events-list.php:58
+#: src/blocks/ticket-button/index.js:96
+msgid "Ticket button"
+msgstr ""
+
+#: src/Admin/EventListBlock.php:809 templates/frontend/events-card.php:46 templates/frontend/events-list.php:58 src/blocks/ticket-button/index.js:148
 msgid "Tickets"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:767
+#: src/Admin/EventListBlock.php:795 src/blocks/ticket-button/index.js:73
+#. translators: %s: the ticket price, e.g. "22.00 EUR".
 msgid "Tickets %s"
 msgstr ""
 
@@ -986,8 +1147,16 @@ msgstr ""
 msgid "Time"
 msgstr ""
 
+#: src/blocks/event-field/index.js:39
+msgid "Time range"
+msgstr ""
+
 #: src/Admin/TranslationMetaBox.php:173 src/Content/EventPostType.php:225
 msgid "Title"
+msgstr ""
+
+#: src/blocks/event-field/index.js:31
+msgid "Title (date removed)"
 msgstr ""
 
 #: templates/admin/settings.php:116
@@ -1024,7 +1193,7 @@ msgstr ""
 msgid "Twice daily"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1148
+#: src/Admin/EventListBlock.php:1176
 msgid "Two separate, independently styleable Query Loops - one for upcoming events, one for past - each under its own heading, built from ordinary blocks so the layout can be freely rearranged, restyled, or removed."
 msgstr ""
 
@@ -1036,7 +1205,7 @@ msgstr ""
 msgid "Uninstalling"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1136
+#: src/Admin/EventListBlock.php:1164
 msgid "Upcoming events"
 msgstr ""
 
@@ -1044,7 +1213,7 @@ msgstr ""
 msgid "Uploaded to this event"
 msgstr ""
 
-#: src/Content/EventPostType.php:185
+#: src/Content/EventPostType.php:185 src/blocks/event-field/index.js:32
 msgid "Venue"
 msgstr ""
 
@@ -1066,6 +1235,10 @@ msgstr ""
 
 #: templates/admin/settings.php:53
 msgid "When enabled, EventMesh will try to sync sources automatically in the background."
+msgstr ""
+
+#: src/blocks/ticket-button/index.js:99
+msgid "When on, the button shows the event price if one is known, otherwise the label below. When off, it always shows the label."
 msgstr ""
 
 #: templates/admin/diagnostics.php:44
@@ -1092,7 +1265,7 @@ msgstr ""
 msgid "You do not have permission to save this setting."
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1005
+#: src/Admin/EventListBlock.php:1033
 msgid "calendar"
 msgstr ""
 
@@ -1100,7 +1273,7 @@ msgstr ""
 msgid "date unknown"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1005 src/Admin/EventListBlock.php:1155
+#: src/Admin/EventListBlock.php:1033 src/Admin/EventListBlock.php:1183
 msgid "events"
 msgstr ""
 
@@ -1112,7 +1285,7 @@ msgstr ""
 msgid "fastcgi_finish_request"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1155
+#: src/Admin/EventListBlock.php:1183
 msgid "layout"
 msgstr ""
 
@@ -1124,7 +1297,7 @@ msgstr ""
 msgid "not written yet"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:1155
+#: src/Admin/EventListBlock.php:1183
 msgid "query"
 msgstr ""
 

@@ -4,7 +4,7 @@ Tags: events, sync, holvi, gutenberg, event list
 Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 1.10.12
+Stable tag: 1.10.13
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -135,6 +135,9 @@ No. The only outgoing requests are the ones described under External services, a
 5. Diagnostics with the background sync health panel.
 
 == Changelog ==
+
+= 1.10.13 =
+* Block editor: the blocks' editor texts load their translations (Finnish) from JSON files built into the zip (Q339).
 
 = 1.10.12 =
 * In the block editor the ticket button preview shows Tickets 22.00 EUR like the front end (Q334).
