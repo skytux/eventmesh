@@ -76,4 +76,18 @@ final class EventFieldAndTicketButtonBlockAssetsTest extends TestCase
 
         self::assertContains($metadata['attributes']['field']['default'], ['starts_at', 'title', 'venue']);
     }
+
+    public function testTicketButtonPreviewReadsTheEventPriceLikeTheFrontEnd(): void
+    {
+        $dir = __DIR__ . '/../../src/blocks/ticket-button';
+        $metadata = json_decode((string) file_get_contents($dir . '/block.json'), true);
+        $asset = require $dir . '/index.asset.php';
+        $script = (string) file_get_contents($dir . '/index.js');
+
+        self::assertSame(['postId', 'postType'], $metadata['usesContext']);
+        self::assertContains('wp-data', $asset['dependencies']);
+        self::assertContains('wp-core-data', $asset['dependencies']);
+        self::assertStringContainsString("__( 'Tickets %s', 'eventmesh' )", $script);
+        self::assertStringContainsString('_eventmesh_manual_price', $script);
+    }
 }

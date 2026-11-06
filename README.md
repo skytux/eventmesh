@@ -139,6 +139,9 @@ CI (GitHub Actions) runs PHPUnit and PHPCS on every push and pull request.
 
 ## Changelog
 
+### 1.10.12
+- In the block editor the ticket button preview shows Tickets 22.00 EUR like the front end (Q334).
+
 ### 1.10.11
 - The browser tab title of an event page has no date and is in the page language (Q334).
 
