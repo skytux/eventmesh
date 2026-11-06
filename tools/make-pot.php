@@ -8,8 +8,9 @@
  * the dev container has no WP-CLI. Adapted from EventCrew's tools/make-pot.php.
  * It handles the singular forms, the context forms and _n()'s plural, carries
  * the `/* translators: *\/` hint that precedes a call, and records every file
- * and line a string appears on. Only PHP files are read: the block editor's
- * JavaScript strings are not extracted (they would need JSON translations).
+ * and line a string appears on. The block editor scripts
+ * (index.js in each src/blocks folder) are read too; tools/make-json.php turns their
+ * strings into the JSON translations the editor loads.
  *
  *     php tools/make-pot.php
  *
@@ -20,6 +21,8 @@ declare(strict_types=1);
 
 $root = dirname(__DIR__);
 $domain = 'eventmesh';
+
+require __DIR__ . '/i18n.php';
 
 /** Single-message forms: function => index of the msgid argument (0-based). */
 $singular = [
@@ -275,6 +278,19 @@ foreach ($files as $path) {
         if (null !== $msgid && null !== $msgidPlural) {
             $addEntry($msgid, $msgidPlural, $ref, $comment, $context);
         }
+    }
+}
+
+// The block editor scripts.
+foreach (array_keys(eventmesh_block_editor_scripts($root)) as $relative) {
+    $found = eventmesh_js_strings((string) file_get_contents($root . '/' . $relative), $domain);
+
+    foreach ($found['strings'] as $string) {
+        $addEntry($string['msgid'], $string['plural'], $relative . ':' . $string['line'], $string['comment'], $string['context']);
+    }
+
+    foreach ($found['skipped'] as $line) {
+        $wrongDomain[] = $relative . ':' . $line;
     }
 }
 

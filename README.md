@@ -130,14 +130,18 @@ composer install
 vendor/bin/phpunit                 # test suite
 vendor/bin/phpcs src               # WordPress Coding Standards
 pwsh scripts/build-zip.ps1         # build a distributable eventmesh.zip
-php tools/build-zip.php            # Linux: build dist/eventmesh-<version>.zip (same files)
+php tools/build-zip.php            # Linux: build dist/eventmesh-<version>.zip (same files plus the editor JSON translations)
 php tools/make-pot.php             # extract strings into languages/eventmesh.pot
 php tools/make-mo.php              # compile languages/*.po into .mo
+php tools/make-json.php            # write the block editor JSON translations (build-zip.php runs it)
 ```
 
 CI (GitHub Actions) runs PHPUnit and PHPCS on every push and pull request.
 
 ## Changelog
+
+### 1.10.13
+- Block editor: the blocks' editor texts load their translations (Finnish) from JSON files built into the zip (Q339).
 
 ### 1.10.12
 - In the block editor the ticket button preview shows Tickets 22.00 EUR like the front end (Q334).

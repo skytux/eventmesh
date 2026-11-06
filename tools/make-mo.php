@@ -26,115 +26,7 @@ if (false === $files || [] === $files) {
     exit(1);
 }
 
-/**
- * Undoes the C-style escapes a PO string literal may hold.
- */
-$unescape = static function (string $literal): string {
-    return (string) preg_replace_callback(
-        '/\\\\(.)/s',
-        static fn (array $m): string => match ($m[1]) {
-            'n' => "\n",
-            't' => "\t",
-            'r' => "\r",
-            default => $m[1],
-        },
-        $literal
-    );
-};
-
-/**
- * Parses a .po file into msgid key => msgstr value, both in .mo form: a
- * context is joined to the msgid with \x04, and plural forms with \x00.
- *
- * @return array<string, string>
- */
-$parse = static function (string $path) use ($unescape): array {
-    $lines = file($path, FILE_IGNORE_NEW_LINES);
-
-    if (false === $lines) {
-        throw new RuntimeException('Could not read ' . $path);
-    }
-
-    $entries = [];
-    $entry = [];
-    $fuzzy = false;
-    $field = null;
-
-    $flush = static function () use (&$entries, &$entry, &$fuzzy, &$field): void {
-        if (isset($entry['msgid'])) {
-            $strings = [];
-
-            foreach ($entry as $key => $value) {
-                if (str_starts_with($key, 'msgstr')) {
-                    $strings[$key] = $value;
-                }
-            }
-
-            ksort($strings, SORT_NATURAL);
-            $translated = '' !== implode('', $strings);
-            $isHeader = '' === $entry['msgid'] && ! isset($entry['msgctxt']);
-
-            if ($translated && (! $fuzzy || $isHeader)) {
-                $key = $entry['msgid'];
-
-                if (isset($entry['msgid_plural'])) {
-                    $key .= "\0" . $entry['msgid_plural'];
-                }
-
-                if (isset($entry['msgctxt'])) {
-                    $key = $entry['msgctxt'] . "\x04" . $key;
-                }
-
-                $entries[$key] = implode("\0", $strings);
-            }
-        }
-
-        $entry = [];
-        $fuzzy = false;
-        $field = null;
-    };
-
-    foreach ($lines as $number => $line) {
-        $line = trim($line);
-
-        if ('' === $line) {
-            $flush();
-            continue;
-        }
-
-        if (str_starts_with($line, '#,')) {
-            $fuzzy = $fuzzy || str_contains($line, 'fuzzy');
-            continue;
-        }
-
-        if (str_starts_with($line, '#')) {
-            continue;
-        }
-
-        if (1 === preg_match('/^(msgctxt|msgid_plural|msgid|msgstr(?:\[\d+\])?)\s+"(.*)"$/s', $line, $m)) {
-            // A new msgid or msgctxt after a msgstr starts the next entry
-            // even without a blank line between them.
-            if (in_array($m[1], ['msgid', 'msgctxt'], true) && null !== $field && str_starts_with($field, 'msgstr')) {
-                $flush();
-            }
-
-            $field = $m[1];
-            $entry[$field] = $unescape($m[2]);
-            continue;
-        }
-
-        if (1 === preg_match('/^"(.*)"$/s', $line, $m) && null !== $field) {
-            $entry[$field] .= $unescape($m[1]);
-            continue;
-        }
-
-        throw new RuntimeException(sprintf('%s:%d: cannot read "%s"', $path, $number + 1, $line));
-    }
-
-    $flush();
-
-    return $entries;
-};
+require __DIR__ . '/i18n.php';
 
 /**
  * Writes the entries as a little-endian GNU .mo file, sorted by key as the
@@ -177,7 +69,7 @@ $write = static function (string $path, array $entries): void {
 };
 
 foreach ($files as $po) {
-    $entries = $parse($po);
+    $entries = eventmesh_read_po($po);
     $mo = substr($po, 0, -3) . '.mo';
     $write($mo, $entries);
     printf("%s\n%d strings\n", $mo, count($entries) - (isset($entries['']) ? 1 : 0));

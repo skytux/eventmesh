@@ -67,54 +67,54 @@ final class EventListBlock
 
         $this->registerPattern();
 
-        register_block_type(
+        $this->loadEditorTranslations(register_block_type(
             EVENTMESH_PLUGIN_DIR . 'src/blocks/event-list',
             [
                 'render_callback' => [$this, 'render'],
             ]
-        );
+        ));
 
-        register_block_type(
+        $this->loadEditorTranslations(register_block_type(
             EVENTMESH_PLUGIN_DIR . 'src/blocks/event-field',
             [
                 'render_callback' => [$this, 'renderEventField'],
             ]
-        );
+        ));
 
-        register_block_type(
+        $this->loadEditorTranslations(register_block_type(
             EVENTMESH_PLUGIN_DIR . 'src/blocks/ticket-button',
             [
                 'render_callback' => [$this, 'renderTicketButton'],
             ]
-        );
+        ));
 
-        register_block_type(
+        $this->loadEditorTranslations(register_block_type(
             EVENTMESH_PLUGIN_DIR . 'src/blocks/provider-embed',
             [
                 'render_callback' => [$this, 'renderProviderEmbed'],
             ]
-        );
+        ));
 
-        register_block_type(
+        $this->loadEditorTranslations(register_block_type(
             EVENTMESH_PLUGIN_DIR . 'src/blocks/other-provider-links',
             [
                 'render_callback' => [$this, 'renderOtherProviderLinks'],
             ]
-        );
+        ));
 
-        register_block_type(
+        $this->loadEditorTranslations(register_block_type(
             EVENTMESH_PLUGIN_DIR . 'src/blocks/all-provider-links',
             [
                 'render_callback' => [$this, 'renderAllProviderLinks'],
             ]
-        );
+        ));
 
-        register_block_type(
+        $this->loadEditorTranslations(register_block_type(
             EVENTMESH_PLUGIN_DIR . 'src/blocks/past-events-marker',
             [
                 'render_callback' => [$this, 'renderPastEventsMarker'],
             ]
-        );
+        ));
 
         // A plain (namespace-less) events Query Loop can't express "upcoming
         // first, past events sorted to the bottom" through the editor UI -
@@ -124,6 +124,34 @@ final class EventListBlock
         add_filter('query_loop_block_query_vars', [$this, 'resetPastEventsMarker']);
         add_filter('pre_render_block', [$this, 'scopeQueryLoopTime'], 10, 2);
         add_filter('render_block_data', [$this, 'rightSizeEventThumbnails']);
+    }
+
+    /**
+     * Points the block's editor script at this plugin's languages/ folder, so
+     * a Finnish wp-admin shows the sidebar and preview texts in Finnish.
+     *
+     * WordPress already sets the "eventmesh" text domain on the script from
+     * block.json, but then only looks for the JSON translations in
+     * wp-content/languages/plugins/, where nothing installs them for a plugin
+     * outside wordpress.org. tools/build-zip.php writes them into languages/
+     * (tools/make-json.php), named by script handle.
+     *
+     * @param mixed $blockType What register_block_type() returned: the
+     *                         WP_Block_Type, or false when it failed.
+     */
+    private function loadEditorTranslations($blockType): void
+    {
+        if (! is_object($blockType) || ! function_exists('wp_set_script_translations')) {
+            return;
+        }
+
+        $handles = $blockType->editor_script_handles ?? [];
+
+        foreach (is_array($handles) ? $handles : [] as $handle) {
+            if (is_string($handle) && '' !== $handle) {
+                wp_set_script_translations($handle, 'eventmesh', EVENTMESH_PLUGIN_DIR . 'languages');
+            }
+        }
     }
 
     /**

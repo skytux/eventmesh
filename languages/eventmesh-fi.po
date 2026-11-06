@@ -1137,3 +1137,175 @@ msgstr "loppuunmyyty"
 #: templates/admin/diagnostics.php:79
 msgid "true (WP-Cron off; needs an external trigger)"
 msgstr "true (WP-Cron pois; tarvitsee ulkoisen käynnistimen)"
+
+#: src/blocks/provider-embed/index.js:67
+msgid "Add the platform name"
+msgstr "Lisää alustan nimi"
+
+#: src/blocks/event-list/index.js:27
+msgid "At most 50."
+msgstr "Enintään 50."
+
+#: src/blocks/event-list/index.js:40
+msgid "Cards"
+msgstr "Kortit"
+
+#: src/blocks/event-field/index.js:30
+msgid "Date & time (full)"
+msgstr "Päivä ja aika (koko)"
+
+#: src/blocks/event-field/index.js:34
+msgid "Date range"
+msgstr "Päiväväli"
+
+#: src/blocks/event-field/index.js:36
+msgid "End date"
+msgstr "Loppupäivä"
+
+#: src/blocks/event-field/index.js:38
+msgid "End time"
+msgstr "Loppuaika"
+
+#: src/blocks/provider-embed/index.js:68
+msgid "Ends the button with the platform the player comes from, e.g. \"Spotify\". On an embed from a platform EventMesh cannot name, the suffix is left off too, so the button never trails off mid-sentence."
+msgstr "Päättää painikkeen sen alustan nimeen, jolta soitin tulee, esim. \"Spotify\". Jos EventMesh ei tunnista alustaa, myös jälkiliite jätetään pois, jotta teksti ei katkea kesken lauseen."
+
+#: src/blocks/event-field/index.js:25
+msgid "Event field"
+msgstr "Tapahtuman kenttä"
+
+#: src/blocks/event-list/index.js:24
+msgid "Event list settings"
+msgstr "Tapahtumalistan asetukset"
+
+#: src/blocks/event-field/index.js:27
+msgid "Field"
+msgstr "Kenttä"
+
+#: src/blocks/event-field/index.js:46 src/blocks/past-events-marker/index.js:33
+msgid "HTML tag"
+msgstr "HTML-tagi"
+
+#: src/blocks/event-field/index.js:49 src/blocks/past-events-marker/index.js:36
+msgid "Heading 1"
+msgstr "Otsikko 1"
+
+#: src/blocks/event-field/index.js:50 src/blocks/past-events-marker/index.js:37
+msgid "Heading 2"
+msgstr "Otsikko 2"
+
+#: src/blocks/event-field/index.js:51 src/blocks/past-events-marker/index.js:38
+msgid "Heading 3"
+msgstr "Otsikko 3"
+
+#: src/blocks/event-field/index.js:52 src/blocks/past-events-marker/index.js:39
+msgid "Heading 4"
+msgstr "Otsikko 4"
+
+#: src/blocks/event-field/index.js:53 src/blocks/past-events-marker/index.js:40
+msgid "Heading 5"
+msgstr "Otsikko 5"
+
+#: src/blocks/event-field/index.js:54 src/blocks/past-events-marker/index.js:41
+msgid "Heading 6"
+msgstr "Otsikko 6"
+
+#: src/blocks/event-list/index.js:36
+msgid "Layout"
+msgstr "Asettelu"
+
+#: src/blocks/event-field/index.js:62
+msgid "Link to the event page"
+msgstr "Linkki tapahtuman sivulle"
+
+#: src/blocks/event-list/index.js:39
+msgid "List"
+msgstr "Lista"
+
+#: src/blocks/event-list/index.js:26
+msgid "Number of events"
+msgstr "Tapahtumien määrä"
+
+#: src/blocks/event-field/index.js:55 src/blocks/past-events-marker/index.js:42
+msgid "Paragraph"
+msgstr "Kappale"
+
+#: src/blocks/past-events-marker/index.js:24
+msgid "Past events marker"
+msgstr "Menneiden tapahtumien merkki"
+
+#: src/blocks/provider-embed/index.js:27
+msgid "Play button text"
+msgstr "Toistopainikkeen teksti"
+
+#: src/blocks/event-field/index.js:69 src/blocks/provider-embed/index.js:45 src/blocks/ticket-button/index.js:109
+msgid "Prefix"
+msgstr "Etuliite"
+
+#: src/blocks/provider-embed/index.js:25
+msgid "Provider embed"
+msgstr "Soitinupotus"
+
+#: src/blocks/ticket-button/index.js:98
+msgid "Show price"
+msgstr "Näytä hinta"
+
+#: src/blocks/ticket-button/index.js:121
+msgid "Shown after the button label, e.g. \" →\". Skipped on the \"Sold out\" state."
+msgstr "Näytetään painikkeen tekstin jälkeen, esim. \" →\". Ei näytetä \"Loppuunmyyty\"-tilassa."
+
+#: src/blocks/provider-embed/index.js:57
+msgid "Shown after the text above, e.g. \" on \" to join it to the platform name below. Spacing is used exactly as typed."
+msgstr "Näytetään yllä olevan tekstin jälkeen, esim. \" – \" liittämään se alla olevaan alustan nimeen. Välilyönnit säilyvät sellaisinaan."
+
+#: src/blocks/event-field/index.js:81
+msgid "Shown after the value, only when the value exists. Include your own spacing, e.g. \" onwards\"."
+msgstr "Näytetään arvon jälkeen, vain kun arvo on olemassa. Lisää omat välilyönnit, esim. \" alkaen\"."
+
+#: src/blocks/ticket-button/index.js:110
+msgid "Shown before the button label, e.g. \"From \". Skipped on the \"Sold out\" state."
+msgstr "Näytetään ennen painikkeen tekstiä, esim. \"Alk. \". Ei näytetä \"Loppuunmyyty\"-tilassa."
+
+#: src/blocks/provider-embed/index.js:46
+msgid "Shown before the text above. Spacing is used exactly as typed."
+msgstr "Näytetään ennen yllä olevaa tekstiä. Välilyönnit säilyvät sellaisinaan."
+
+#: src/blocks/event-field/index.js:70
+msgid "Shown before the value, only when the value exists. Include your own spacing, e.g. \"at \"."
+msgstr "Näytetään ennen arvoa, vain kun arvo on olemassa. Lisää omat välilyönnit, esim. \"klo \"."
+
+#: src/blocks/provider-embed/index.js:28
+msgid "Shown on the button that loads the player. Only used while \"Show a play button and load the player only when clicked\" is on under Settings."
+msgstr "Näytetään painikkeessa, joka lataa soittimen. Käytössä vain, kun \"Näytä toistopainike ja lataa soitin vasta klikattaessa\" on päällä kohdassa Asetukset."
+
+#: src/blocks/event-field/index.js:35
+msgid "Start date"
+msgstr "Alkupäivä"
+
+#: src/blocks/event-field/index.js:37
+msgid "Start time"
+msgstr "Alkuaika"
+
+#: src/blocks/event-field/index.js:80 src/blocks/provider-embed/index.js:56 src/blocks/ticket-button/index.js:120
+msgid "Suffix"
+msgstr "Jälkiliite"
+
+#: src/blocks/past-events-marker/index.js:26
+msgid "Text"
+msgstr "Teksti"
+
+#: src/blocks/ticket-button/index.js:96
+msgid "Ticket button"
+msgstr "Lippupainike"
+
+#: src/blocks/event-field/index.js:39
+msgid "Time range"
+msgstr "Aikaväli"
+
+#: src/blocks/event-field/index.js:31
+msgid "Title (date removed)"
+msgstr "Otsikko (ilman päivää)"
+
+#: src/blocks/ticket-button/index.js:99
+msgid "When on, the button shows the event price if one is known, otherwise the label below. When off, it always shows the label."
+msgstr "Kun päällä, painike näyttää tapahtuman hinnan, jos se tiedetään, muuten alla olevan tekstin. Kun pois, aina tekstin."

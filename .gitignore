@@ -15,3 +15,6 @@ dist/
 *.zip
 
 .vscode/
+
+# Written by tools/make-json.php (run by tools/build-zip.php).
+languages/*.json
