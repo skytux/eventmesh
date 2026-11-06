@@ -4,7 +4,7 @@ Tags: events, sync, holvi, gutenberg, event list
 Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 1.10.10
+Stable tag: 1.10.11
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -135,6 +135,9 @@ No. The only outgoing requests are the ones described under External services, a
 5. Diagnostics with the background sync health panel.
 
 == Changelog ==
+
+= 1.10.11 =
+* The browser tab title of an event page has no date and is in the page language (Q334).
 
 = 1.10.10 =
 * Event lists show the event title without the date when there is no clean name (Q334).

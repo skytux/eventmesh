@@ -139,6 +139,9 @@ CI (GitHub Actions) runs PHPUnit and PHPCS on every push and pull request.
 
 ## Changelog
 
+### 1.10.11
+- The browser tab title of an event page has no date and is in the page language (Q334).
+
 ### 1.10.10
 - Event lists show the event title without the date when there is no clean name (Q334).
 
