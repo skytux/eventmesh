@@ -9,6 +9,8 @@ return [
         'wp-block-editor',
         'wp-components',
         'wp-i18n',
+        'wp-data',
+        'wp-core-data',
     ],
     'version' => (string) filemtime(__DIR__ . '/index.js'),
 ];

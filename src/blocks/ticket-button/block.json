@@ -8,7 +8,7 @@
   "icon": "tickets-alt",
   "description": "A button linking to the current event's ticket page. Rendered directly in PHP rather than via Block Bindings, so the link is always correct regardless of binding support.",
   "keywords": ["tickets", "button", "eventmesh"],
-  "usesContext": ["postId"],
+  "usesContext": ["postId", "postType"],
   "supports": {
     "html": false,
     "shadow": true,
