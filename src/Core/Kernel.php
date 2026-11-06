@@ -26,6 +26,7 @@ use EventMesh\Djs\DjTable;
 use EventMesh\Djs\EventDjsFilter;
 use EventMesh\Djs\ProfileDescriptions;
 use EventMesh\Inference\EventFieldQueue;
+use EventMesh\Naming\DocumentTitle;
 use EventMesh\Naming\EventNameFilters;
 use EventMesh\Naming\EventNameQueue;
 use EventMesh\Services\ConnectorManager;
@@ -82,6 +83,7 @@ final class Kernel
         $this->container->get(EventDjsFilter::class)->boot();
         $this->container->get(EventNameQueue::class)->boot();
         $this->container->get(EventNameFilters::class)->boot();
+        $this->container->get(DocumentTitle::class)->boot();
         $this->container->get(EventFieldQueue::class)->boot();
 
         do_action(
@@ -238,6 +240,11 @@ final class Kernel
         $this->container->singleton(
             EventNameFilters::class,
             fn () => new EventNameFilters()
+        );
+
+        $this->container->singleton(
+            DocumentTitle::class,
+            fn () => new DocumentTitle()
         );
 
         $this->container->singleton(
