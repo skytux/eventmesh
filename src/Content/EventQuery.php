@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace EventMesh\Content;
 
+use EventMesh\Naming\DisplayTitle;
 use EventMesh\Naming\EventDisplayName;
 use EventMesh\Support\EventMeta;
 use EventMesh\Support\EventStatus;
@@ -115,14 +116,16 @@ final class EventQuery
             $title = '' !== ($translation['title'] ?? '') ? $translation['title'] : $post->post_title;
 
             // What the templates show as the heading: the clean name and its
-            // DJ line, or the title (and no DJ line) while there is no clean
-            // name yet - see EventDisplayName.
+            // DJ line, or, while there is no clean name yet, the title without
+            // its date in the page's language (and no DJ line) - see
+            // EventDisplayName and eventmesh_display_title().
             $display = EventDisplayName::forEvent($postId);
+            $plainTitle = DisplayTitle::of($post);
 
             $events[] = [
                 'id' => $postId,
                 'title' => $title,
-                'display_title' => null !== $display ? $display['name'] : $title,
+                'display_title' => null !== $display ? $display['name'] : ('' !== $plainTitle ? $plainTitle : $title),
                 'dj_line' => null !== $display ? $display['dj_line'] : '',
                 'content' => '' !== ($translation['content'] ?? '') ? $translation['content'] : $post->post_content,
                 'excerpt' => '' !== ($translation['excerpt'] ?? '') ? $translation['excerpt'] : $post->post_excerpt,

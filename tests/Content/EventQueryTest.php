@@ -162,6 +162,22 @@ final class EventQueryTest extends TestCase
         self::assertFalse($events[0]['is_canceled']);
     }
 
+    public function testDisplayTitleFallsBackToTheTitleWithoutTheDate(): void
+    {
+        $post = new \WP_Post(1, 'eventmesh_event', 'Ecstatic Dance 14.11.2026 / Ihmeidentekijä');
+        $this->queueQueryResults([$post]);
+
+        Functions\when('wp_timezone')->justReturn(new \DateTimeZone('Europe/Helsinki'));
+        Functions\when('get_post_meta')->alias(
+            static fn (int $postId, string $key = '', bool $single = false) => '' === $key ? [] : ''
+        );
+
+        $events = (new EventQuery())->recent();
+
+        self::assertSame('Ecstatic Dance / Ihmeidentekijä', $events[0]['display_title']);
+        self::assertSame('Ecstatic Dance 14.11.2026 / Ihmeidentekijä', $events[0]['title']);
+    }
+
     public function testMarkQueryLoopUpcomingFirstSetsTheFlagForEventmeshQueries(): void
     {
         $result = (new EventQuery())->markQueryLoopUpcomingFirst(['post_type' => 'eventmesh_event']);

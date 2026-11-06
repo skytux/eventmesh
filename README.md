@@ -139,6 +139,9 @@ CI (GitHub Actions) runs PHPUnit and PHPCS on every push and pull request.
 
 ## Changelog
 
+### 1.10.10
+- Event lists show the event title without the date when there is no clean name (Q334).
+
 ### 1.10.9
 - Event pages open in the language of the site page the visitor came from (then the remembered choice, then the browser language), and the EN | FI switch stays on the same event. A ticket button with a price and no prefix reads Tickets 22.00 EUR, in Finnish Liput 22.00 EUR (Q308).
 

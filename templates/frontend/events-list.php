@@ -26,7 +26,7 @@ if (! defined('ABSPATH')) {
                     <?php $image = (string) ($event['image'] ?? ''); ?>
                     <?php if ('' !== $image) : ?>
                         <a href="<?php echo esc_url((string) ($event['url'] ?? '#')); ?>">
-                            <img src="<?php echo esc_url($image); ?>" alt="<?php echo esc_attr((string) ($event['title'] ?? '')); ?>" />
+                            <img src="<?php echo esc_url($image); ?>" alt="<?php echo esc_attr((string) ($event['display_title'] ?? $event['title'] ?? '')); ?>" />
                         </a>
                     <?php endif; ?>
                     <h3<?php echo $canceled ? ' style="text-decoration:line-through"' : ''; ?>><a href="<?php echo esc_url((string) ($event['url'] ?? '#')); ?>"><?php echo esc_html((string) ($event['display_title'] ?? $event['title'] ?? '')); ?></a><?php echo EventMesh\Naming\EventDisplayName::djLineHtml((string) ($event['dj_line'] ?? '')); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- djLineHtml() escapes the DJ line itself and returns a span. ?></h3>

@@ -24,7 +24,7 @@ if (! defined('ABSPATH')) {
         <?php endif; ?>
         <article class="eventmesh-event-card">
             <?php if ('' !== $image) : ?>
-                <img src="<?php echo esc_url($image); ?>" alt="<?php echo esc_attr($title); ?>" />
+                <img src="<?php echo esc_url($image); ?>" alt="<?php echo esc_attr((string) ($event['display_title'] ?? $title)); ?>" />
             <?php endif; ?>
             <h3<?php echo $canceled ? ' style="text-decoration:line-through"' : ''; ?>><?php echo esc_html((string) ($event['display_title'] ?? $title)); ?><?php echo EventMesh\Naming\EventDisplayName::djLineHtml((string) ($event['dj_line'] ?? '')); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- djLineHtml() escapes the DJ line itself and returns a span. ?></h3>
             <?php if ($soldOut) : ?>
