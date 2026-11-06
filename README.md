@@ -140,6 +140,9 @@ CI (GitHub Actions) runs PHPUnit and PHPCS on every push and pull request.
 
 ## Changelog
 
+### 1.10.14
+- Ticket button: a Label field in the block sidebar; the editor preview shows Sold out for a sold-out event (Q340).
+
 ### 1.10.13
 - Block editor: the blocks' editor texts load their translations (Finnish) from JSON files built into the zip (Q339).
 

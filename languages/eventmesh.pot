@@ -618,6 +618,10 @@ msgstr ""
 msgid "Keep published if removed from the source"
 msgstr ""
 
+#: src/blocks/ticket-button/index.js:152
+msgid "Label"
+msgstr ""
+
 #: templates/admin/diagnostics.php:105
 msgid "Last completed sync"
 msgstr ""
@@ -853,7 +857,7 @@ msgstr ""
 msgid "Plugin"
 msgstr ""
 
-#: src/blocks/event-field/index.js:69 src/blocks/provider-embed/index.js:45 src/blocks/ticket-button/index.js:109
+#: src/blocks/event-field/index.js:69 src/blocks/provider-embed/index.js:45 src/blocks/ticket-button/index.js:164
 msgid "Prefix"
 msgstr ""
 
@@ -953,11 +957,11 @@ msgstr ""
 msgid "Show more"
 msgstr ""
 
-#: src/blocks/ticket-button/index.js:98
+#: src/blocks/ticket-button/index.js:141
 msgid "Show price"
 msgstr ""
 
-#: src/blocks/ticket-button/index.js:121
+#: src/blocks/ticket-button/index.js:176
 msgid "Shown after the button label, e.g. \" →\". Skipped on the \"Sold out\" state."
 msgstr ""
 
@@ -969,7 +973,7 @@ msgstr ""
 msgid "Shown after the value, only when the value exists. Include your own spacing, e.g. \" onwards\"."
 msgstr ""
 
-#: src/blocks/ticket-button/index.js:110
+#: src/blocks/ticket-button/index.js:165
 msgid "Shown before the button label, e.g. \"From \". Skipped on the \"Sold out\" state."
 msgstr ""
 
@@ -985,8 +989,12 @@ msgstr ""
 msgid "Shown on the button that loads the player. Only used while \"Show a play button and load the player only when clicked\" is on under Settings."
 msgstr ""
 
+#: src/blocks/ticket-button/index.js:153
+msgid "Shown on the button when the price is not shown."
+msgstr ""
+
 #: src/Admin/EventListBlock.php:746 src/Content/EventPostType.php:329 src/Content/EventPostType.php:339 templates/frontend/events-card.php:31
-#: templates/frontend/events-card.php:46 templates/frontend/events-list.php:34 templates/frontend/events-list.php:58
+#: templates/frontend/events-card.php:46 templates/frontend/events-list.php:34 templates/frontend/events-list.php:58 src/blocks/ticket-button/index.js:188
 msgid "Sold out"
 msgstr ""
 
@@ -1030,7 +1038,7 @@ msgstr ""
 msgid "Status:"
 msgstr ""
 
-#: src/blocks/event-field/index.js:80 src/blocks/provider-embed/index.js:56 src/blocks/ticket-button/index.js:120
+#: src/blocks/event-field/index.js:80 src/blocks/provider-embed/index.js:56 src/blocks/ticket-button/index.js:175
 msgid "Suffix"
 msgstr ""
 
@@ -1130,15 +1138,16 @@ msgstr ""
 msgid "This will permanently delete all synced events and reset every EventMesh setting. Continue?"
 msgstr ""
 
-#: src/blocks/ticket-button/index.js:96
+#: src/blocks/ticket-button/index.js:139
 msgid "Ticket button"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:809 templates/frontend/events-card.php:46 templates/frontend/events-list.php:58 src/blocks/ticket-button/index.js:148
+#: src/Admin/EventListBlock.php:809 templates/frontend/events-card.php:46 templates/frontend/events-list.php:58 src/blocks/ticket-button/index.js:85
+#: src/blocks/ticket-button/index.js:158 src/blocks/ticket-button/index.js:205
 msgid "Tickets"
 msgstr ""
 
-#: src/Admin/EventListBlock.php:795 src/blocks/ticket-button/index.js:73
+#: src/Admin/EventListBlock.php:795 src/blocks/ticket-button/index.js:101
 #. translators: %s: the ticket price, e.g. "22.00 EUR".
 msgid "Tickets %s"
 msgstr ""
@@ -1237,7 +1246,7 @@ msgstr ""
 msgid "When enabled, EventMesh will try to sync sources automatically in the background."
 msgstr ""
 
-#: src/blocks/ticket-button/index.js:99
+#: src/blocks/ticket-button/index.js:142
 msgid "When on, the button shows the event price if one is known, otherwise the label below. When off, it always shows the label."
 msgstr ""
 
