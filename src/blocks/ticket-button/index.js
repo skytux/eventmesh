@@ -28,6 +28,23 @@
 		return '' !== manual ? manual : String( meta._eventmesh_price || '' ).trim();
 	}
 
+	// The event's sold-out state the way the front end resolves it
+	// (EventMeta::isSoldOut()): the edit screen's choice ('1' sold out, '0'
+	// available), else the synced value.
+	function eventSoldOut( meta ) {
+		if ( ! meta ) {
+			return false;
+		}
+
+		var manual = String( meta._eventmesh_manual_sold_out || '' );
+
+		if ( '1' === manual || '0' === manual ) {
+			return '1' === manual;
+		}
+
+		return '1' === String( meta._eventmesh_sold_out || '' );
+	}
+
 	blocks.registerBlockType( 'eventmesh/ticket-button', {
 		edit: function ( props ) {
 			var attributes = props.attributes;
@@ -40,7 +57,7 @@
 			var postId = props.context && props.context.postId;
 			var postType = ( props.context && props.context.postType ) || 'eventmesh_event';
 			// null while there is no event to read (or it is still loading).
-			var price = useSelect(
+			var event = useSelect(
 				function ( select ) {
 					if ( ! postId || 'eventmesh_event' !== postType ) {
 						return null;
@@ -48,14 +65,25 @@
 
 					var record = select( 'core' ).getEntityRecord( 'postType', postType, postId );
 
-					return record ? eventPrice( record.meta ) : null;
+					return record
+						? { price: eventPrice( record.meta ), soldOut: eventSoldOut( record.meta ) }
+						: null;
 				},
 				[ postId, postType ]
 			);
 
-			if ( null === price ) {
-				price = SAMPLE_PRICE;
-			}
+			var price = event ? event.price : SAMPLE_PRICE;
+			var soldOut = !! ( event && event.soldOut );
+
+			// WordPress fills in block.json's English default ("Tickets")
+			// for a label that was never changed; the front end translates
+			// that value (EventListBlock::ticketButtonLabel()), so show it
+			// translated here too. An emptied label shows the placeholder
+			// and gives "Tickets" on the front end.
+			var label =
+				'Tickets' === attributes.text
+					? __( 'Tickets', 'eventmesh' )
+					: attributes.text || '';
 
 			// The same label as the front end (EventListBlock::
 			// ticketButtonLabel()): with "Show price" on and a price known,
@@ -81,9 +109,24 @@
 			// normal button under any theme without needing its own
 			// stylesheet - the classes are purely presentational, this
 			// isn't a real core/button instance.
-			var blockProps = useBlockProps( {
-				className: 'wp-block-button__link wp-element-button',
-			} );
+			//
+			// Sold out is a status that replaces the label, price, prefix and
+			// suffix, the same as on the front end, which also draws it as
+			// an outline (frontend.css, which the editor does not load).
+			var blockProps = useBlockProps(
+				soldOut
+					? {
+							className:
+								'wp-block-button__link wp-element-button eventmesh-ticket-button--secondary',
+							style: {
+								background: 'transparent',
+								color: 'inherit',
+								boxShadow: 'inset 0 0 0 1px currentColor',
+								opacity: 0.75,
+							},
+					  }
+					: { className: 'wp-block-button__link wp-element-button' }
+			);
 
 			return el(
 				Fragment,
@@ -103,6 +146,18 @@
 							checked: showPrice,
 							onChange: function ( value ) {
 								setAttributes( { showPrice: value } );
+							},
+						} ),
+						el( TextControl, {
+							label: __( 'Label', 'eventmesh' ),
+							help: __(
+								'Shown on the button when the price is not shown.',
+								'eventmesh'
+							),
+							value: label,
+							placeholder: __( 'Tickets', 'eventmesh' ),
+							onChange: function ( value ) {
+								setAttributes( { text: value } );
 							},
 						} ),
 						el( TextControl, {
@@ -129,26 +184,28 @@
 						} )
 					)
 				),
-				el(
-					'a',
-					Object.assign( {}, blockProps, {
-						href: '#',
-						onClick: function ( event ) {
-							event.preventDefault();
-						},
-					} ),
-					'' !== priceLabel
-						? el( 'span', {}, priceLabel )
-						: el( RichText, {
-								tagName: 'span',
-								value: attributes.text,
-								onChange: function ( value ) {
-									setAttributes( { text: value } );
-								},
-								placeholder: __( 'Tickets', 'eventmesh' ),
-								allowedFormats: [],
-						  } )
-				)
+				soldOut
+					? el( 'span', blockProps, __( 'Sold out', 'eventmesh' ) )
+					: el(
+						'a',
+						Object.assign( {}, blockProps, {
+							href: '#',
+							onClick: function ( event ) {
+								event.preventDefault();
+							},
+						} ),
+						'' !== priceLabel
+							? el( 'span', {}, priceLabel )
+							: el( RichText, {
+									tagName: 'span',
+									value: label,
+									onChange: function ( value ) {
+										setAttributes( { text: value } );
+									},
+									placeholder: __( 'Tickets', 'eventmesh' ),
+									allowedFormats: [],
+							  } )
+					)
 			);
 		},
 		save: function () {

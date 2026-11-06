@@ -1309,3 +1309,11 @@ msgstr "Otsikko (ilman päivää)"
 #: src/blocks/ticket-button/index.js:99
 msgid "When on, the button shows the event price if one is known, otherwise the label below. When off, it always shows the label."
 msgstr "Kun päällä, painike näyttää tapahtuman hinnan, jos se tiedetään, muuten alla olevan tekstin. Kun pois, aina tekstin."
+
+#: src/blocks/ticket-button/index.js:152
+msgid "Label"
+msgstr "Teksti"
+
+#: src/blocks/ticket-button/index.js:153
+msgid "Shown on the button when the price is not shown."
+msgstr "Näytetään painikkeessa, kun hintaa ei näytetä."
