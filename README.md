@@ -140,6 +140,9 @@ CI (GitHub Actions) runs PHPUnit and PHPCS on every push and pull request.
 
 ## Changelog
 
+### 1.10.15
+- Test correction: the all-capitals name test now uses a DJ name that is in its event title. No change in behaviour.
+
 ### 1.10.14
 - Ticket button: a Label field in the block sidebar; the editor preview shows Sold out for a sold-out event (Q340).
 

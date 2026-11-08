@@ -51,7 +51,7 @@ final class EventNameGuardTest extends TestCase
         $result = EventNameGuard::clean(
             'CACAO ECSTATIC DANCE',
             'EKSTAATTINEN TANSSI',
-            ['MILLA LINNA'],
+            ['AINO TESTINEN'],
             'CACAO ECSTATIC DANCE 12.12.2026 / Aino Testinen & Bo Kokeilu',
             'KAAKAO EKSTAATTINEN TANSSI 12.12.2026 / Aino Testinen & Bo Kokeilu'
         );

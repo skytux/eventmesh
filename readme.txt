@@ -4,7 +4,7 @@ Tags: events, sync, holvi, gutenberg, event list
 Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 1.10.14
+Stable tag: 1.10.15
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -135,6 +135,9 @@ No. The only outgoing requests are the ones described under External services, a
 5. Diagnostics with the background sync health panel.
 
 == Changelog ==
+
+= 1.10.15 =
+* Test correction: the all-capitals name test now uses a DJ name that is in its event title. No change in behaviour.
 
 = 1.10.14 =
 * Ticket button: a Label field in the block sidebar; the editor preview shows Sold out for a sold-out event (Q340).
