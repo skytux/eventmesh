@@ -156,7 +156,11 @@ final class DescriptionQueue
     {
         $post = get_post($postId);
 
-        if (! $post instanceof \WP_Post || EventPostType::NAME !== $post->post_type || 'publish' !== $post->post_status) {
+        if (
+            ! $post instanceof \WP_Post
+            || EventPostType::NAME !== $post->post_type
+            || 'publish' !== $post->post_status
+        ) {
             return false;
         }
 
@@ -187,7 +191,7 @@ final class DescriptionQueue
         $this->stats = ['written' => 0, 'translated' => 0, 'failed' => 0];
 
         if (! LlmSettings::isReady()) {
-            return ['ready' => false, 'written' => 0, 'translated' => 0, 'failed' => 0, 'left' => count($this->queue()), 'error' => ''];
+            return ['ready' => false, 'left' => count($this->queue()), 'error' => ''] + $this->stats;
         }
 
         $writer = null;
@@ -195,7 +199,10 @@ final class DescriptionQueue
         $error = '';
         $outOfTime = false;
         $tryAgainSoon = false;
-        $waiting = array_merge(self::queued(TranslationQueue::OPTION_QUEUE), self::queued(EventNameQueue::OPTION_QUEUE));
+        $waiting = array_merge(
+            self::queued(TranslationQueue::OPTION_QUEUE),
+            self::queued(EventNameQueue::OPTION_QUEUE)
+        );
 
         foreach ($this->queue() as $postId) {
             if (in_array($postId, $waiting, true)) {
@@ -271,7 +278,11 @@ final class DescriptionQueue
     {
         $post = get_post($postId);
 
-        if (! $post instanceof \WP_Post || EventPostType::NAME !== $post->post_type || 'publish' !== $post->post_status) {
+        if (
+            ! $post instanceof \WP_Post
+            || EventPostType::NAME !== $post->post_type
+            || 'publish' !== $post->post_status
+        ) {
             return 'done';
         }
 

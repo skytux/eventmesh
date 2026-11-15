@@ -174,7 +174,9 @@ final class DescriptionStore
 
         $failure = TranslationStore::failure($postId, self::failureKey($lang));
 
-        return TranslationStore::attemptsFor($failure, $from) >= TranslationStore::MAX_ATTEMPTS ? 'gave_up' : 'translate';
+        $attempts = TranslationStore::attemptsFor($failure, $from);
+
+        return $attempts >= TranslationStore::MAX_ATTEMPTS ? 'gave_up' : 'translate';
     }
 
     /**
@@ -270,6 +272,8 @@ final class DescriptionStore
     {
         $text = trim(sanitize_textarea_field($text));
 
-        return function_exists('mb_substr') ? mb_substr($text, 0, self::MAX_LENGTH) : substr($text, 0, self::MAX_LENGTH);
+        return function_exists('mb_substr')
+            ? mb_substr($text, 0, self::MAX_LENGTH)
+            : substr($text, 0, self::MAX_LENGTH);
     }
 }

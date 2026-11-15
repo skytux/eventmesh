@@ -345,7 +345,10 @@ final class DescriptionWriter
             $description = is_string($dj['description'] ?? null) ? self::redact($dj['description']) : '';
             $djs[] = [
                 'name' => trim($dj['name']),
-                'description' => self::cut((string) preg_replace('/\s+/u', ' ', $description), self::MAX_DJ_DESCRIPTION),
+                'description' => self::cut(
+                    (string) preg_replace('/\s+/u', ' ', $description),
+                    self::MAX_DJ_DESCRIPTION
+                ),
             ];
         }
 

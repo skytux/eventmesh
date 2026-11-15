@@ -11,18 +11,6 @@ use EventMesh\Translation\TimeBudget;
  * `wp eventmesh describe`: writes the descriptions the coming events still
  * lack, now, instead of waiting for the background runs. A text that is
  * there is never written again, unless --regenerate names the event.
- *
- * ## OPTIONS
- *
- * [--event=<id>]
- * : Only this event.
- *
- * [--regenerate]
- * : With --event: write its Finnish text again, and the translations nobody
- *   edited.
- *
- * [--dry-run]
- * : List the events that would be written, and how many requests it takes.
  */
 final class DescriptionCommand
 {
@@ -35,6 +23,19 @@ final class DescriptionCommand
     }
 
     /**
+     * Writes the descriptions the coming events still lack.
+     *
+     * ## OPTIONS
+     *
+     * [--event=<id>]
+     * : Only this event.
+     *
+     * [--regenerate]
+     * : With --event: write its Finnish text again, and the translations nobody edited.
+     *
+     * [--dry-run]
+     * : List the events that would be written, and how many requests it takes.
+     *
      * @param array<int, string>    $args
      * @param array<string, string> $assoc
      */
@@ -71,7 +72,7 @@ final class DescriptionCommand
             foreach (DescriptionStore::languages() as $lang) {
                 $decision = DescriptionStore::decide($postId, $lang);
 
-                if ('write' === $decision || 'translate' === $decision || ('wait' === $decision && ! DescriptionStore::isEdited($postId, $lang))) {
+                if (in_array($decision, ['write', 'translate', 'wait'], true)) {
                     $work[] = $lang;
                 }
             }
@@ -104,7 +105,9 @@ final class DescriptionCommand
             $idle = 0 === $result['written'] + $result['translated'] + $result['failed'] ? $idle + 1 : 0;
 
             if ('' !== $result['error']) {
-                \WP_CLI::warning(sprintf('The LLM request failed (%s). The rest is written in the background.', $result['error']));
+                \WP_CLI::warning(
+                    sprintf('The LLM request failed (%s). The rest is written in the background.', $result['error'])
+                );
                 break;
             }
         } while ($result['left'] > 0 && $idle < self::MAX_IDLE_RUNS);
