@@ -124,7 +124,7 @@ msgstr ""
 msgid "Automatic translation is off, or the API URL, model or key is missing."
 msgstr ""
 
-#: src/Translation/TranslationDisplay.php:191 templates/frontend/events-card.php:37 templates/frontend/events-list.php:49
+#: src/Translation/TranslationDisplay.php:244 templates/frontend/events-card.php:37 templates/frontend/events-list.php:49
 msgid "Automatically translated"
 msgstr ""
 

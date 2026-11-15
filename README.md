@@ -140,6 +140,9 @@ CI (GitHub Actions) runs PHPUnit and PHPCS on every push and pull request.
 
 ## Changelog
 
+### 1.10.17
+- Swedish translation. An event with no translation in the page language shows the site default language before the original.
+
 ### 1.10.16
 - Short event descriptions written once by the AI, in Finnish first and then translated; editable in the event editor; wp eventmesh describe fills the missing ones.
 
