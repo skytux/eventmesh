@@ -59,6 +59,7 @@ final class FactoryResetTest extends TestCase
                 'eventmesh/translate_queue',
                 'eventmesh/name_queue',
                 'eventmesh/infer_queue',
+                'eventmesh/describe_queue',
                 'eventmesh/dj_descriptions',
             ],
             $unscheduledHooks
