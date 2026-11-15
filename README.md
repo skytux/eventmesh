@@ -140,6 +140,9 @@ CI (GitHub Actions) runs PHPUnit and PHPCS on every push and pull request.
 
 ## Changelog
 
+### 1.10.16
+- Short event descriptions written once by the AI, in Finnish first and then translated; editable in the event editor; wp eventmesh describe fills the missing ones.
+
 ### 1.10.15
 - Test correction: the all-capitals name test now uses a DJ name that is in its event title. No change in behaviour.
 

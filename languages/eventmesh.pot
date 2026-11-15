@@ -330,6 +330,10 @@ msgstr ""
 msgid "Edit Event"
 msgstr ""
 
+#: src/Admin/DescriptionMetaBox.php:70
+msgid "Edited by hand."
+msgstr ""
+
 #: src/Admin/TranslationMetaBox.php:142
 msgid "Edited by hand. Automatic translation leaves it alone."
 msgstr ""
@@ -796,6 +800,10 @@ msgstr ""
 msgid "Not translated yet."
 msgstr ""
 
+#: src/Admin/DescriptionMetaBox.php:68
+msgid "Not written yet."
+msgstr ""
+
 #: templates/admin/djs.php:187
 #. translators: %s: where the description came from, such as Team page or SoundCloud
 msgid "Now from: %s."
@@ -949,6 +957,10 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
+#: src/Admin/DescriptionMetaBox.php:39
+msgid "Short description"
+msgstr ""
+
 #: templates/admin/settings.php:83
 msgid "Show a play button and load the player only when clicked"
 msgstr ""
@@ -1082,6 +1094,14 @@ msgstr ""
 msgid "Text"
 msgstr ""
 
+#: src/Admin/DescriptionMetaBox.php:66
+msgid "The AI could not write it (%s)."
+msgstr ""
+
+#: src/Admin/DescriptionMetaBox.php:59
+msgid "The AI is off or not set up (EventMesh → Settings). You can still write the texts here by hand."
+msgstr ""
+
 #: src/Admin/SettingsPage.php:156
 msgid "The API key was removed."
 msgstr ""
@@ -1202,6 +1222,10 @@ msgstr ""
 msgid "Twice daily"
 msgstr ""
 
+#: src/Admin/DescriptionMetaBox.php:53
+msgid "Two or three sentences for newsletters, emails and channel posts. The AI writes them once in Finnish and translates them. What you type here is kept. Empty a field to have the AI write it again."
+msgstr ""
+
 #: src/Admin/EventListBlock.php:1176
 msgid "Two separate, independently styleable Query Loops - one for upcoming events, one for past - each under its own heading, built from ordinary blocks so the layout can be freely rearranged, restyled, or removed."
 msgstr ""
@@ -1252,6 +1276,14 @@ msgstr ""
 
 #: templates/admin/diagnostics.php:44
 msgid "WordPress"
+msgstr ""
+
+#: src/Admin/DescriptionMetaBox.php:88
+msgid "Write again with the AI (keeps the translations edited by hand)"
+msgstr ""
+
+#: src/Admin/DescriptionMetaBox.php:72
+msgid "Written by the AI."
 msgstr ""
 
 #: src/Admin/SettingsPage.php:249 src/Admin/SettingsPage.php:271 src/Admin/TranslationMetaBox.php:309
