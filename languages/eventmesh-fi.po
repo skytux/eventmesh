@@ -1317,3 +1317,35 @@ msgstr "Teksti"
 #: src/blocks/ticket-button/index.js:153
 msgid "Shown on the button when the price is not shown."
 msgstr "Näytetään painikkeessa, kun hintaa ei näytetä."
+
+#: src/Admin/DescriptionMetaBox.php:38
+msgid "Short description"
+msgstr "Lyhyt kuvaus"
+
+#: src/Admin/DescriptionMetaBox.php:51
+msgid "Two or three sentences for newsletters, emails and channel posts. The AI writes them once in Finnish and translates them. What you type here is kept. Empty a field to have the AI write it again."
+msgstr "Kaksi tai kolme lausetta uutiskirjeisiin, sähköposteihin ja kanavan viesteihin. Tekoäly kirjoittaa ne kerran suomeksi ja kääntää ne. Tähän kirjoittamasi teksti säilyy. Tyhjennä kenttä, niin tekoäly kirjoittaa sen uudelleen."
+
+#: src/Admin/DescriptionMetaBox.php:57
+msgid "The AI is off or not set up (EventMesh → Settings). You can still write the texts here by hand."
+msgstr "Tekoäly on pois päältä tai asetukset puuttuvat (EventMesh → Asetukset). Voit silti kirjoittaa tekstit tähän käsin."
+
+#: src/Admin/DescriptionMetaBox.php:64
+msgid "The AI could not write it (%s)."
+msgstr "Tekoäly ei saanut sitä kirjoitettua (%s)."
+
+#: src/Admin/DescriptionMetaBox.php:66
+msgid "Not written yet."
+msgstr "Ei vielä kirjoitettu."
+
+#: src/Admin/DescriptionMetaBox.php:68
+msgid "Edited by hand."
+msgstr "Muokattu käsin."
+
+#: src/Admin/DescriptionMetaBox.php:70
+msgid "Written by the AI."
+msgstr "Tekoälyn kirjoittama."
+
+#: src/Admin/DescriptionMetaBox.php:88
+msgid "Write again with the AI (keeps the translations edited by hand)"
+msgstr "Kirjoita uudelleen tekoälyllä (käsin muokatut käännökset säilyvät)"

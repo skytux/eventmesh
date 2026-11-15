@@ -30,6 +30,7 @@ final class ScheduledJobsTest extends TestCase
                 'eventmesh/name_queue',
                 'eventmesh/infer_queue',
                 'eventmesh/dj_descriptions',
+                'eventmesh/describe_queue',
             ],
             $removed
         );

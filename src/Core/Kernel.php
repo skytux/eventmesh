@@ -6,6 +6,7 @@ namespace EventMesh\Core;
 
 use EventMesh\Admin\Admin;
 use EventMesh\Admin\DashboardPage;
+use EventMesh\Admin\DescriptionMetaBox;
 use EventMesh\Admin\DiagnosticsPage;
 use EventMesh\Admin\DjsPage;
 use EventMesh\Admin\EventListBlock;
@@ -17,6 +18,9 @@ use EventMesh\Connectors\Holvi\HolviHtmlParser;
 use EventMesh\Content\EventPostType;
 use EventMesh\Content\EventQuery;
 use EventMesh\Content\SingleEventTemplate;
+use EventMesh\Description\DescriptionCommand;
+use EventMesh\Description\DescriptionFilters;
+use EventMesh\Description\DescriptionQueue;
 use EventMesh\Djs\DjDescriptions;
 use EventMesh\Djs\DjLinkApplier;
 use EventMesh\Djs\DjRepository;
@@ -85,6 +89,13 @@ final class Kernel
         $this->container->get(EventNameFilters::class)->boot();
         $this->container->get(DocumentTitle::class)->boot();
         $this->container->get(EventFieldQueue::class)->boot();
+        $this->container->get(DescriptionQueue::class)->boot();
+        $this->container->get(DescriptionFilters::class)->boot();
+        $this->container->get(DescriptionMetaBox::class)->boot();
+
+        if (defined('WP_CLI') && WP_CLI && class_exists('WP_CLI')) {
+            \WP_CLI::add_command('eventmesh describe', $this->container->get(DescriptionCommand::class));
+        }
 
         do_action(
             'eventmesh/register_connectors',
@@ -270,6 +281,34 @@ final class Kernel
             TranslationQueue::class,
             fn (Container $container) => new TranslationQueue(
                 $container->get(Logger::class)
+            )
+        );
+
+        $this->container->singleton(
+            DescriptionQueue::class,
+            fn (Container $container) => new DescriptionQueue(
+                $container->get(Logger::class)
+            )
+        );
+
+        $this->container->singleton(
+            DescriptionFilters::class,
+            fn (Container $container) => new DescriptionFilters(
+                $container->get(DescriptionQueue::class)
+            )
+        );
+
+        $this->container->singleton(
+            DescriptionMetaBox::class,
+            fn (Container $container) => new DescriptionMetaBox(
+                $container->get(DescriptionFilters::class)
+            )
+        );
+
+        $this->container->singleton(
+            DescriptionCommand::class,
+            fn (Container $container) => new DescriptionCommand(
+                $container->get(DescriptionQueue::class)
             )
         );
 

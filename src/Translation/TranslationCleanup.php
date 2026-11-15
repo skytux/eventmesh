@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace EventMesh\Translation;
 
+use EventMesh\Description\DescriptionQueue;
 use EventMesh\Inference\EventFieldQueue;
 use EventMesh\Inference\InferredFields;
 use EventMesh\Naming\EventNameQueue;
@@ -35,6 +36,11 @@ final class TranslationCleanup
 
         delete_option(EventFieldQueue::OPTION_QUEUE);
         wp_clear_scheduled_hook(EventFieldQueue::HOOK);
+
+        // The descriptions themselves stay on the events: people edit them.
+        delete_option(DescriptionQueue::OPTION_QUEUE);
+        delete_option(DescriptionQueue::OPTION_MEMORY);
+        wp_clear_scheduled_hook(DescriptionQueue::HOOK);
     }
 
     /**

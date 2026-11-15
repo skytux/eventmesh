@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace EventMesh\Support;
 
+use EventMesh\Description\DescriptionQueue;
 use EventMesh\Djs\DjDescriptions;
 use EventMesh\Inference\EventFieldQueue;
 use EventMesh\Naming\EventNameQueue;
@@ -32,6 +33,7 @@ final class ScheduledJobs
             EventNameQueue::HOOK,
             EventFieldQueue::HOOK,
             DjDescriptions::HOOK,
+            DescriptionQueue::HOOK,
         ];
     }
 
