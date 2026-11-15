@@ -62,6 +62,64 @@ final class TranslationDisplayTest extends TestCase
         self::assertSame('sv', TranslationDisplay::currentLanguage());
     }
 
+    /**
+     * @param array<string, array{title: string, content: string, hash: string, status: string}> $stored
+     */
+    private static function reader(array $stored): \Closure
+    {
+        $empty = ['title' => '', 'content' => '', 'hash' => '', 'status' => ''];
+
+        return static fn (string $lang): array => $stored[$lang] ?? $empty;
+    }
+
+    public function testPicksThePageLanguageTranslationFirst(): void
+    {
+        $sv = ['title' => 'Dansafton', 'content' => '<p>Text</p>', 'hash' => 'h1', 'status' => 'auto'];
+
+        self::assertSame(
+            $sv,
+            TranslationDisplay::pick('sv', 'en', 'fi', 'h1', self::reader(['sv' => $sv, 'en' => self::translation()]))
+        );
+    }
+
+    public function testFallsBackToTheDefaultLanguageNotTheOriginal(): void
+    {
+        // A Finnish event with only an English translation, on a Swedish page.
+        self::assertSame(
+            self::translation(),
+            TranslationDisplay::pick('sv', 'en', 'fi', 'h1', self::reader(['en' => self::translation()]))
+        );
+    }
+
+    public function testFallsBackToTheOriginalWhenItIsInTheDefaultLanguage(): void
+    {
+        self::assertNull(
+            TranslationDisplay::pick('sv', 'en', 'en', 'h1', self::reader(['fi' => self::translation()]))
+        );
+    }
+
+    public function testFallsBackToTheOriginalWhenTheDefaultTranslationIsMissingOrStale(): void
+    {
+        self::assertNull(TranslationDisplay::pick('sv', 'en', 'fi', 'h1', self::reader([])));
+        self::assertNull(
+            TranslationDisplay::pick('sv', 'en', 'fi', 'h1', self::reader(['en' => self::translation('h0')]))
+        );
+        self::assertNull(TranslationDisplay::pick('sv', '', 'fi', 'h1', self::reader(['en' => self::translation()])));
+    }
+
+    public function testShowsTheOriginalOnAPageInTheOriginalLanguage(): void
+    {
+        self::assertNull(TranslationDisplay::pick('fi', 'en', 'fi', 'h1', self::reader(['en' => self::translation()])));
+    }
+
+    public function testDefaultLanguageComesFromPolylang(): void
+    {
+        Functions\when('pll_default_language')->justReturn('en');
+        Functions\when('get_locale')->justReturn('fi');
+
+        self::assertSame('en', TranslationDisplay::defaultLanguage());
+    }
+
     public function testLabelHasItsClass(): void
     {
         Functions\when('esc_html__')->returnArg();

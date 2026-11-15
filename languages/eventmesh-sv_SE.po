@@ -1,0 +1,1356 @@
+# Swedish translation for EventMesh.
+# Copyright (C) EventMesh contributors
+# This file is distributed under the GPL-2.0 license.
+msgid ""
+msgstr ""
+"Project-Id-Version: EventMesh\n"
+"Report-Msgid-Bugs-To: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2026-11-15 00:00+0200\n"
+"Language-Team: Swedish\n"
+"Language: sv_SE\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Domain: eventmesh\n"
+
+#: templates/admin/djs.php
+#. translators: %d: number of DJs
+msgid "%d DJ profile will be fetched in the background."
+msgid_plural "%d DJ profiles will be fetched in the background."
+msgstr[0] "%d DJ-profil hämtas i bakgrunden."
+msgstr[1] "%d DJ-profiler hämtas i bakgrunden."
+
+#: templates/admin/djs.php
+#. translators: %d: number of DJs
+msgid "%d DJ got a new or changed description."
+msgid_plural "%d DJs got a new or changed description."
+msgstr[0] "%d DJ fick en ny eller ändrad beskrivning."
+msgstr[1] "%d DJ:s fick en ny eller ändrad beskrivning."
+
+#: templates/admin/djs.php
+#. translators: %d: number of future events
+msgid "%d future event got new or changed links."
+msgid_plural "%d future events got new or changed links."
+msgstr[0] "%d kommande evenemang fick nya eller ändrade länkar."
+msgstr[1] "%d kommande evenemang fick nya eller ändrade länkar."
+
+#: templates/admin/dashboard.php
+msgid "(change in Settings)"
+msgstr "(ändra under Inställningar)"
+
+#: templates/admin/diagnostics.php
+msgid "(overdue)"
+msgstr "(försenad)"
+
+#: src/Admin/TranslationMetaBox.php
+msgid "(the text has changed; it will be checked again)"
+msgstr "(texten har ändrats; den kontrolleras igen)"
+
+#: templates/admin/djs.php
+msgid "A DJ needs a name."
+msgstr "En DJ behöver ett namn."
+
+#: templates/admin/djs.php
+msgid "A DJ without a typed description gets the text under its name on the team page: a heading (h2 to h4) that is the DJ name or other spelling, and the paragraphs after it. A DJ not on the team page gets the profile text from SoundCloud or Mixcloud. Other plugins read the descriptions with the eventmesh/event_djs filter."
+msgstr "En DJ utan inskriven beskrivning får texten under sitt namn på teamsidan: en rubrik (h2 till h4) som är DJ-namnet eller en annan stavning, och styckena efter den. En DJ som inte finns på teamsidan får profiltexten från SoundCloud eller Mixcloud. Andra tillägg läser beskrivningarna med filtret eventmesh/event_djs."
+
+#: templates/admin/djs.php
+msgid "A few sentences in English about the DJ. Text you type here is kept as it is. Leave it empty to fill it from the team page or the SoundCloud or Mixcloud profile."
+msgstr "Några meningar på engelska om DJ:n. Text du skriver här behålls som den är. Lämna tomt för att fylla i från teamsidan eller profilen på SoundCloud eller Mixcloud."
+
+#: templates/admin/settings.php
+msgid "A key is saved. Leave empty to keep the saved key."
+msgstr "En nyckel är sparad. Lämna tomt för att behålla den sparade nyckeln."
+
+#: templates/admin/settings.php
+msgid "API URL"
+msgstr "API-URL"
+
+#: templates/admin/settings.php
+msgid "API key"
+msgstr "API-nyckel"
+
+#: templates/admin/djs.php
+msgid "Actions"
+msgstr "Åtgärder"
+
+#: templates/admin/djs.php
+msgid "Add DJ"
+msgstr "Lägg till DJ"
+
+#: src/Content/EventPostType.php
+msgctxt "event"
+msgid "Add New"
+msgstr "Lägg till ny"
+
+#: src/Content/EventPostType.php
+msgid "Add New Event"
+msgstr "Lägg till nytt evenemang"
+
+#: templates/admin/sources.php
+msgid "Add another source"
+msgstr "Lägg till en källa till"
+
+#: templates/admin/sources.php
+msgid "Add one or more Holvi event URLs. Each row can be enabled or disabled independently."
+msgstr "Lägg till en eller flera evenemangs-URL:er från Holvi. Varje rad kan aktiveras eller inaktiveras för sig."
+
+#: src/blocks/provider-embed/index.js
+msgid "Add the platform name"
+msgstr "Lägg till plattformens namn"
+
+#: templates/admin/settings.php
+msgid "An event is never translated into its own original language."
+msgstr "Ett evenemang översätts aldrig till sitt eget originalspråk."
+
+#: src/blocks/event-list/index.js
+msgid "At most 50."
+msgstr "Högst 50."
+
+#: templates/admin/dashboard.php
+msgid "Automatic sync"
+msgstr "Automatisk synkning"
+
+#: templates/admin/settings.php
+msgid "Automatic translation"
+msgstr "Automatisk översättning"
+
+#: src/Admin/TranslationMetaBox.php
+#. translators: 1: model name, 2: date and time
+msgid "Automatic translation by %1$s, %2$s."
+msgstr "Automatiskt översatt av %1$s, %2$s."
+
+#: src/Admin/TranslationMetaBox.php
+msgid "Automatic translation is off or not set up (EventMesh → Settings). You can still write translations here by hand."
+msgstr "Automatisk översättning är av eller inte inställd (EventMesh → Inställningar). Du kan fortfarande skriva översättningar här för hand."
+
+#: src/Admin/SettingsPage.php
+msgid "Automatic translation is off, or the API URL, model or key is missing."
+msgstr "Automatisk översättning är av, eller så saknas API-URL, modell eller nyckel."
+
+#: src/Translation/TranslationDisplay.php templates/frontend/events-card.php templates/frontend/events-list.php
+msgid "Automatically translated"
+msgstr "Automatiskt översatt"
+
+#: src/Content/EventPostType.php
+msgid "Available"
+msgstr "Tillgänglig"
+
+#: templates/admin/diagnostics.php
+msgid "Available (fallback sync runs without delaying visitors)"
+msgstr "Tillgänglig (reservsynkningen körs utan att besökare får vänta)"
+
+#: src/Admin/TranslationMetaBox.php
+msgid "Back to automatic"
+msgstr "Tillbaka till automatisk"
+
+#: templates/admin/diagnostics.php templates/admin/settings.php
+msgid "Background sync"
+msgstr "Bakgrundssynkning"
+
+#: templates/admin/diagnostics.php
+msgid "Background sync health"
+msgstr "Bakgrundssynkningens hälsa"
+
+#: templates/frontend/sync-status.php
+msgid "Background sync:"
+msgstr "Bakgrundssynkning:"
+
+#: templates/admin/djs.php
+msgid "Cancel"
+msgstr "Avbryt"
+
+#: src/blocks/event-list/index.js
+msgid "Cards"
+msgstr "Kort"
+
+#: src/Support/SyncStatus.php
+msgid "Completed"
+msgstr "Klar"
+
+#: src/Support/SyncStatus.php
+msgid "Completed with errors"
+msgstr "Klar med fel"
+
+#: templates/admin/diagnostics.php
+msgid "Connected plugins"
+msgstr "Anslutna tillägg"
+
+#: src/Admin/SettingsPage.php
+msgid "Connection OK."
+msgstr "Anslutningen fungerar."
+
+#: src/Admin/SettingsPage.php
+#. translators: %s: short error kind, e.g. http_401 or network
+msgid "Connection failed: %s"
+msgstr "Anslutningen misslyckades: %s"
+
+#: templates/admin/sources.php
+msgid "Connector"
+msgstr "Koppling"
+
+#: templates/admin/sources.php
+msgid "Connectors"
+msgstr "Kopplingar"
+
+#: src/Admin/TranslationMetaBox.php
+msgid "Content"
+msgstr "Innehåll"
+
+#: src/Admin/DashboardPage.php
+#. translators: 1: created, 2: updated, 3: failed, 4: skipped, 5: archived, 6: date/time
+msgid "Created %1$d, updated %2$d, failed %3$d, skipped %4$d, archived %5$d — %6$s"
+msgstr "Skapade %1$d, uppdaterade %2$d, misslyckades %3$d, hoppade över %4$d, arkiverade %5$d — %6$s"
+
+#: src/Admin/DashboardPage.php
+#. translators: 1: created count, 2: updated count, 3: failed count, 4: skipped count, 5: archived count
+msgid "Created %1$d, updated %2$d, failed %3$d, skipped %4$d, archived %5$d."
+msgstr "Skapade %1$d, uppdaterade %2$d, misslyckades %3$d, hoppade över %4$d, arkiverade %5$d."
+
+#: templates/frontend/sync-status.php
+#. translators: 1: events created, 2: events updated, 3: events failed, 4: events skipped.
+msgid "Created %1$d, updated %2$d, failed %3$d, skipped %4$d."
+msgstr "Skapade %1$d, uppdaterade %2$d, misslyckades %3$d, hoppade över %4$d."
+
+#: src/Content/EventPostType.php
+msgid "Customized"
+msgstr "Anpassad"
+
+#: src/Admin/EventListBlock.php
+#. translators: event date without year, as a PHP date() format, e.g. Finnish "D j.n."
+msgid "D j F"
+msgstr "D j F"
+
+#: src/Admin/EventListBlock.php
+#. translators: event date with year, as a PHP date() format, e.g. Finnish "D j.n.Y"
+msgid "D j F Y"
+msgstr "D j F Y"
+
+#: templates/admin/diagnostics.php
+msgid "DISABLE_WP_CRON"
+msgstr "DISABLE_WP_CRON"
+
+#: templates/admin/djs.php
+msgid "DJ deleted."
+msgstr "DJ:n är borttagen."
+
+#: templates/admin/djs.php
+msgid "DJ name"
+msgstr "DJ-namn"
+
+#: src/Admin/TranslationMetaBox.php
+msgid "DJ names:"
+msgstr "DJ-namn:"
+
+#: templates/admin/djs.php
+msgid "DJ saved."
+msgstr "DJ:n är sparad."
+
+#: src/Admin/DjsPage.php templates/admin/djs.php
+msgid "DJs"
+msgstr "DJ:s"
+
+#: src/Admin/Admin.php
+msgid "Daily"
+msgstr "Dagligen"
+
+#: src/Admin/Admin.php templates/admin/dashboard.php
+msgid "Dashboard"
+msgstr "Översikt"
+
+#: src/blocks/event-field/index.js
+msgid "Date & time (full)"
+msgstr "Datum och tid (fullständigt)"
+
+#: src/blocks/event-field/index.js
+msgid "Date range"
+msgstr "Datumintervall"
+
+#: templates/admin/djs.php
+msgid "Delete"
+msgstr "Ta bort"
+
+#: templates/admin/settings.php
+msgid "Delete all EventMesh data when the plugin is deleted"
+msgstr "Ta bort all EventMesh-data när tillägget tas bort"
+
+#: templates/admin/djs.php
+msgid "Delete this DJ?"
+msgstr "Ta bort den här DJ:n?"
+
+#: src/Content/EventPostType.php templates/admin/djs.php
+msgid "Description"
+msgstr "Beskrivning"
+
+#: templates/admin/djs.php
+msgid "Descriptions"
+msgstr "Beskrivningar"
+
+#: templates/admin/djs.php
+msgid "Descriptions fetched."
+msgstr "Beskrivningarna är hämtade."
+
+#: src/Admin/Admin.php templates/admin/diagnostics.php
+msgid "Diagnostics"
+msgstr "Diagnostik"
+
+#: src/Content/EventPostType.php
+msgid "Disable (also returns 404 on its own page)"
+msgstr "Inaktivera (ger också 404 på sin egen sida)"
+
+#: templates/admin/dashboard.php templates/admin/diagnostics.php templates/frontend/sync-status.php
+msgid "Disabled"
+msgstr "Inaktiverad"
+
+#: src/Admin/EventListBlock.php
+msgid "Displays a curated list of upcoming events."
+msgstr "Visar en utvald lista med kommande evenemang."
+
+#: src/Connectors/Dummy/DummyConnector.php
+msgid "Dummy (testing)"
+msgstr "Dummy (test)"
+
+#: templates/admin/sources.php
+msgid "Dummy (testing) — sample events"
+msgstr "Dummy (test) — exempelevenemang"
+
+#: src/Content/EventPostType.php
+msgid "Each field shows the value found on the last sync; type a value below it to override what appears on the front end. Overrides are kept and never replaced by a later sync. Leave blank to use the found value."
+msgstr "Varje fält visar värdet som hittades vid senaste synkningen; skriv ett värde under det för att ersätta det som visas på webbplatsen. Ersättningar behålls och skrivs aldrig över av en senare synkning. Lämna tomt för att använda det hittade värdet."
+
+#: templates/admin/djs.php
+msgid "Each link must be an address on its own service: a Spotify link in the Spotify field, and so on."
+msgstr "Varje länk måste vara en adress på sin egen tjänst: en Spotify-länk i Spotify-fältet och så vidare."
+
+#: templates/admin/djs.php
+msgid "Edit"
+msgstr "Redigera"
+
+#: templates/admin/djs.php
+msgid "Edit DJ"
+msgstr "Redigera DJ"
+
+#: src/Content/EventPostType.php
+msgid "Edit Event"
+msgstr "Redigera evenemang"
+
+#: src/Admin/DescriptionMetaBox.php
+msgid "Edited by hand."
+msgstr "Redigerad för hand."
+
+#: src/Admin/TranslationMetaBox.php
+msgid "Edited by hand. Automatic translation leaves it alone."
+msgstr "Redigerad för hand. Automatisk översättning rör den inte."
+
+#: src/Support/EmbedHtmlSanitizer.php
+msgid "Embedded media player"
+msgstr "Inbäddad mediaspelare"
+
+#: templates/admin/settings.php
+msgid "Enable automatic background synchronization"
+msgstr "Aktivera automatisk synkning i bakgrunden"
+
+#: templates/admin/dashboard.php templates/admin/diagnostics.php templates/admin/sources.php
+#: templates/admin/sources.php
+#: templates/frontend/sync-status.php
+msgid "Enabled"
+msgstr "Aktiverad"
+
+#: src/blocks/event-field/index.js
+msgid "End date"
+msgstr "Slutdatum"
+
+#: src/blocks/event-field/index.js
+msgid "End time"
+msgstr "Sluttid"
+
+#: src/Content/EventPostType.php
+msgid "Ends at"
+msgstr "Slutar"
+
+#: src/blocks/provider-embed/index.js
+msgid "Ends the button with the platform the player comes from, e.g. \"Spotify\". On an embed from a platform EventMesh cannot name, the suffix is left off too, so the button never trails off mid-sentence."
+msgstr "Avslutar knappen med plattformen spelaren kommer från, t.ex. \"Spotify\". För en inbäddning från en plattform som EventMesh inte kan namnge utelämnas även tillägget, så att knappen aldrig slutar mitt i en mening."
+
+#: src/Admin/SettingsPage.php
+msgid "Enter the API URL, model and key first."
+msgstr "Ange API-URL, modell och nyckel först."
+
+#: src/Support/SyncStatus.php templates/admin/dashboard.php
+msgid "Error"
+msgstr "Fel"
+
+#: src/Content/EventPostType.php
+msgctxt "add new on admin bar"
+msgid "Event"
+msgstr "Evenemang"
+
+#: src/Content/EventPostType.php
+msgctxt "post type singular name"
+msgid "Event"
+msgstr "Evenemang"
+
+#: src/Content/EventPostType.php
+msgid "Event Archives"
+msgstr "Evenemangsarkiv"
+
+#: src/Content/EventPostType.php
+msgid "Event Attributes"
+msgstr "Evenemangsattribut"
+
+#: src/blocks/event-field/index.js
+msgid "Event field"
+msgstr "Evenemangsfält"
+
+#: src/blocks/event-list/index.js
+msgid "Event list settings"
+msgstr "Inställningar för evenemangslistan"
+
+#: src/Admin/TranslationMetaBox.php
+msgid "Event name:"
+msgstr "Evenemangets namn:"
+
+#: src/Admin/Admin.php src/Admin/EventListBlock.php
+msgid "EventMesh"
+msgstr "EventMesh"
+
+#: src/Admin/SettingsPage.php
+msgid "EventMesh can no longer read the saved API key for automatic translation (the site's security keys have changed). Enter the key again."
+msgstr "EventMesh kan inte längre läsa den sparade API-nyckeln för automatisk översättning (webbplatsens säkerhetsnycklar har ändrats). Ange nyckeln igen."
+
+#: src/Content/EventPostType.php
+msgid "EventMesh details"
+msgstr "EventMesh-detaljer"
+
+#: src/Admin/EventListBlock.php
+msgid "EventMesh events"
+msgstr "EventMesh-evenemang"
+
+#: src/Admin/EventListBlock.php
+msgid "EventMesh events (upcoming + past)"
+msgstr "EventMesh-evenemang (kommande + tidigare)"
+
+#: templates/frontend/sync-status.php
+msgid "EventMesh sync status"
+msgstr "EventMesh synkstatus"
+
+#: src/Content/SingleEventTemplate.php
+msgid "EventMesh: Single event"
+msgstr "EventMesh: Enskilt evenemang"
+
+#: src/Content/EventPostType.php
+msgid "Events"
+msgstr "Evenemang"
+
+#: src/Content/EventPostType.php
+msgctxt "admin menu"
+msgid "Events"
+msgstr "Evenemang"
+
+#: src/Content/EventPostType.php
+msgctxt "post type general name"
+msgid "Events"
+msgstr "Evenemang"
+
+#: src/Content/EventPostType.php
+msgid "Events list"
+msgstr "Evenemangslista"
+
+#: src/Content/EventPostType.php
+msgid "Events list navigation"
+msgstr "Navigering i evenemangslistan"
+
+#: templates/admin/settings.php
+#. translators: %d: number of events
+msgid "Events waiting for translation: %d"
+msgstr "Evenemang som väntar på översättning: %d"
+
+#: src/Admin/Admin.php
+msgid "Every 15 minutes"
+msgstr "Var 15:e minut"
+
+#: src/Admin/Admin.php
+msgid "Every 30 minutes"
+msgstr "Var 30:e minut"
+
+#: templates/admin/sources.php
+msgid "Every installed connector is listed here. Tick a connector to sync its events; unticking it archives its events (moves them to Draft) on the next sync."
+msgstr "Alla installerade kopplingar listas här. Kryssa i en koppling för att synka dess evenemang; tar du bort krysset arkiveras dess evenemang (flyttas till Utkast) vid nästa synkning."
+
+#: src/Content/EventPostType.php
+msgid "External ID"
+msgstr "Externt ID"
+
+#: templates/admin/settings.php
+msgid "Factory Reset"
+msgstr "Fabriksåterställning"
+
+#: templates/admin/settings.php
+msgid "Factory reset"
+msgstr "Fabriksåterställning"
+
+#: src/Admin/SettingsPage.php
+#. translators: %d: number of deleted events
+msgid "Factory reset complete: removed %d event(s). All settings reset."
+msgstr "Fabriksåterställningen är klar: %d evenemang togs bort. Alla inställningar är återställda."
+
+#: src/Admin/TranslationMetaBox.php
+#. translators: 1: number of failed attempts, 2: short error kind
+msgid "Failed %1$d times (%2$s). Given up until the original changes."
+msgstr "Misslyckades %1$d gånger (%2$s). Inga fler försök förrän originalet ändras."
+
+#: src/Admin/TranslationMetaBox.php
+#. translators: 1: number of failed attempts, 2: maximum attempts, 3: short error kind
+msgid "Failed attempts: %1$d of %2$d (%3$s). Tried again later."
+msgstr "Misslyckade försök: %1$d av %2$d (%3$s). Försöker igen senare."
+
+#: src/Content/EventPostType.php
+msgid "Featured image"
+msgstr "Utvald bild"
+
+#: src/Content/EventPostType.php
+msgid "Featured image set"
+msgstr "Utvald bild angiven"
+
+#: templates/admin/djs.php
+msgid "Fetch descriptions now"
+msgstr "Hämta beskrivningar nu"
+
+#: src/blocks/event-field/index.js
+msgid "Field"
+msgstr "Fält"
+
+#: src/Content/EventPostType.php
+msgid "Filter events list"
+msgstr "Filtrera evenemangslistan"
+
+#: src/Admin/TranslationMetaBox.php
+msgid "Finnish name:"
+msgstr "Finskt namn:"
+
+#: src/Content/EventPostType.php
+#. translators: %s: field name, e.g. Title
+msgid "Follow source again for %s"
+msgstr "Följ källan igen för %s"
+
+#: src/Content/EventPostType.php
+msgid "Follow the source"
+msgstr "Följ källan"
+
+#: src/Content/EventPostType.php
+msgid "Following source"
+msgstr "Följer källan"
+
+#: src/Content/EventPostType.php
+msgid "Force available"
+msgstr "Tvinga tillgänglig"
+
+#: src/Content/EventPostType.php
+msgid "Force sold out"
+msgstr "Tvinga slutsåld"
+
+#: src/Content/EventPostType.php
+msgid "Found:"
+msgstr "Hittat:"
+
+#: templates/admin/diagnostics.php
+msgid "Free"
+msgstr "Gratis"
+
+#: src/blocks/event-field/index.js src/blocks/past-events-marker/index.js
+msgid "HTML tag"
+msgstr "HTML-tagg"
+
+#: src/blocks/event-field/index.js src/blocks/past-events-marker/index.js
+msgid "Heading 1"
+msgstr "Rubrik 1"
+
+#: src/blocks/event-field/index.js src/blocks/past-events-marker/index.js
+msgid "Heading 2"
+msgstr "Rubrik 2"
+
+#: src/blocks/event-field/index.js src/blocks/past-events-marker/index.js
+msgid "Heading 3"
+msgstr "Rubrik 3"
+
+#: src/blocks/event-field/index.js src/blocks/past-events-marker/index.js
+msgid "Heading 4"
+msgstr "Rubrik 4"
+
+#: src/blocks/event-field/index.js src/blocks/past-events-marker/index.js
+msgid "Heading 5"
+msgstr "Rubrik 5"
+
+#: src/blocks/event-field/index.js src/blocks/past-events-marker/index.js
+msgid "Heading 6"
+msgstr "Rubrik 6"
+
+#: templates/admin/diagnostics.php
+#. translators: %d: number of seconds the sync lock has been held.
+msgid "Held (%ds) — a sync is running or recently died"
+msgstr "Upptaget (%ds) — en synkning körs eller avbröts nyss"
+
+#: src/Content/EventPostType.php
+msgid "Hide from event listings"
+msgstr "Dölj i evenemangslistor"
+
+#: src/Connectors/Holvi/HolviConnector.php
+msgid "Holvi"
+msgstr "Holvi"
+
+#: templates/admin/sources.php
+msgid "Holvi source URLs"
+msgstr "Källadresser i Holvi"
+
+#: src/Admin/Admin.php
+msgid "Hourly"
+msgstr "Varje timme"
+
+#: templates/admin/settings.php
+msgid "How often background sync runs. Actual timing still depends on site traffic unless real server cron is configured."
+msgstr "Hur ofta bakgrundssynkningen körs. Den faktiska tidpunkten beror ändå på trafiken till webbplatsen om inte en riktig servercron är inställd."
+
+#: templates/admin/sources.php
+msgid "ID"
+msgstr "ID"
+
+#: src/Admin/DashboardPage.php src/Support/SyncStatus.php
+msgid "Idle"
+msgstr "Vilande"
+
+#: src/Content/EventPostType.php
+msgid "Insert into event"
+msgstr "Infoga i evenemang"
+
+#: src/Content/EventPostType.php
+msgid "Keep published if removed from the source"
+msgstr "Håll publicerad om den tas bort från källan"
+
+#: src/blocks/ticket-button/index.js
+msgid "Label"
+msgstr "Etikett"
+
+#: templates/admin/diagnostics.php
+msgid "Last completed sync"
+msgstr "Senaste slutförda synkning"
+
+#: templates/admin/dashboard.php
+msgid "Last error"
+msgstr "Senaste fel"
+
+#: templates/admin/settings.php
+#. translators: %s: short error kind, e.g. http_401 or network
+msgid "Last error: %s"
+msgstr "Senaste fel: %s"
+
+#: templates/frontend/sync-status.php
+msgid "Last run:"
+msgstr "Senast körd:"
+
+#: templates/admin/settings.php
+#. translators: 1: date and time, 2: translations made, 3: translations that failed the check
+msgid "Last run: %1$s. Translated %2$d, failed the check %3$d."
+msgstr "Senast körd: %1$s. Översatte %2$d, %3$d klarade inte kontrollen."
+
+#: templates/admin/dashboard.php
+msgid "Last sync"
+msgstr "Senaste synkning"
+
+#: templates/admin/diagnostics.php
+msgid "Last sync attempt"
+msgstr "Senaste synkförsök"
+
+#: src/blocks/event-list/index.js
+msgid "Layout"
+msgstr "Layout"
+
+#: src/Content/SingleEventTemplate.php
+msgid "Layout for an individual event page. Fully editable as blocks."
+msgstr "Layout för en enskild evenemangssida. Helt redigerbar som block."
+
+#: templates/admin/diagnostics.php
+msgid "Level"
+msgstr "Nivå"
+
+#: src/blocks/event-field/index.js
+msgid "Link to the event page"
+msgstr "Länka till evenemangssidan"
+
+#: src/blocks/event-list/index.js
+msgid "List"
+msgstr "Lista"
+
+#: src/Support/ProviderEmbedMarkup.php
+msgid "Listen to this DJ"
+msgstr "Lyssna på den här DJ:n"
+
+#: templates/admin/settings.php
+msgid "Load embedded players only when scrolled into view"
+msgstr "Ladda inbäddade spelare först när de syns på skärmen"
+
+#: templates/admin/diagnostics.php
+msgid "Message"
+msgstr "Meddelande"
+
+#: templates/frontend/sync-status.php
+msgid "Message:"
+msgstr "Meddelande:"
+
+#: src/Support/EmbedHtmlSanitizer.php
+msgid "Mixcloud player"
+msgstr "Mixcloud-spelare"
+
+#: templates/admin/settings.php
+msgid "Model"
+msgstr "Modell"
+
+#: src/Support/DateTimeFormat.php
+msgid "Never"
+msgstr "Aldrig"
+
+#: src/Content/EventPostType.php
+msgid "New Event"
+msgstr "Nytt evenemang"
+
+#: templates/frontend/sync-status.php
+msgid "Next run:"
+msgstr "Nästa körning:"
+
+#: templates/admin/dashboard.php templates/admin/diagnostics.php
+msgid "Next scheduled sync"
+msgstr "Nästa schemalagda synkning"
+
+#: templates/admin/djs.php
+msgid "No DJs yet."
+msgstr "Inga DJ:s än."
+
+#: templates/admin/sources.php
+msgid "No connectors are installed yet."
+msgstr "Inga kopplingar är installerade än."
+
+#: src/Admin/DashboardPage.php
+msgid "No connectors are registered."
+msgstr "Inga kopplingar är registrerade."
+
+#: templates/frontend/events-list.php
+msgid "No events are available yet."
+msgstr "Inga evenemang finns än."
+
+#: src/Content/EventPostType.php
+msgid "No events found in Trash."
+msgstr "Inga evenemang hittades i papperskorgen."
+
+#: src/Content/EventPostType.php
+msgid "No events found."
+msgstr "Inga evenemang hittades."
+
+#: src/Admin/DashboardPage.php
+msgid "No events were found."
+msgstr "Inga evenemang hittades."
+
+#: src/Content/EventPostType.php
+msgid "No featured image"
+msgstr "Ingen utvald bild"
+
+#: templates/admin/settings.php
+msgid "No key saved."
+msgstr "Ingen nyckel sparad."
+
+#: templates/admin/diagnostics.php
+msgid "No other plugins are connected to EventMesh."
+msgstr "Inga andra tillägg är anslutna till EventMesh."
+
+#: src/Admin/EventListBlock.php
+msgid "No past events."
+msgstr "Inga tidigare evenemang."
+
+#: templates/admin/dashboard.php templates/admin/diagnostics.php
+msgid "No recent log entries yet."
+msgstr "Inga loggposter än."
+
+#: templates/frontend/sync-status.php
+msgid "No sync has run yet."
+msgstr "Ingen synkning har körts än."
+
+#: src/Admin/DashboardPage.php
+msgid "No sync yet."
+msgstr "Ingen synkning än."
+
+#: src/Admin/TranslationMetaBox.php
+msgid "No target languages other than the original."
+msgstr "Inga målspråk utöver originalet."
+
+#: src/Admin/EventListBlock.php
+msgid "No upcoming events."
+msgstr "Inga kommande evenemang."
+
+#: templates/admin/dashboard.php templates/admin/djs.php
+msgid "None"
+msgstr "Ingen"
+
+#: src/Content/EventPostType.php
+msgid "Normally an event that no longer appears in its source is moved to Draft on the next sync. Tick this to keep it published; its details stay frozen at the last sync."
+msgstr "Normalt flyttas ett evenemang som inte längre finns i sin källa till Utkast vid nästa synkning. Kryssa i detta för att hålla det publicerat; dess uppgifter låses vid senaste synkningen."
+
+#: templates/admin/diagnostics.php
+msgid "Not available (fallback sync runs inline on a visitor request)"
+msgstr "Inte tillgänglig (reservsynkningen körs direkt vid ett besök)"
+
+#: src/Admin/DashboardPage.php templates/admin/diagnostics.php
+msgid "Not scheduled"
+msgstr "Inte schemalagd"
+
+#: src/Admin/TranslationMetaBox.php
+msgid "Not translated yet."
+msgstr "Inte översatt än."
+
+#: src/Admin/DescriptionMetaBox.php
+msgid "Not written yet."
+msgstr "Inte skriven än."
+
+#: templates/admin/djs.php
+#. translators: %s: where the description came from, such as Team page or SoundCloud
+msgid "Now from: %s."
+msgstr "Nu från: %s."
+
+#: src/blocks/event-list/index.js
+msgid "Number of events"
+msgstr "Antal evenemang"
+
+#: templates/admin/settings.php
+msgid "Off by default: deleting the plugin keeps every synced event and setting so reinstalling picks up where you left off."
+msgstr "Av som standard: när tillägget tas bort behålls alla synkade evenemang och inställningar, så att en ny installation fortsätter där du slutade."
+
+#: templates/admin/djs.php
+msgid "One per line. Matched the same way as the name."
+msgstr "En per rad. Matchas på samma sätt som namnet."
+
+#: templates/admin/settings.php
+msgid "Only applies when the play button above is off. Players still load on their own, just not until the visitor scrolls to them. Players without JavaScript fall back to loading normally."
+msgstr "Gäller bara när spelknappen ovan är av. Spelarna laddas ändå av sig själva, men först när besökaren scrollar fram till dem. Utan JavaScript laddas spelarna som vanligt."
+
+#: src/Admin/TranslationMetaBox.php
+msgid "Original language:"
+msgstr "Originalspråk:"
+
+#: templates/admin/djs.php
+msgid "Other spellings"
+msgstr "Andra stavningar"
+
+#: templates/admin/diagnostics.php
+msgid "PHP"
+msgstr "PHP"
+
+#: src/blocks/event-field/index.js src/blocks/past-events-marker/index.js
+msgid "Paragraph"
+msgstr "Stycke"
+
+#: src/Content/EventPostType.php
+msgid "Parent Events:"
+msgstr "Överordnade evenemang:"
+
+#: src/Admin/EventListBlock.php templates/frontend/events-card.php templates/frontend/events-list.php
+msgid "Past Events"
+msgstr "Tidigare evenemang"
+
+#: src/Admin/EventListBlock.php
+msgid "Past events"
+msgstr "Tidigare evenemang"
+
+#: src/blocks/past-events-marker/index.js
+msgid "Past events marker"
+msgstr "Markör för tidigare evenemang"
+
+#: src/blocks/provider-embed/index.js
+msgid "Play button text"
+msgstr "Text på spelknappen"
+
+#: templates/admin/diagnostics.php
+msgid "Plugin"
+msgstr "Tillägg"
+
+#: src/blocks/event-field/index.js src/blocks/provider-embed/index.js src/blocks/ticket-button/index.js
+msgid "Prefix"
+msgstr "Prefix"
+
+#: src/Content/EventPostType.php src/blocks/event-field/index.js
+msgid "Price"
+msgstr "Pris"
+
+#: src/blocks/provider-embed/index.js
+msgid "Provider embed"
+msgstr "Inbäddning från tjänst"
+
+#: templates/admin/settings.php
+msgid "Provider embeds"
+msgstr "Inbäddningar från tjänster"
+
+#: src/Content/EventPostType.php
+msgid "Provider links"
+msgstr "Länkar till tjänster"
+
+#: templates/admin/dashboard.php
+msgid "Published events"
+msgstr "Publicerade evenemang"
+
+#: templates/admin/djs.php
+msgid "Reads the team page and every profile again. Typed descriptions are not changed."
+msgstr "Läser teamsidan och alla profiler igen. Inskrivna beskrivningar ändras inte."
+
+#: templates/admin/diagnostics.php
+msgid "Recent EventMesh activity"
+msgstr "Senaste EventMesh-aktivitet"
+
+#: templates/admin/dashboard.php
+msgid "Recent activity"
+msgstr "Senaste aktivitet"
+
+#: templates/admin/settings.php
+msgid "Recommended. A page listing many events downloads nothing from Spotify/SoundCloud/Mixcloud until a visitor actually asks to hear something, which is by far the biggest thing you can do for its page speed score. Turn this off to have the players appear ready to play on arrival."
+msgstr "Rekommenderas. En sida med många evenemang laddar inget från Spotify/SoundCloud/Mixcloud förrän en besökare faktiskt vill lyssna, vilket är det överlägset största du kan göra för sidans hastighetspoäng. Stäng av detta om spelarna ska vara redo att spela direkt."
+
+#: src/Content/EventPostType.php
+msgid "Remote URL"
+msgstr "Fjärr-URL"
+
+#: templates/admin/sources.php
+msgid "Remove"
+msgstr "Ta bort"
+
+#: templates/admin/settings.php
+msgid "Remove key"
+msgstr "Ta bort nyckel"
+
+#: templates/admin/settings.php
+msgid "Removes every synced event and resets all EventMesh settings to their defaults. The plugin itself stays installed and active. This cannot be undone."
+msgstr "Tar bort alla synkade evenemang och återställer alla EventMesh-inställningar till standard. Själva tillägget förblir installerat och aktivt. Detta kan inte ångras."
+
+#: src/Support/SyncStatus.php
+msgid "Running"
+msgstr "Körs"
+
+#: templates/admin/settings.php
+msgid "Runs only when the API URL, model and key below are all set."
+msgstr "Körs bara när API-URL, modell och nyckel nedan alla är angivna."
+
+#: templates/admin/djs.php
+msgid "Save DJ"
+msgstr "Spara DJ"
+
+#: templates/admin/settings.php
+msgid "Save Settings"
+msgstr "Spara inställningar"
+
+#: templates/admin/sources.php
+msgid "Save sources"
+msgstr "Spara källor"
+
+#: templates/admin/djs.php
+msgid "Save team page"
+msgstr "Spara teamsida"
+
+#: templates/admin/settings.php
+msgid "Save the settings first; both buttons use the saved settings."
+msgstr "Spara inställningarna först; båda knapparna använder de sparade inställningarna."
+
+#: src/Content/EventPostType.php
+msgid "Search Events"
+msgstr "Sök evenemang"
+
+#: src/Admin/Admin.php src/Admin/SettingsPage.php templates/admin/settings.php
+msgid "Settings"
+msgstr "Inställningar"
+
+#: src/Admin/DescriptionMetaBox.php
+msgid "Short description"
+msgstr "Kort beskrivning"
+
+#: templates/admin/settings.php
+msgid "Show a play button and load the player only when clicked"
+msgstr "Visa en spelknapp och ladda spelaren först vid klick"
+
+#: src/Admin/EventListBlock.php
+msgid "Show more"
+msgstr "Visa mer"
+
+#: src/blocks/ticket-button/index.js
+msgid "Show price"
+msgstr "Visa pris"
+
+#: src/blocks/ticket-button/index.js
+msgid "Shown after the button label, e.g. \" →\". Skipped on the \"Sold out\" state."
+msgstr "Visas efter knappens text, t.ex. \" →\". Hoppas över när det är slutsålt."
+
+#: src/blocks/provider-embed/index.js
+msgid "Shown after the text above, e.g. \" on \" to join it to the platform name below. Spacing is used exactly as typed."
+msgstr "Visas efter texten ovan, t.ex. \" på \" för att foga den till plattformsnamnet nedan. Mellanslag används exakt som de skrivs."
+
+#: src/blocks/event-field/index.js
+msgid "Shown after the value, only when the value exists. Include your own spacing, e.g. \" onwards\"."
+msgstr "Visas efter värdet, bara när värdet finns. Lägg in egna mellanslag, t.ex. \" och framåt\"."
+
+#: src/blocks/ticket-button/index.js
+msgid "Shown before the button label, e.g. \"From \". Skipped on the \"Sold out\" state."
+msgstr "Visas före knappens text, t.ex. \"Från \". Hoppas över när det är slutsålt."
+
+#: src/blocks/provider-embed/index.js
+msgid "Shown before the text above. Spacing is used exactly as typed."
+msgstr "Visas före texten ovan. Mellanslag används exakt som de skrivs."
+
+#: src/blocks/event-field/index.js
+msgid "Shown before the value, only when the value exists. Include your own spacing, e.g. \"at \"."
+msgstr "Visas före värdet, bara när värdet finns. Lägg in egna mellanslag, t.ex. \"kl. \"."
+
+#: src/blocks/provider-embed/index.js
+msgid "Shown on the button that loads the player. Only used while \"Show a play button and load the player only when clicked\" is on under Settings."
+msgstr "Visas på knappen som laddar spelaren. Används bara när \"Visa en spelknapp och ladda spelaren först vid klick\" är på under Inställningar."
+
+#: src/blocks/ticket-button/index.js
+msgid "Shown on the button when the price is not shown."
+msgstr "Visas på knappen när priset inte visas."
+
+#: src/Admin/EventListBlock.php src/Content/EventPostType.php templates/frontend/events-card.php
+#: templates/frontend/events-card.php templates/frontend/events-list.php src/blocks/ticket-button/index.js
+msgid "Sold out"
+msgstr "Slutsålt"
+
+#: src/Support/EmbedHtmlSanitizer.php
+msgid "SoundCloud player"
+msgstr "SoundCloud-spelare"
+
+#: src/Content/EventPostType.php
+msgid "Source"
+msgstr "Källa"
+
+#: src/Admin/Admin.php templates/admin/sources.php
+msgid "Sources"
+msgstr "Källor"
+
+#: src/Support/EmbedHtmlSanitizer.php
+msgid "Spotify player"
+msgstr "Spotify-spelare"
+
+#: src/blocks/event-field/index.js
+msgid "Start date"
+msgstr "Startdatum"
+
+#: src/blocks/event-field/index.js
+msgid "Start time"
+msgstr "Starttid"
+
+#: src/Content/EventPostType.php
+msgid "Starts at"
+msgstr "Börjar"
+
+#: templates/frontend/events-list.php
+msgid "Starts:"
+msgstr "Börjar:"
+
+#: templates/admin/dashboard.php templates/admin/diagnostics.php templates/admin/settings.php
+msgid "Status"
+msgstr "Status"
+
+#: templates/frontend/sync-status.php
+msgid "Status:"
+msgstr "Status:"
+
+#: src/blocks/event-field/index.js src/blocks/provider-embed/index.js src/blocks/ticket-button/index.js
+msgid "Suffix"
+msgstr "Suffix"
+
+#: src/Admin/DashboardPage.php
+msgid "Sync in progress…"
+msgstr "Synkning pågår…"
+
+#: templates/admin/settings.php
+msgid "Sync interval"
+msgstr "Synkintervall"
+
+#: templates/admin/diagnostics.php
+msgid "Sync lock"
+msgstr "Synklås"
+
+#: templates/admin/dashboard.php
+msgid "Sync now"
+msgstr "Synka nu"
+
+#: templates/admin/dashboard.php
+msgid "Sync status"
+msgstr "Synkstatus"
+
+#: src/Content/EventPostType.php
+msgid "Synced content"
+msgstr "Synkat innehåll"
+
+#: src/Admin/DjsPage.php templates/admin/djs.php
+msgid "Team page"
+msgstr "Teamsida"
+
+#: templates/admin/djs.php
+msgid "Team page saved."
+msgstr "Teamsidan är sparad."
+
+#: templates/admin/settings.php
+msgid "Test connection"
+msgstr "Testa anslutningen"
+
+#: src/blocks/past-events-marker/index.js
+msgid "Text"
+msgstr "Text"
+
+#: src/Admin/DescriptionMetaBox.php
+msgid "The AI could not write it (%s)."
+msgstr "AI:n kunde inte skriva den (%s)."
+
+#: src/Admin/DescriptionMetaBox.php
+msgid "The AI is off or not set up (EventMesh → Settings). You can still write the texts here by hand."
+msgstr "AI:n är av eller inte inställd (EventMesh → Inställningar). Du kan fortfarande skriva texterna här för hand."
+
+#: src/Admin/SettingsPage.php
+msgid "The API key was removed."
+msgstr "API-nyckeln togs bort."
+
+#: templates/admin/djs.php
+msgid "The DJ could not be saved."
+msgstr "DJ:n kunde inte sparas."
+
+#: src/Admin/DiagnosticsPage.php
+msgid "The background sync is overdue even though DISABLE_WP_CRON is set, so nothing is triggering wp-cron.php. Confirm your system cron (or external scheduler) is calling your-site/wp-cron.php on the interval you expect."
+msgstr "Bakgrundssynkningen är försenad trots att DISABLE_WP_CRON är satt, så inget anropar wp-cron.php. Kontrollera att systemets cron (eller en extern schemaläggare) anropar din-webbplats/wp-cron.php med det intervall du väntar dig."
+
+#: src/Admin/DiagnosticsPage.php
+msgid "The background sync is overdue. WordPress runs it via a loopback request, which this host appears to block. Add define('DISABLE_WP_CRON', true); to wp-config.php and trigger wp-cron.php from a system cron (or external scheduler) instead."
+msgstr "Bakgrundssynkningen är försenad. WordPress kör den med en loopback-förfrågan, som det här webbhotellet verkar blockera. Lägg till define('DISABLE_WP_CRON', true); i wp-config.php och anropa wp-cron.php från systemets cron (eller en extern schemaläggare) i stället."
+
+#: templates/admin/settings.php
+msgid "The base URL, without /chat/completions at the end."
+msgstr "Bas-URL:en, utan /chat/completions på slutet."
+
+#: templates/admin/sources.php
+msgid "The dummy connector has no URLs. When enabled above, it generates these sample events on each sync — no network calls:"
+msgstr "Dummykopplingen har inga URL:er. När den är aktiverad ovan skapar den dessa exempelevenemang vid varje synkning — utan nätverksanrop:"
+
+#: templates/admin/settings.php
+msgid "The key is stored encrypted and is never shown again."
+msgstr "Nyckeln lagras krypterad och visas aldrig igen."
+
+#: src/Admin/TranslationMetaBox.php
+msgid "The original has changed since this was made, so the original is shown until it is translated again."
+msgstr "Originalet har ändrats sedan detta gjordes, så originalet visas tills det har översatts igen."
+
+#: src/Admin/TranslationMetaBox.php
+msgid "The original has changed since this was saved, so the original is shown. Update this translation and save, or go back to automatic."
+msgstr "Originalet har ändrats sedan detta sparades, så originalet visas. Uppdatera översättningen och spara, eller gå tillbaka till automatisk."
+
+#: src/Admin/View.php
+msgid "The requested EventMesh admin view could not be loaded."
+msgstr "Den begärda EventMesh-vyn kunde inte laddas."
+
+#: templates/admin/settings.php
+msgid "The saved key can no longer be read (the site's security keys have changed). Enter it again."
+msgstr "Den sparade nyckeln kan inte längre läsas (webbplatsens säkerhetsnycklar har ändrats). Ange den igen."
+
+#: templates/admin/dashboard.php
+msgid "The sync request failed. Reload and try again."
+msgstr "Synkförfrågan misslyckades. Ladda om och försök igen."
+
+#: src/Content/EventPostType.php
+msgid "The title, description, and featured image follow the source until you edit them, then your version is kept on every sync. Tick a box to discard your version and follow the source again when you save."
+msgstr "Titel, beskrivning och utvald bild följer källan tills du redigerar dem, sedan behålls din version vid varje synkning. Kryssa i en ruta för att slänga din version och följa källan igen när du sparar."
+
+#: templates/admin/settings.php
+msgid "This will permanently delete all synced events and reset every EventMesh setting. Continue?"
+msgstr "Detta tar bort alla synkade evenemang permanent och återställer alla EventMesh-inställningar. Fortsätta?"
+
+#: src/blocks/ticket-button/index.js
+msgid "Ticket button"
+msgstr "Biljettknapp"
+
+#: src/Admin/EventListBlock.php templates/frontend/events-card.php templates/frontend/events-list.php src/blocks/ticket-button/index.js
+#: src/blocks/ticket-button/index.js
+msgid "Tickets"
+msgstr "Biljetter"
+
+#: src/Admin/EventListBlock.php src/blocks/ticket-button/index.js
+#. translators: %s: the ticket price, e.g. "22.00 EUR".
+msgid "Tickets %s"
+msgstr "Biljetter %s"
+
+#: templates/admin/diagnostics.php
+msgid "Time"
+msgstr "Tid"
+
+#: src/blocks/event-field/index.js
+msgid "Time range"
+msgstr "Tidsintervall"
+
+#: src/Admin/TranslationMetaBox.php src/Content/EventPostType.php
+msgid "Title"
+msgstr "Titel"
+
+#: src/blocks/event-field/index.js
+msgid "Title (date removed)"
+msgstr "Titel (utan datum)"
+
+#: templates/admin/settings.php
+msgid "Translate events automatically"
+msgstr "Översätt evenemang automatiskt"
+
+#: templates/admin/settings.php
+msgid "Translate into"
+msgstr "Översätt till"
+
+#: templates/admin/settings.php
+msgid "Translate now"
+msgstr "Översätt nu"
+
+#: src/Admin/SettingsPage.php
+#. translators: 1: translations made, 2: translations that failed the check, 3: events still queued
+msgid "Translated %1$d, failed the check %2$d. Events still queued: %3$d (they continue in the background)."
+msgstr "Översatte %1$d, %2$d klarade inte kontrollen. Evenemang kvar i kön: %3$d (de fortsätter i bakgrunden)."
+
+#: src/Admin/SettingsPage.php
+#. translators: 1: number of translations made, 2: short error kind
+msgid "Translated %1$d. Stopped by an error from the LLM server: %2$s. It is tried again later."
+msgstr "Översatte %1$d. Stoppades av ett fel från LLM-servern: %2$s. Försöker igen senare."
+
+#: templates/admin/settings.php
+msgid "Translates the title and text of each event with a language model on a server you choose (any service with an OpenAI-compatible chat completions API). Only the event title and text are sent. Translations are shown to visitors who view the site in another language."
+msgstr "Översätter titel och text för varje evenemang med en språkmodell på en server du väljer (vilken tjänst som helst med ett OpenAI-kompatibelt API för chat completions). Bara evenemangets titel och text skickas. Översättningarna visas för besökare som ser webbplatsen på ett annat språk."
+
+#: src/Admin/TranslationMetaBox.php
+msgid "Translations"
+msgstr "Översättningar"
+
+#: src/Admin/Admin.php
+msgid "Twice daily"
+msgstr "Två gånger om dagen"
+
+#: src/Admin/DescriptionMetaBox.php
+msgid "Two or three sentences for newsletters, emails and channel posts. The AI writes them once in Finnish and translates them. What you type here is kept. Empty a field to have the AI write it again."
+msgstr "Två eller tre meningar för nyhetsbrev, e-post och kanalinlägg. AI:n skriver dem en gång på finska och översätter dem. Det du skriver här behålls. Töm ett fält för att låta AI:n skriva det igen."
+
+#: src/Admin/EventListBlock.php
+msgid "Two separate, independently styleable Query Loops - one for upcoming events, one for past - each under its own heading, built from ordinary blocks so the layout can be freely rearranged, restyled, or removed."
+msgstr "Två separata Query Loops som kan stylas var för sig – en för kommande evenemang, en för tidigare – var och en under sin egen rubrik, byggda av vanliga block så att layouten fritt kan ändras, stylas om eller tas bort."
+
+#: src/Admin/DjsPage.php
+msgid "Typed here"
+msgstr "Inskrivet här"
+
+#: templates/admin/settings.php
+msgid "Uninstalling"
+msgstr "Avinstallation"
+
+#: src/Admin/EventListBlock.php
+msgid "Upcoming events"
+msgstr "Kommande evenemang"
+
+#: src/Content/EventPostType.php
+msgid "Uploaded to this event"
+msgstr "Uppladdat till detta evenemang"
+
+#: src/Content/EventPostType.php src/blocks/event-field/index.js
+msgid "Venue"
+msgstr "Plats"
+
+#: templates/frontend/events-list.php
+msgid "Venue:"
+msgstr "Plats:"
+
+#: src/Content/EventPostType.php
+msgid "View Event"
+msgstr "Visa evenemang"
+
+#: src/Content/EventPostType.php
+msgid "Visibility"
+msgstr "Synlighet"
+
+#: templates/admin/djs.php
+msgid "When a DJ name or other spelling appears as whole words in an event title or text (case and accents do not matter), the event gets the DJ links for each service it has no link for yet, and its player is updated. A link typed on the event itself is never replaced. After every change here, all future events are checked again."
+msgstr "När ett DJ-namn eller en annan stavning finns som hela ord i ett evenemangs titel eller text (versaler och accenter spelar ingen roll), får evenemanget DJ:ns länkar för varje tjänst det inte har någon länk till än, och dess spelare uppdateras. En länk som skrivits in på själva evenemanget ersätts aldrig. Efter varje ändring här kontrolleras alla kommande evenemang igen."
+
+#: templates/admin/settings.php
+msgid "When enabled, EventMesh will try to sync sources automatically in the background."
+msgstr "När detta är på försöker EventMesh synka källorna automatiskt i bakgrunden."
+
+#: src/blocks/ticket-button/index.js
+msgid "When on, the button shows the event price if one is known, otherwise the label below. When off, it always shows the label."
+msgstr "När detta är på visar knappen evenemangets pris om det är känt, annars etiketten nedan. När det är av visas alltid etiketten."
+
+#: templates/admin/diagnostics.php
+msgid "WordPress"
+msgstr "WordPress"
+
+#: src/Admin/DescriptionMetaBox.php
+msgid "Write again with the AI (keeps the translations edited by hand)"
+msgstr "Skriv om med AI:n (behåller översättningar som redigerats för hand)"
+
+#: src/Admin/DescriptionMetaBox.php
+msgid "Written by the AI."
+msgstr "Skriven av AI:n."
+
+#: src/Admin/SettingsPage.php src/Admin/TranslationMetaBox.php
+msgid "You do not have permission to do this."
+msgstr "Du har inte behörighet att göra detta."
+
+#: src/Admin/DjsPage.php
+msgid "You do not have permission to edit DJs."
+msgstr "Du har inte behörighet att redigera DJ:s."
+
+#: src/Admin/Admin.php
+msgid "You do not have permission to run this action."
+msgstr "Du har inte behörighet att köra den här åtgärden."
+
+#: src/Admin/SourcesPage.php
+msgid "You do not have permission to save sources."
+msgstr "Du har inte behörighet att spara källor."
+
+#: src/Admin/SettingsPage.php
+msgid "You do not have permission to save this setting."
+msgstr "Du har inte behörighet att spara den här inställningen."
+
+#: src/Admin/EventListBlock.php
+msgid "calendar"
+msgstr "kalender"
+
+#: src/Admin/SourcesPage.php
+msgid "date unknown"
+msgstr "okänt datum"
+
+#: src/Admin/EventListBlock.php
+msgid "events"
+msgstr "evenemang"
+
+#: templates/admin/diagnostics.php
+msgid "false (WordPress spawns WP-Cron itself, via loopback)"
+msgstr "false (WordPress startar WP-Cron själv, via loopback)"
+
+#: templates/admin/diagnostics.php
+msgid "fastcgi_finish_request"
+msgstr "fastcgi_finish_request"
+
+#: src/Admin/EventListBlock.php
+msgid "layout"
+msgstr "layout"
+
+#: src/Admin/TranslationMetaBox.php
+msgid "not detected yet"
+msgstr "inte hittat än"
+
+#: src/Admin/TranslationMetaBox.php
+msgid "not written yet"
+msgstr "inte skriven än"
+
+#: src/Admin/EventListBlock.php
+msgid "query"
+msgstr "fråga"
+
+#: src/Admin/SourcesPage.php
+msgid "sold out"
+msgstr "slutsålt"
+
+#: templates/admin/diagnostics.php
+msgid "true (WP-Cron off; needs an external trigger)"
+msgstr "true (WP-Cron av; behöver en extern utlösare)"

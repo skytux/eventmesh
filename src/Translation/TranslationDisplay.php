@@ -13,8 +13,9 @@ use EventMesh\Content\EventPostType;
  * The page language is Polylang's current language when Polylang is active,
  * else the first two letters of the request's locale. A translation is used
  * only when it exists for that language and was made from the event's
- * current original text (or was saved by a person against it); otherwise the
- * original shows. Translations that came from the model carry a small
+ * current original text (or was saved by a person against it). Without one,
+ * the site's default language comes next (its translation, or the original
+ * when the event is written in it), then the original. Translations that came from the model carry a small
  * "Automatically translated" line under the content; edited ones and the
  * original never do.
  *
@@ -135,21 +136,56 @@ final class TranslationDisplay
         $translation = null;
 
         if ($this->isFrontEnd()) {
-            $pageLang = self::currentLanguage();
-            $originalLang = TranslationStore::originalLanguage($post->ID);
-
-            if ('' !== $pageLang && '' !== $originalLang && $pageLang !== $originalLang) {
-                $candidate = TranslationStore::read($post->ID, $pageLang);
-
-                if (self::choose($pageLang, $originalLang, $candidate, TranslationStore::originalHash($post))) {
-                    $translation = $candidate;
-                }
-            }
+            $postId = $post->ID;
+            $translation = self::pick(
+                self::currentLanguage(),
+                self::defaultLanguage(),
+                TranslationStore::originalLanguage($postId),
+                TranslationStore::originalHash($post),
+                static fn (string $lang): array => TranslationStore::read($postId, $lang)
+            );
         }
 
         $this->cache[$post->ID] = $translation;
 
         return $translation;
+    }
+
+    /**
+     * The translation to show on a page in $pageLang, or null for the
+     * original. When the page language has no usable translation, the site's
+     * default language is next (its translation, or the original when the
+     * event is written in it), and the original last: a Swedish page shows an
+     * English copy of a Finnish event before it shows the Finnish text.
+     *
+     * @param \Closure(string): Translation $read Reads the stored translation for a language.
+     *
+     * @return Translation|null
+     */
+    public static function pick(
+        string $pageLang,
+        string $defaultLang,
+        string $originalLang,
+        string $currentHash,
+        \Closure $read
+    ): ?array {
+        if ('' === $pageLang || '' === $originalLang || $pageLang === $originalLang) {
+            return null;
+        }
+
+        foreach (array_unique([$pageLang, $defaultLang]) as $lang) {
+            if ('' === $lang || $lang === $originalLang) {
+                return null;
+            }
+
+            $candidate = $read($lang);
+
+            if (self::choose($lang, $originalLang, $candidate, $currentHash)) {
+                return $candidate;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -184,6 +220,23 @@ final class TranslationDisplay
         }
 
         return LlmSettings::languageCode(determine_locale());
+    }
+
+    /**
+     * The site's default language as a two-letter code: Polylang's default
+     * language when Polylang is active, else the site locale's.
+     */
+    public static function defaultLanguage(): string
+    {
+        if (function_exists('pll_default_language')) {
+            $slug = pll_default_language('slug');
+
+            if (is_string($slug) && '' !== $slug) {
+                return LlmSettings::languageCode($slug);
+            }
+        }
+
+        return LlmSettings::languageCode(get_locale());
     }
 
     public static function label(): string
