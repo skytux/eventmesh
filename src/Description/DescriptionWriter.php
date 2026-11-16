@@ -39,7 +39,7 @@ final class DescriptionWriter
     private const MAX_DJ_DESCRIPTION = 1200;
     private const MAX_WORDS = 2000;
 
-    /** The site's words and style, from the plugin that sends the texts (EventCrew). */
+    /** The site's words and style, from the plugin that sends the texts (Talkoola, formerly EventCrew). */
     public const WORDS_FILTER = 'eventmesh/description_words';
 
     /** A line with one of these is left out of what the model is sent, and a text with one is not kept. */

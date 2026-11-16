@@ -4,7 +4,7 @@ Tags: events, sync, holvi, gutenberg, event list
 Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 1.10.17
+Stable tag: 1.10.18
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -136,6 +136,9 @@ No. The only outgoing requests are the ones described under External services, a
 
 == Changelog ==
 
+= 1.10.18 =
+* Comments name the sister plugin by its new name, Talkoola (formerly EventCrew). No change in behaviour.
+
 = 1.10.17 =
 * Swedish translation. An event with no translation in the page language shows the site default language before the original.
 
@@ -248,6 +251,9 @@ No. The only outgoing requests are the ones described under External services, a
 * Built-in dummy/test source (enable in Sources) for demos.
 
 == Upgrade Notice ==
+
+= 1.10.18 =
+No settings change.
 
 = 1.10.6 =
 No database schema change.

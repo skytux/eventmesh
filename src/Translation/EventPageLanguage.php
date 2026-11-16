@@ -13,7 +13,7 @@ use EventMesh\Content\EventPostType;
  * Events are not translated by Polylang, so their addresses (/events/...)
  * have no language in them and Polylang would show every event page in the
  * default language: English menus, English texts, an English copy of a
- * Finnish event. The rule here, the same as EventCrew's crew page:
+ * Finnish event. The rule here, the same as Talkoola's crew page:
  *
  * 1. A Polylang language in the address (/fi/...) wins; nothing changes.
  * 2. A link to an event from a page with a language carries that language as

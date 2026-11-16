@@ -122,7 +122,7 @@ final class EventSynchronizerTest extends TestCase
     }
 
     /**
-     * The only contract EventCrew - or any other plugin - can build on: a
+     * The only contract Talkoola - or any other plugin - can build on: a
      * new event fires with isNew true, exactly once, with the real post id.
      */
     public function testFiresEventSyncedWithIsNewTrueOnInsert(): void

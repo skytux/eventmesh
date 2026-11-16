@@ -13,8 +13,8 @@ namespace EventMesh\Support;
  *
  *     add_filter('eventmesh/integrations', function (array $integrations): array {
  *         $integrations[] = [
- *             'id'     => 'eventcrew',
- *             'label'  => 'EventCrew',
+ *             'id'     => 'talkoola',
+ *             'label'  => 'Talkoola',
  *             'status' => 'Connected — auto-creating tasks',
  *         ];
  *         return $integrations;

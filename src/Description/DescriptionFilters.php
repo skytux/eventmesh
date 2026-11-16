@@ -7,7 +7,7 @@ namespace EventMesh\Description;
 use EventMesh\Content\EventPostType;
 
 /**
- * The descriptions for other plugins (EventCrew), through filters only, so
+ * The descriptions for other plugins (Talkoola), through filters only, so
  * they need no EventMesh class:
  *
  * - `eventmesh/event_description` ('', $postId, $lang): the text in that
